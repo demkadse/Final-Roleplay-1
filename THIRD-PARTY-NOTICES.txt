@@ -1,0 +1,39 @@
+FRP1 - bundled third-party software
+==================================
+
+This document applies only to the third-party components listed below. It
+does not select or grant a license for FRP1 itself.
+
+The release includes the following Microsoft NuGet components, version
+10.0.14. Their complete license and third-party notices are included under
+LICENSES/<package-id>/10.0.14/ in the release archive.
+
+System.Drawing.Common
+  https://www.nuget.org/packages/System.Drawing.Common/10.0.14
+  Assemblies: System.Drawing.Common.dll, System.Private.Windows.Core.dll,
+              System.Private.Windows.GdiPlus.dll
+  License: MIT; LICENSE.TXT and THIRD-PARTY-NOTICES.TXT from the NuGet package.
+
+Microsoft.Win32.SystemEvents
+  https://www.nuget.org/packages/Microsoft.Win32.SystemEvents/10.0.14
+  Assemblies: Microsoft.Win32.SystemEvents.dll and its Windows runtime asset.
+  License: MIT; THIRD-PARTY-NOTICES.TXT from the NuGet package.
+
+System.Security.Cryptography.ProtectedData
+  https://www.nuget.org/packages/System.Security.Cryptography.ProtectedData/10.0.14
+  Assembly: System.Security.Cryptography.ProtectedData.dll
+  License: MIT; THIRD-PARTY-NOTICES.TXT from the NuGet package.
+
+The latter two packages declare MIT in their NuGet metadata but do not
+include a separate LICENSE.TXT. Their included LICENSE.TXT is the complete
+official .NET Runtime MIT license from their recorded source repository
+commit, without modification:
+  https://github.com/dotnet/dotnet/blob/0427b9abbead3fa64c6655eb4290c537397131fa/src/runtime/LICENSE.TXT
+
+The original runtime license is also retained in the source tree as
+LICENSES/dotnet-runtime-10.0.14-LICENSE.TXT. All bundled notices are copied
+verbatim; the public package URLs above are provenance information, not
+network services used by the plugin or the offline packaging scripts.
+
+Dalamud and its game-provided dependencies are not distributed in this
+release. Build-only NuGet tools are not part of the installed package.

@@ -1,0 +1,14 @@
+<Project Sdk="Dalamud.NET.Sdk/15.0.0">
+  <PropertyGroup>
+    <Version>0.1.0</Version>
+    <Author>FRP1 Contributors</Author>
+    <Name>Final Roleplay 1</Name>
+    <Punchline>Lokale Rollenspielprofile für FFXIV.</Punchline>
+    <Description>Rollenspielprofile mit lokalem Editor, Profiljournal, Symbolen und Portraits, privaten Kontakten und freiwilligen verschlüsselten Direktverbindungen. Ohne Registrierung, zentrale Profildatenbank oder Telemetrie. Verbindungen hängen von erreichbaren lokalen Adressen und den jeweiligen Netzwerken ab.</Description>
+    <Tags>roleplay;profile;rp</Tags>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FRP1.Core\FRP1.Core.csproj" />
+    <PackageReference Include="System.Drawing.Common" Version="10.0.14" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Drawing.Common" Version="10.0.14" />
+    <ProjectReference Include="../../src/FRP1.Core/FRP1.Core.csproj" />
+    <Compile Include="../../src/FRP1.Plugin/AudienceSettings.cs" Link="Plugin/AudienceSettings.cs" />
+    <Compile Include="../../src/FRP1.Plugin/ProfileDetailsDraft.cs" Link="Plugin/ProfileDetailsDraft.cs" />
+    <Compile Include="../../src/FRP1.Plugin/UsageGuidelines.cs" Link="Plugin/UsageGuidelines.cs" />
+    <Compile Include="../../src/FRP1.Plugin/UsageAcknowledgementStore.cs" Link="Plugin/UsageAcknowledgementStore.cs" />
+    <Compile Include="../../src/FRP1.Plugin/Theming/ThemeCatalog.cs" Link="Plugin/Theming/ThemeCatalog.cs" />
+    <Compile Include="../../src/FRP1.Plugin/Theming/ThemePreferences.cs" Link="Plugin/Theming/ThemePreferences.cs" />
+    <Compile Include="../../src/FRP1.Plugin/Theming/ThemeSettingsStore.cs" Link="Plugin/Theming/ThemeSettingsStore.cs" />
+    <Compile Include="../../src/FRP1.Plugin/ThemeSession.cs" Link="Plugin/ThemeSession.cs" />
+    <Compile Include="../../src/FRP1.Plugin/RpBar/RpBarPreferences.cs" Link="Plugin/RpBar/RpBarPreferences.cs" />
+    <Compile Include="../../src/FRP1.Plugin/RpBar/RpBarSettingsStore.cs" Link="Plugin/RpBar/RpBarSettingsStore.cs" />
+    <Compile Include="../../src/FRP1.Plugin/RpBar/RpBarGeometry.cs" Link="Plugin/RpBar/RpBarGeometry.cs" />
+    <Compile Include="../../src/FRP1.Plugin/RpBar/OwnProfileSession.cs" Link="Plugin/RpBar/OwnProfileSession.cs" />
+    <Compile Include="../../src/FRP1.Plugin/HelpContent.cs" Link="Plugin/HelpContent.cs" />
+    <Compile Include="../../src/FRP1.Plugin/Profiles/SafeRichText.cs" Link="Plugin/Profiles/SafeRichText.cs" />
+    <Compile Include="../../src/FRP1.Plugin/Profiles/ProfileReader.cs" Link="Plugin/Profiles/ProfileReader.cs" />
+    <Compile Include="../../src/FRP1.Plugin/Profiles/GlanceTemplates.cs" Link="Plugin/Profiles/GlanceTemplates.cs" />
+    <Compile Include="../../src/FRP1.Plugin/Contacts/ContactModels.cs" Link="Plugin/Contacts/ContactModels.cs" />
+    <Compile Include="../../src/FRP1.Plugin/Contacts/ContactStore.cs" Link="Plugin/Contacts/ContactStore.cs" />
+    <Compile Include="../../src/FRP1.Plugin/Contacts/RegisterSession.cs" Link="Plugin/Contacts/RegisterSession.cs" />
+    <Compile Include="../../src/FRP1.Plugin/Presentation/PresentationResolver.cs" Link="Plugin/Presentation/PresentationResolver.cs" />
+    <Compile Include="../../src/FRP1.Plugin/Networking/NetworkAdapters.cs" Link="Plugin/Networking/NetworkAdapters.cs" />
+    <Compile Include="../../src/FRP1.Plugin/Networking/NetworkSession.cs" Link="Plugin/Networking/NetworkSession.cs" />
+    <Compile Include="../../src/FRP1.Plugin/Utility/LocalJsonFile.cs" Link="Plugin/Utility/LocalJsonFile.cs" />
+    <Compile Include="../../src/FRP1.Plugin/Utility/LocalPreferences.cs" Link="Plugin/Utility/LocalPreferences.cs" />
+    <Compile Include="../../src/FRP1.Plugin/Utility/ProfileReference.cs" Link="Plugin/Utility/ProfileReference.cs" />
+    <Compile Include="../../src/FRP1.Plugin/Utility/RpTextDraft.cs" Link="Plugin/Utility/RpTextDraft.cs" />
+    <Compile Include="../../src/FRP1.Plugin/Automation/AutomationPreferences.cs" Link="Plugin/Automation/AutomationPreferences.cs" />
+    <Compile Include="../../src/FRP1.Plugin/Automation/AutomationSettingsStore.cs" Link="Plugin/Automation/AutomationSettingsStore.cs" />
+    <Compile Include="../../src/FRP1.Plugin/Automation/AutomationEngine.cs" Link="Plugin/Automation/AutomationEngine.cs" />
+    <Compile Include="../../src/FRP1.Plugin/Localization/UiText.cs" Link="Plugin/Localization/UiText.cs" />
+    <Compile Include="../../src/FRP1.Plugin/Localization/LanguageSettingsStore.cs" Link="Plugin/Localization/LanguageSettingsStore.cs" />
+    <Compile Include="../../src/FRP1.Plugin/Localization/LanguageSession.cs" Link="Plugin/Localization/LanguageSession.cs" />
+    <Compile Include="../../src/FRP1.Plugin/UiProfiles/ExtendedProfileDraft.cs" Link="Plugin/UiProfiles/ExtendedProfileDraft.cs" />
+    <Compile Include="../../src/FRP1.Plugin/UiProfiles/PortraitNormalizer.cs" Link="Plugin/UiProfiles/PortraitNormalizer.cs" />
+    <Compile Include="../../src/FRP1.Plugin/UiSocial/SocialUiOptions.cs" Link="Plugin/UiSocial/SocialUiOptions.cs" />
+    <Compile Include="../../src/FRP1.Plugin/UiSocial/SocialUiRules.cs" Link="Plugin/UiSocial/SocialUiRules.cs" />
+    <Compile Include="../../src/FRP1.Plugin/GameIntegration/GameDisplayModels.cs" Link="Plugin/GameIntegration/GameDisplayModels.cs" />
+    <Compile Include="../../src/FRP1.Plugin/GameIntegration/GamePresentationOptions.cs" Link="Plugin/GameIntegration/GamePresentationOptions.cs" />
+  </ItemGroup>
+</Project>

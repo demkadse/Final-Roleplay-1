@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="src/FRP1.Core/FRP1.Core.csproj" />
+  <Project Path="src/FRP1.Plugin/FRP1.Plugin.csproj" />
+  <Project Path="tools/FRP1.Probe/FRP1.Probe.csproj" />
+  <Project Path="tests/FRP1.Core.Tests/FRP1.Core.Tests.csproj" />
+</Solution>

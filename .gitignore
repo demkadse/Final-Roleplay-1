@@ -1,0 +1,10 @@
+**/bin/
+**/obj/
+.vs/
+.idea/
+*.user
+*.pfx
+*.p12
+*.key
+.frp1/
+.release-staging/
