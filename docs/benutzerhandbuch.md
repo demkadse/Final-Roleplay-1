@@ -1,8 +1,8 @@
 # FRP1 – Benutzerhandbuch
 
-Stand: 2026-11-11 · vorbereiteter früher öffentlicher Teststand 0.1.0.0.
+Stand: 2026-11-11 · veröffentlichter früher öffentlicher Teststand 0.1.0.0 (Prerelease).
 
-**Veröffentlichungsvorbereitung:** Der Quellcode ist bereits im bestehenden Repository `demkadse/Final-Roleplay-1` auf Branch `master` hochgeladen; das Repository ist derzeit privat. Öffentliche Freigabe, Installerindex und Releasepaket sind noch nicht als öffentlich erreichbar bestätigt. Die folgenden Installationsschritte gelten danach. Der geprüfte Codestand besteht 467 Tests und unabhängiges Review; eine echte Spiel-/LAN-/Internetabnahme steht noch aus.
+**Veröffentlicht:** Das bestehende Repository `demkadse/Final-Roleplay-1`, Branch `master`, ist öffentlich und MIT-lizenziert. Installerindex und Releasepaket sind ohne Anmeldung erreichbar und geprüft. Der zuvor geprüfte Codestand besteht 467 Tests und unabhängiges Review; zusätzlich bestehen 33 Offline-Paketprüfungen ohne Fehler. Eine echte Spiel-/LAN-/Internetabnahme steht noch aus.
 
 ## 1. Was FRP1 ist
 
@@ -12,13 +12,13 @@ FRP1 speichert Profile auf den beteiligten Rechnern. Es gibt **keinen FRP1-Profi
 
 Private Notizen, Beziehungen, Favoriten, lokale Content-IDs, eigene Zuordnungen, Altersauswahl, Besuchsverlauf und Einstellungen bleiben lokal und werden gar nicht mit anderen Clients geteilt. Die Profildarstellung einer anderen Person kommt aus dem direkten Austausch oder deinem lokalen Cache, nicht aus einer Website. Es gibt keinen FRP1-IP-Broker oder automatischen Vermittlungsdienst.
 
-GitHub liefert ausschließlich Plugin-Dateien, Quelltext und den Installerindex. **Für Installation und Benutzung brauchst du kein GitHub-Konto.** Die geplanten öffentlichen JSON-/ZIP-Downloads sind nach Veröffentlichung ohne Anmeldung verfügbar. FFXIV und Softwaredownloads nutzen ihre üblichen Dienste; sie werden nicht zu FRP1-Profildatenservern.
+GitHub liefert ausschließlich Plugin-Dateien, Quelltext und den Installerindex. **Für Installation und Benutzung brauchst du kein GitHub-Konto.** Die öffentlichen JSON-/ZIP-Downloads sind ohne Anmeldung verfügbar. FFXIV und Softwaredownloads nutzen ihre üblichen Dienste; sie werden nicht zu FRP1-Profildatenservern.
 
 ## 2. Voraussetzungen und Installation
 
 Du brauchst einen Windows-FFXIV-Client mit XIVLauncher/Dalamud und kompatibler Dalamud API 15. FRP1 ist kein eigenständig startbares Programm und kein Plugin für Konsolen ohne Dalamud-Client. Für die normale Installation musst du keinen Quellcode bauen oder .NET-SDK einrichten.
 
-Geplante Installeradresse:
+Installeradresse:
 
 ```text
 https://raw.githubusercontent.com/demkadse/Final-Roleplay-1/master/repo.json
@@ -34,7 +34,7 @@ https://raw.githubusercontent.com/demkadse/Final-Roleplay-1/master/repo.json
 
 In das Repositoryfeld gehört die `repo.json`-Adresse, nicht die GitHub-Startseite und nicht das ZIP. Das normale Verfahren beschreibt die [offizielle Dalamud-Dokumentation](https://dalamud.dev/plugin-publishing/custom-repositories/).
 
-Das Release verwendet Tag `v0.1.0.0` und Asset `FRP1-0.1.0.0.zip` im bestehenden [demkadse/Final-Roleplay-1](https://github.com/demkadse/Final-Roleplay-1), Branch `master`. Solange die öffentliche Verteilung noch vorbereitet wird, ist eine nicht erreichbare Datei kein bestätigter Installationsfehler deines Rechners.
+Das veröffentlichte [Release v0.1.0.0](https://github.com/demkadse/Final-Roleplay-1/releases/tag/v0.1.0.0) enthält [FRP1-0.1.0.0.zip](https://github.com/demkadse/Final-Roleplay-1/releases/download/v0.1.0.0/FRP1-0.1.0.0.zip) und [SHA256SUMS](https://github.com/demkadse/Final-Roleplay-1/releases/download/v0.1.0.0/SHA256SUMS) im bestehenden [Projekt](https://github.com/demkadse/Final-Roleplay-1), Branch `master`. Es ist als früher Teststand/Prerelease markiert. Normale Installation erfolgt über den JSON-Index; das ZIP muss dafür nicht manuell entpackt werden.
 
 ## 3. Erststart: Regeln und tatsächliches Alter
 
@@ -231,7 +231,7 @@ Hinweisbestätigung bleibt versionsgebunden lokal gespeichert. Altersauswahl ist
 
 | Problem | Prüfen |
 |---|---|
-| Repository/Plugin erscheint nicht | Ist die Veröffentlichung bereits bestätigt? Vollständige raw-`repo.json`-Adresse statt GitHub-Seite/ZIP, Eintrag aktiviert und gespeichert, Liste neu geladen, API 15 kompatibel? |
+| Repository/Plugin erscheint nicht | Vollständige raw-`repo.json`-Adresse statt GitHub-Seite/ZIP, Eintrag aktiviert und gespeichert, Liste neu geladen, API 15 kompatibel? Die öffentliche JSON-/ZIP-Erreichbarkeit wurde zur Veröffentlichung geprüft; spätere Netz-/GitHub-Störungen sind davon getrennt. |
 | Hinweise/Alterswahl blockieren | Checkbox aktiv gesetzt, Bestätigung erfolgreich gespeichert, Alterswahl für diese neue Sitzung getroffen? Fehlerhafte Bestätigung gibt keinen Zugriff frei. |
 | Profil kann nicht gespeichert werden | Pflichtname, richtige Inhaltsfreigabe, Text-/Bild-/Gesamtgrenzen; alte Entwurfsversion oder laufender Vorgang? Entwurf klären und Fehlermeldung beachten. |
 | Kein aktives Profil | Zuerst lokal speichern, dann ausdrücklich in der eigenen Leiste für den aktuellen Charakter auswählen. |
@@ -258,6 +258,8 @@ Deaktivieren und lokale Daten löschen sind getrennte Entscheidungen. Eine Deins
 ## 16. Was geprüft ist und was noch offen bleibt
 
 Der Codestand besteht 467 automatisierte Tests, den vollständigen Release-Build ohne Warnungen/Fehler und unabhängiges Review ohne kritische oder wichtige Restbefunde. Die zusätzliche Probe besteht acht Gruppen mit echten Loopback-TLS-Clients.
+
+Für die Veröffentlichung bestehen separat 33 Offline-Paketprüfungen ohne Fehler und ein Paketbuilder ohne Warnungen/Fehler. JSON und ZIP wurden anonym mit HTTP 200 geprüft; der ZIP-Hash stimmt mit dem geprüften Kandidaten überein. Das war keine erneute Ausführung der 467 Funktionstests und keine reale Spiel-/Netzabnahme.
 
 Reale Spielbedienung, Darstellung, LAN/Internet/NAT/CGNAT und umfangreiche Belastung sind noch nicht abgenommen. Es gibt keine Garantie, dass zwei beliebige Netze ohne weitere Infrastruktur eine direkte Verbindung erlauben.
 

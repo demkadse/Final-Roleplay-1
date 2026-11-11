@@ -4,7 +4,7 @@
 
 FRP1 ist ein Dalamud-Plugin für Charakterbeschreibungen, erste Eindrücke, RP-Status und Kontakte. Es orientiert sich beim Bedienkonzept an Total RP 3 und übernimmt die lokal beziehungsweise direkt zwischen Clients umsetzbaren Funktionen von Glance in einer eigenen FFXIV-Oberfläche.
 
-**Stand: 2026-11-11 – früher Teststand 0.1.0.0.** Der Quellcode liegt bereits im bestehenden privaten GitHub-Repository; öffentliche Freigabe und Installerverteilung werden vorbereitet. Der Code besteht 467 Tests, Release-Build und unabhängiges Review. Eine tatsächliche Spielabnahme und reale LAN-/Internet-/NAT-Abnahme sind noch nicht erfolgt.
+**Stand: 2026-11-11 – veröffentlicht als früher öffentlicher Teststand 0.1.0.0 (Prerelease).** Repository, MIT-Lizenz, Installerindex und Releasepaket sind öffentlich verfügbar. Der geprüfte Code besteht 467 Tests, Release-Build und unabhängiges Review; zusätzlich bestehen 33 Offline-Paketprüfungen. Eine tatsächliche Spielabnahme und reale LAN-/Internet-/NAT-Abnahme sind noch nicht erfolgt.
 
 ## Kein zentraler Server für deine Profile
 
@@ -31,9 +31,9 @@ Das Diagramm zeigt die FRP1-Datenwege. FFXIV-Spielverkehr ist kein FRP1-Profiltr
 
 ## Installation über die .json-Adresse
 
-**Der Quellcode ist bereits hochgeladen, das bestehende Repository jedoch noch privat. Öffentliche Freigabe, Installerindex und Releasepaket werden vorbereitet und sind noch nicht als öffentlich erreichbar bestätigt.** Die Anleitung gilt nach erfolgreicher öffentlicher Freigabe.
+**FRP1 ist veröffentlicht:** Das bestehende Repository ist öffentlich, und Installerindex sowie Releasepaket sind ohne Anmeldung erreichbar.
 
-Für Installation und Benutzung ist **kein GitHub-Konto** erforderlich. Nach Veröffentlichung können die öffentliche JSON-Datei und das ZIP-Paket ohne Anmeldung heruntergeladen werden; FRP1 verlangt ebenfalls kein Konto.
+Für Installation und Benutzung ist **kein GitHub-Konto** erforderlich. Die öffentliche JSON-Datei und das ZIP-Paket können ohne Anmeldung heruntergeladen werden; FRP1 verlangt ebenfalls kein Konto.
 
 Installeradresse für **Custom Plugin Repositories**:
 
@@ -50,7 +50,7 @@ https://raw.githubusercontent.com/demkadse/Final-Roleplay-1/master/repo.json
 
 Die GitHub-Projektseite oder eine ZIP-Adresse gehört nicht in das Repositoryfeld. Der Index ist eine JSON-Liste, aus der Dalamud die eigentlichen Installations-/Updatepakete lädt. Grundlage ist das [offizielle Dalamud-Verfahren für eigene Repositories](https://dalamud.dev/plugin-publishing/custom-repositories/).
 
-Bestehendes Projekt: [demkadse/Final-Roleplay-1](https://github.com/demkadse/Final-Roleplay-1), Branch `master`. Vorgesehen sind Tag `v0.1.0.0` und Paket `FRP1-0.1.0.0.zip`. Die öffentliche Erreichbarkeit dieser Installerverteilung ist noch nicht bestätigt; es wird kein separates Repository angelegt.
+Projekt: [demkadse/Final-Roleplay-1](https://github.com/demkadse/Final-Roleplay-1), Branch `master`. Das [Release v0.1.0.0](https://github.com/demkadse/Final-Roleplay-1/releases/tag/v0.1.0.0) enthält [FRP1-0.1.0.0.zip](https://github.com/demkadse/Final-Roleplay-1/releases/download/v0.1.0.0/FRP1-0.1.0.0.zip) und [SHA256-Prüfsummen](https://github.com/demkadse/Final-Roleplay-1/releases/download/v0.1.0.0/SHA256SUMS). Das Release ist ausdrücklich als früher Teststand/Prerelease markiert.
 
 ## Die ersten Minuten
 
@@ -124,6 +124,8 @@ Softwareupdates laufen über den normalen Dalamud-Installer und die Repositoryad
 
 Der geprüfte Codestand besteht **467/467 Tests**, ohne Fehler oder übersprungene Tests, einen vollständigen Release-Build mit **0 Warnungen/0 Fehlern** und das abschließende unabhängige Review ohne kritische oder wichtige Restbefunde. Die separate Probe besteht acht Gruppen mit zwei echten Loopback-TLS-Clients.
 
+Für die Veröffentlichung bestehen zusätzlich **33 Offline-Paketprüfungen ohne Fehler**. Der öffentliche ZIP-Download wurde anonym mit HTTP 200 geladen und seine SHA-256-Prüfsumme gegen das geprüfte Paket bestätigt; die öffentliche JSON-Adresse liefert einen gültigen Installerindex für Version 0.1.0.0/API 15. Das ist eine Distributionsprüfung, keine erneute Ausführung der 467 Funktionstests und keine Spiel-/Netzabnahme.
+
 **Nicht tatsächlich abgenommen:** Bedienung/Renderdarstellung im laufenden Spiel, reales LAN/Internet, NAT/CGNAT und umfangreiche Belastung. Dies ist ein früher Teststand, keine Zusicherung reibungsloser Verbindung zwischen beliebigen zwei Spielern.
 
 Taschen/Inventar und TRP3 Extended sind ausgeschlossen. WoW-/MSP-Import, Musik und lokale UI-Klick-/Bestätigungstöne sind nicht implementiert. RP-Sprachen sind Profilangaben, kein Eingriff in Spielsprache. NPC-Werkzeuge sind ausschließlich lokale Textentwürfe, keine NPC-Imitation oder Chatautomation.
@@ -138,7 +140,7 @@ dotnet test FRP1.slnx -c Release --nologo -p:BuildInParallel=false
 dotnet run --project tools/FRP1.Probe -c Release -- --self-test
 ```
 
-Release-Ausgaben aus dem Entwicklungsbuild: `src/FRP1.Plugin/bin/Release/FRP1.Plugin.dll` und `src/FRP1.Plugin/bin/Release/FRP1.Plugin/latest.zip`. Die Veröffentlichungsvorbereitung verwendet das geplante Paket `FRP1-0.1.0.0.zip`.
+Release-Ausgaben aus dem Entwicklungsbuild: `src/FRP1.Plugin/bin/Release/FRP1.Plugin.dll` und `src/FRP1.Plugin/bin/Release/FRP1.Plugin/latest.zip`. Das veröffentlichte Installerpaket heißt `FRP1-0.1.0.0.zip`.
 
 Weitere Dokumentation: [Benutzerhandbuch](docs/benutzerhandbuch.md), [Release-Notes 0.1.0.0](docs/release-notes-v0.1.0.0.md), [Status](STATUS.md), [Übergabe](HANDOFF.md), [Architektur](docs/architecture.md), [Machbarkeit](docs/feasibility.md), [TRP3-Abgleich](docs/trp3-feature-map.md), [Glance-Abgleich](docs/glance-feature-map.md), [UX/Gestaltung](docs/ux-and-vanity.md).
 

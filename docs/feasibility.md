@@ -6,7 +6,7 @@ Stand: 2026-11-11
 
 FRP1 speichert Profile lokal und tauscht sie nach Zustimmung direkt zwischen aktiven Clients aus. Der Transport ist inzwischen in der Pluginoberfläche integriert; die separate Loopback-Probe bleibt ein zusätzliches Diagnose-/Prüfwerkzeug. Dauerhafte DPAPI-Identität und gespeicherte Kopplungen ersetzen die frühere rein flüchtige Prototypidentität.
 
-Es gibt keine Registrierung, Cloudprofile, zentrale Profildatenbank, Telemetrie, Relays, STUN oder automatische externe Discovery. Der eingehende Verbindungsteil läuft im aktiven Client, kein separat betriebener Dienst. Quellenlinks dienen der Entwicklung. Der geplante GitHub-Installerindex und das ZIP dienen ausschließlich Softwareinstallation/-updates, nicht Profiltransport oder Profilspeicherung; dafür ist kein GitHub-Konto nötig.
+Es gibt keine Registrierung, Cloudprofile, zentrale Profildatenbank, Telemetrie, Relays, STUN oder automatische externe Discovery. Der eingehende Verbindungsteil läuft im aktiven Client, kein separat betriebener Dienst. Quellenlinks dienen der Entwicklung. Der öffentlich erreichbare GitHub-Installerindex und das ZIP dienen ausschließlich Softwareinstallation/-updates, nicht Profiltransport oder Profilspeicherung; dafür ist kein GitHub-Konto nötig.
 
 ## Unvermeidbare Netzwerkgrenzen
 

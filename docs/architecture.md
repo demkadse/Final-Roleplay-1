@@ -22,7 +22,7 @@ Stand: 2026-11-11. Native Module und Direkttransport sind verbunden; der vollst�
 
 Asynchrone Ergebnisse werden im UI-Lebenszyklus übernommen; Dateiarbeit und Netzwerk blockieren den Game-Thread nicht. Style-Scope und Hooks gelten nur für FRP1 und werden beim Entladen abgemeldet/zurückgenommen.
 
-Die vorbereitete GitHub-Veröffentlichung ergänzt ausschließlich die Softwareverteilung: öffentlicher `repo.json`-Installerindex und Release-ZIP für Dalamud. GitHub erhält dadurch keine FRP1-Profile oder privaten Registerdaten. Für Installation/Benutzung ist kein GitHub-Konto erforderlich; ein Softwaredownloadserver ist kein Profilbackend. Stand der tatsächlichen Veröffentlichung: [STATUS.md](../STATUS.md).
+Die veröffentlichte GitHub-Verteilung ergänzt ausschließlich die Softwareinstallation/-updates: öffentlicher `repo.json`-Installerindex und Release-ZIP für Dalamud. GitHub erhält dadurch keine FRP1-Profile oder privaten Registerdaten. Für Installation/Benutzung ist kein GitHub-Konto erforderlich; ein Softwaredownloadserver ist kein Profilbackend. Veröffentlichung und Downloadprüfung: [STATUS.md](../STATUS.md).
 
 ## Öffentliche und private Daten
 
