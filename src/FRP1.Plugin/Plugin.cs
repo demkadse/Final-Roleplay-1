@@ -64,7 +64,8 @@ public sealed class Plugin : IDalamudPlugin
         resolver = new PresentationResolver(policy, register);
         profileUi = new ProfileUiModule(policy, TextureProvider, DataManager);
         socialUi = new SocialUiModule(profileStore, ownProfiles, network, register, resolver,
-            TargetManager, ObjectTable, ContextMenu, Framework, profileUi.OpenForeign, directory, TextureProvider);
+            TargetManager, ObjectTable, ContextMenu, Framework, profileUi.OpenForeign, directory, TextureProvider,
+            () => ClientState.IsLoggedIn && !Condition[ConditionFlag.BetweenAreas] && !Condition[ConditionFlag.BetweenAreas51]);
         localTools = new LocalToolsModule(ownProfiles, directory, OpenExistingProfile, policy);
         gamePresentation = new GamePresentationModule(NamePlateGui, ChatGui, GameGui, Framework, ClientState, DataManager,
             policy, () => GamePresentationModule.CaptureAllowed(resolver, socialUi.ActorSnapshots,
@@ -72,7 +73,8 @@ public sealed class Plugin : IDalamudPlugin
         themeSession = new ThemeSession(new ThemeSettingsStore(directory));
         mainWindow = new MainWindow(profileStore, new AudienceSettings(directory),
             new UsageAcknowledgementStore(directory), themeSession, ownProfiles, profileUi, socialUi, TextureProvider);
-        rpBarWindow = new RpBarWindow(ownProfiles, mainWindow);
+        rpBarWindow = new RpBarWindow(ownProfiles, mainWindow, resolver, policy, () => socialUi.BarScene,
+            profileUi.OpenForeign, socialUi.OpenTargetDetails);
         mainWindow.RpBarWindow = rpBarWindow;
         mainWindow.LocalTools = localTools;
         mainWindow.GamePresentation = gamePresentation;

@@ -19,6 +19,15 @@ public sealed partial class SocialUiModule
     private ActorSnapshot? CurrentTarget => pinnedTarget ?? Volatile.Read(ref scene).Target;
     private void ClearPinnedTarget() { pinnedTarget = null; pinnedTargetKey = null; glanceOwner = null; foreignGlance = -1; }
 
+    public void OpenTargetDetails()
+    {
+        if (!AccessReady || Volatile.Read(ref scene).Target is not { } actor) return;
+        var view = resolver.Resolve(actor);
+        if (!view.IsReadable || view.Key is not { } key) return;
+        pinnedTarget = actor; pinnedTargetKey = key;
+        SetOptions(options with { TargetVisible = true }); targetWindow.IsOpen = true;
+    }
+
     public void DrawOverlays()
     {
         if (!AccessReady || !Volatile.Read(ref overlaysVisible) || !options.MouseoverTooltip || ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow) || ImGui.IsAnyItemActive()) return;

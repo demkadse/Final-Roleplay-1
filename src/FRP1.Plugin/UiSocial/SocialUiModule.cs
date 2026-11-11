@@ -32,6 +32,7 @@ public sealed partial class SocialUiModule : IDisposable
     private readonly IFramework framework;
     private readonly ITextureProvider? textures;
     private readonly Action<Func<ResolvedProfile?>> openForeign;
+    private readonly Func<bool>? sceneReady;
     private readonly CancellationTokenSource lifetime = new();
     private readonly ConcurrentQueue<ProfileKey> openRequests = new();
     private readonly List<UiAction> actions = [];
@@ -73,11 +74,12 @@ public sealed partial class SocialUiModule : IDisposable
     public SocialUiModule(ProfileStore profileStore, OwnProfileSession ownProfiles, NetworkSession networkSession,
         RegisterSession registerSession, PresentationResolver presentationResolver, ITargetManager targetManager,
         IObjectTable objectTable, IContextMenu contextMenus, IFramework gameFramework,
-        Action<Func<ResolvedProfile?>> openForeignProfile, string? configurationDirectory = null, ITextureProvider? textureProvider = null)
+        Action<Func<ResolvedProfile?>> openForeignProfile, string? configurationDirectory = null, ITextureProvider? textureProvider = null,
+        Func<bool>? isSceneReady = null)
     {
         profiles = profileStore; own = ownProfiles; network = networkSession; register = registerSession; resolver = presentationResolver;
         targets = targetManager; objects = objectTable; contextMenu = contextMenus; framework = gameFramework;
-        openForeign = openForeignProfile; textures = textureProvider;
+        openForeign = openForeignProfile; textures = textureProvider; sceneReady = isSceneReady;
         targetWindow = new SocialTargetWindow(this);
         notesWindow = new SocialNotesWindow(this);
         Windows = Array.AsReadOnly<Window>([targetWindow, notesWindow]);
@@ -94,6 +96,14 @@ public sealed partial class SocialUiModule : IDisposable
 
     public IReadOnlyList<Window> Windows { get; }
     public IReadOnlyList<VisibleActorSnapshot> ActorSnapshots => Volatile.Read(ref scene).Actors;
+    public RpBarSceneSnapshot BarScene
+    {
+        get
+        {
+            var captured = Volatile.Read(ref scene).BarContext ?? new(false, false, null, null);
+            return captured with { SceneValid = captured.SceneValid && AccessReady && (sceneReady?.Invoke() ?? true) };
+        }
+    }
     public SocialUiOptions Options => options;
     public bool AccessReady => !disposed && accessReady && contentId != 0 &&
         profiles.Policy.Snapshot.Selection != FRP1.Core.Safety.AudienceSelection.Unspecified;
@@ -110,6 +120,7 @@ public sealed partial class SocialUiModule : IDisposable
         if (contentId == currentContentId && accessReady == ready) return;
         if (publication.HasValue) { network.SetPublishedProfile(null); publication = null; publishedHash = null; }
         contentId = currentContentId; accessReady = ready; generation++;
+        Volatile.Write(ref scene, new SceneSnapshot([], null, null));
         selectedContact = null; ClearContactDraft();
         ClearPinnedTarget(); cacheRemovalChoice = null; cacheRemovalConfirmed = false;
         while (openRequests.TryDequeue(out _)) { }
@@ -221,7 +232,9 @@ public sealed partial class SocialUiModule : IDisposable
         if (disposed) return;
         try
         {
-            var origin = objects.LocalPlayer?.Position;
+            var local = objects.LocalPlayer;
+            var origin = local?.Position;
+            var target = targets.Target;
             var actors = objects.OfType<IPlayerCharacter>().Take(512).Select(player =>
             {
                 var actor = Snapshot(player);
@@ -229,14 +242,16 @@ public sealed partial class SocialUiModule : IDisposable
                 return actor is null ? null : new VisibleActorSnapshot(actor.Value, position,
                     origin.HasValue ? Vector3.Distance(origin.Value, position) : float.PositiveInfinity, player.HomeWorld.Value.Name.ToString());
             }).OfType<VisibleActorSnapshot>().ToArray();
-            Volatile.Write(ref scene, new SceneSnapshot(Array.AsReadOnly(actors), Snapshot(targets.Target),
-                Snapshot(targets.MouseOverTarget ?? targets.MouseOverNameplateTarget)));
+            var localActor = Snapshot(local);
+            Volatile.Write(ref scene, new SceneSnapshot(Array.AsReadOnly(actors), Snapshot(target),
+                Snapshot(targets.MouseOverTarget ?? targets.MouseOverNameplateTarget),
+                new RpBarSceneSnapshot(localActor.HasValue && (sceneReady?.Invoke() ?? true), target is not null, Snapshot(target), localActor)));
         }
         catch (Exception ex) when (ex is InvalidOperationException or ObjectDisposedException)
         { Volatile.Write(ref scene, new SceneSnapshot([], null, null)); }
     }
 
-    private static ActorSnapshot? Snapshot(IGameObject? value) => value is IPlayerCharacter player
+    private static ActorSnapshot? Snapshot(IGameObject? value) => value is IPlayerCharacter player && player.IsValid()
         ? new ActorSnapshot(player.Name.TextValue, player.HomeWorld.RowId, player.EntityId) : null;
 
     private void OnContextMenu(IMenuOpenedArgs args)
@@ -327,5 +342,6 @@ public sealed partial class SocialUiModule : IDisposable
     }
 
     private sealed record UiAction(Task Task, Action? OnSuccess, long Generation);
-    private sealed record SceneSnapshot(IReadOnlyList<VisibleActorSnapshot> Actors, ActorSnapshot? Target, ActorSnapshot? Mouseover);
+    private sealed record SceneSnapshot(IReadOnlyList<VisibleActorSnapshot> Actors, ActorSnapshot? Target, ActorSnapshot? Mouseover,
+        RpBarSceneSnapshot? BarContext = null);
 }

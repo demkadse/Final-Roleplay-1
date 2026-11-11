@@ -31,7 +31,9 @@ public sealed partial class ProfileUiModule
         portraitFeedback = null;
     }
 
-    public void DrawEditor(ExtendedProfileDraft draft, Action changed, ContentRating? contentRating = null)
+    public Action<string, string>? HelpHeading { get; set; }
+
+    private bool PrepareEditor(ExtendedProfileDraft draft, Action changed, ContentRating? contentRating)
     {
         ArgumentNullException.ThrowIfNull(draft);
         ArgumentNullException.ThrowIfNull(changed);
@@ -43,60 +45,64 @@ public sealed partial class ProfileUiModule
             editorRating = rating;
         }
         draftChanged = changed;
-        if (!EditorAllowed()) { Wrapped(ProfileUiText.Get("Die Profilbearbeitung ist für die aktuelle Freigabe gesperrt.")); return; }
-        if (ImGui.CollapsingHeader(ProfileUiText.Id("Weitere Charakterdaten")))
+        return EditorAllowed();
+    }
+
+    // Kept as the narrow character-fields entry point for existing host callers.
+    public void DrawEditor(ExtendedProfileDraft draft, Action changed, ContentRating? contentRating = null) =>
+        DrawCharacterData(draft, changed, contentRating);
+
+    public void DrawCharacterData(ExtendedProfileDraft draft, Action changed, ContentRating? contentRating = null)
+    {
+        if (!PrepareEditor(draft, changed, contentRating)) return;
+        if (ImGui.InputText(ProfileUiText.Id("Augenfarbe"), ref draft.EyeColor, 320)) changed();
+        if (ImGui.InputText(ProfileUiText.Id("Größe"), ref draft.Height, 320)) changed();
+        if (ImGui.InputText(ProfileUiText.Id("Gewicht"), ref draft.Weight, 320)) changed();
+        if (ImGui.InputText(ProfileUiText.Id("Geburtsort"), ref draft.Birthplace, 640)) changed();
+        if (ImGui.InputText(ProfileUiText.Id("Wohnort"), ref draft.Residence, 640)) changed();
+        Wrapped(ProfileUiText.Get("RP-Sprachen: eine frei beschriebene Sprache je Zeile, höchstens zwölf."));
+        if (ImGui.InputTextMultiline("##RpLanguages", ref draft.LanguagesText, 4096, new Vector2(-1, 85))) changed();
+    }
+
+    public void DrawExperience(ExtendedProfileDraft draft, Action changed, ContentRating? contentRating = null)
+    {
+        if (!PrepareEditor(draft, changed, contentRating)) return;
+        Wrapped(ProfileUiText.Get("Diese Angaben sind Gesprächshinweise. Sie erteilen keine Einwilligung und keine Altersfreigabe."));
+        if (ImGui.BeginCombo(ProfileUiText.Id("RP-Erfahrung"), Experience(draft.Preferences.Experience)))
         {
-            if (ImGui.InputText(ProfileUiText.Id("Augenfarbe"), ref draft.EyeColor, 320)) changed();
-            if (ImGui.InputText(ProfileUiText.Id("Größe"), ref draft.Height, 320)) changed();
-            if (ImGui.InputText(ProfileUiText.Id("Gewicht"), ref draft.Weight, 320)) changed();
-            if (ImGui.InputText(ProfileUiText.Id("Geburtsort"), ref draft.Birthplace, 640)) changed();
-            if (ImGui.InputText(ProfileUiText.Id("Wohnort"), ref draft.Residence, 640)) changed();
-            Wrapped(ProfileUiText.Get("RP-Sprachen: eine frei beschriebene Sprache je Zeile, höchstens zwölf."));
-            if (ImGui.InputTextMultiline("##RpLanguages", ref draft.LanguagesText, 4096, new Vector2(-1, 85))) changed();
+            foreach (var experience in Enum.GetValues<RpExperience>())
+                if (ImGui.Selectable(Experience(experience), draft.Preferences.Experience == experience))
+                { draft.Preferences = draft.Preferences with { Experience = experience }; changed(); }
+            ImGui.EndCombo();
         }
-        if (ImGui.CollapsingHeader(ProfileUiText.Id("Persönlichkeitsmerkmale")))
+        var style = draft.Preferences.PreferredStyle;
+        if (ImGui.InputTextMultiline(ProfileUiText.Id("Bevorzugter RP-Stil"), ref style, 2048, new Vector2(-1, 70)))
+        { draft.Preferences = draft.Preferences with { PreferredStyle = style }; changed(); }
+        Preference(ProfileUiText.Id("Verletzungen"), draft.Preferences.Injury, value => draft.Preferences = draft.Preferences with { Injury = value }, changed);
+        Preference(ProfileUiText.Id("Charaktertod"), draft.Preferences.CharacterDeath, value => draft.Preferences = draft.Preferences with { CharacterDeath = value }, changed);
+        Preference(ProfileUiText.Id("Romantik"), draft.Preferences.Romance, value => draft.Preferences = draft.Preferences with { Romance = value }, changed);
+        Preference(ProfileUiText.Id("Kriminalität"), draft.Preferences.Crime, value => draft.Preferences = draft.Preferences with { Crime = value }, changed);
+        Preference(ProfileUiText.Id("Kontrollverlust"), draft.Preferences.LossOfControl, value => draft.Preferences = draft.Preferences with { LossOfControl = value }, changed);
+    }
+
+    public void DrawHeaderDesign(ExtendedProfileDraft draft, Action changed, ContentRating? contentRating = null)
+    {
+        if (!PrepareEditor(draft, changed, contentRating)) return;
+        editorPortrait.Set(candidate ?? draft.Portrait);
+        if (editorPortrait.Current is { } portrait) ImGui.Image(portrait.Handle, new Vector2(64));
+        DrawIcon(draft.Appearance.IconId, new Vector2(28));
+        if (ImGui.Button(ProfileUiText.Id("Portrait und Profilgestaltung"))) ImGui.OpenPopup("profile-header-design");
+        var available = Vector2.Max(Vector2.One, ImGui.GetMainViewport().WorkSize - new Vector2(16));
+        var width = MathF.Min(540, available.X);
+        ImGui.SetNextWindowSizeConstraints(new Vector2(width, 0), new Vector2(width, available.Y));
+        if (!ImGui.BeginPopup("profile-header-design")) return;
+        try
         {
-            for (var index = 0; index < draft.PersonalityTraits.Count; index++)
-            {
-                ImGui.PushID(index);
-                var trait = draft.PersonalityTraits[index];
-                var left = trait.LeftLabel; var right = trait.RightLabel; var value = trait.Value;
-                var edited = ImGui.InputText(ProfileUiText.Id("Linker Pol"), ref left, 320);
-                edited |= ImGui.InputText(ProfileUiText.Id("Rechter Pol"), ref right, 320);
-                edited |= ImGui.SliderInt(ProfileUiText.Id("Gewichtung"), ref value, 0, 100);
-                if (edited) { draft.PersonalityTraits[index] = new(left, right, value); changed(); }
-                if (ImGui.Button(ProfileUiText.Id("Merkmal entfernen"))) { draft.PersonalityTraits.RemoveAt(index); changed(); ImGui.PopID(); break; }
-                ImGui.Separator(); ImGui.PopID();
-            }
-            ImGui.BeginDisabled(draft.PersonalityTraits.Count >= 8);
-            if (ImGui.Button(ProfileUiText.Id("Merkmal hinzufügen"))) { draft.PersonalityTraits.Add(new("Zurückhaltend", "Offen")); changed(); }
-            ImGui.EndDisabled();
-        }
-        if (ImGui.CollapsingHeader(ProfileUiText.Id("RP-Erfahrung und Absprachen")))
-        {
-            Wrapped(ProfileUiText.Get("Diese Angaben sind Gesprächshinweise. Sie erteilen keine Einwilligung und keine Altersfreigabe."));
-            if (ImGui.BeginCombo(ProfileUiText.Id("RP-Erfahrung"), Experience(draft.Preferences.Experience)))
-            {
-                foreach (var experience in Enum.GetValues<RpExperience>())
-                    if (ImGui.Selectable(Experience(experience), draft.Preferences.Experience == experience))
-                    { draft.Preferences = draft.Preferences with { Experience = experience }; changed(); }
-                ImGui.EndCombo();
-            }
-            var style = draft.Preferences.PreferredStyle;
-            if (ImGui.InputTextMultiline(ProfileUiText.Id("Bevorzugter RP-Stil"), ref style, 2048, new Vector2(-1, 70)))
-            { draft.Preferences = draft.Preferences with { PreferredStyle = style }; changed(); }
-            Preference(ProfileUiText.Id("Verletzungen"), draft.Preferences.Injury, value => draft.Preferences = draft.Preferences with { Injury = value }, changed);
-            Preference(ProfileUiText.Id("Charaktertod"), draft.Preferences.CharacterDeath, value => draft.Preferences = draft.Preferences with { CharacterDeath = value }, changed);
-            Preference(ProfileUiText.Id("Romantik"), draft.Preferences.Romance, value => draft.Preferences = draft.Preferences with { Romance = value }, changed);
-            Preference(ProfileUiText.Id("Kriminalität"), draft.Preferences.Crime, value => draft.Preferences = draft.Preferences with { Crime = value }, changed);
-            Preference(ProfileUiText.Id("Kontrollverlust"), draft.Preferences.LossOfControl, value => draft.Preferences = draft.Preferences with { LossOfControl = value }, changed);
-        }
-        if (ImGui.CollapsingHeader(ProfileUiText.Id("Öffentliche Profilgestaltung")))
-        {
+            if (!EditorAllowed()) { ImGui.CloseCurrentPopup(); return; }
+            DrawHelpHeading("Öffentliche Profilgestaltung", "Formatting");
             Wrapped(ProfileUiText.Get("Diese Gestaltung wird mit deinem Profil geteilt. Das persönliche FRP1-Fensterdesign bleibt davon getrennt."));
-            DrawIcon(draft.Appearance.IconId, new Vector2(32));
             if (ImGui.Button(ProfileUiText.Id("Profilicon auswählen")))
-                OpenIconPicker(draft.Appearance.IconId, id => { draft.Appearance = draft.Appearance with { IconId = id }; changed(); });
+                OpenIconPicker(draft.Appearance.IconId, id => { draft.Appearance = draft.Appearance with { IconId = id }; changed(); }, editorRating);
             var nameColor = draft.Appearance.NameColor;
             var accent = draft.Appearance.AccentColor;
             if (ColorEditor(ProfileUiText.Id("Namensfarbe"), ref nameColor)) { draft.Appearance = draft.Appearance with { NameColor = nameColor }; changed(); }
@@ -108,47 +114,18 @@ public sealed partial class ProfileUiModule
                     { draft.Appearance = draft.Appearance with { Layout = layout }; changed(); }
                 ImGui.EndCombo();
             }
-            Wrapped(ProfileUiText.Get("Textgestaltung: # Überschrift, - Liste, [b]fett[/b], [i]kursiv[/i] und [color=#RRGGBB]Farbe[/color]. Unbekannte Markierungen bleiben Text."));
+            DrawHelpHeading("Portrait", "Portrait");
             DrawPortraitEditor(draft, changed);
+            if (ImGui.Button(ProfileUiText.Id("Schließen"))) ImGui.CloseCurrentPopup();
         }
-        if (ImGui.CollapsingHeader(ProfileUiText.Id("Begleiterprofile")))
-        {
-            Wrapped(ProfileUiText.Get("Dies sind selbst beschriebene Begleiter. Eine automatische Zuordnung zu einem Spielobjekt wird nicht behauptet."));
-            for (var index = 0; index < draft.Companions.Count; index++)
-            {
-                ImGui.PushID(index);
-                var companion = draft.Companions[index];
-                var name = companion.Name; var species = companion.Species; var description = companion.Description;
-                var edited = ImGui.InputText(ProfileUiText.Id("Name"), ref name, 640);
-                edited |= ImGui.InputText(ProfileUiText.Id("Art / Volk"), ref species, 640);
-                edited |= ImGui.InputTextMultiline(ProfileUiText.Id("Beschreibung"), ref description, 8192, new Vector2(-1, 85));
-                if (edited) { companion = companion with { Name = name, Species = species, Description = description }; draft.Companions[index] = companion; changed(); }
-                if (ImGui.BeginCombo(ProfileUiText.Id("Begleitertyp"), CompanionType(companion.Kind)))
-                {
-                    foreach (var kind in Enum.GetValues<CompanionKind>())
-                        if (ImGui.Selectable(CompanionType(kind), companion.Kind == kind))
-                        { draft.Companions[index] = draft.Companions[index] with { Kind = kind }; changed(); }
-                    ImGui.EndCombo();
-                }
-                DrawIcon(companion.IconId, new Vector2(28));
-                if (ImGui.Button(ProfileUiText.Id("Begleitericon auswählen")))
-                {
-                    var id = companion.Id;
-                    OpenIconPicker(companion.IconId, icon =>
-                    {
-                        var target = draft.Companions.FindIndex(item => item.Id == id);
-                        if (target >= 0) { draft.Companions[target] = draft.Companions[target] with { IconId = icon }; changed(); }
-                    });
-                }
-                if (ImGui.Button(ProfileUiText.Id("Begleiter entfernen"))) { draft.Companions.RemoveAt(index); changed(); ImGui.PopID(); break; }
-                ImGui.Separator(); ImGui.PopID();
-            }
-            ImGui.BeginDisabled(draft.Companions.Count >= 8);
-            if (ImGui.Button(ProfileUiText.Id("Begleiter hinzufügen"))) { draft.Companions.Add(new CompanionProfile { Name = "Neuer Begleiter" }); changed(); }
-            ImGui.EndDisabled();
-        }
+        finally { ImGui.EndPopup(); }
     }
 
+    private void DrawHelpHeading(string title, string topic)
+    {
+        if (HelpHeading is { } heading) heading(ProfileUiText.Get(title), topic);
+        else ImGui.TextUnformatted(ProfileUiText.Get(title));
+    }
     private void DrawPortraitEditor(ExtendedProfileDraft draft, Action changed)
     {
         ImGui.Separator();

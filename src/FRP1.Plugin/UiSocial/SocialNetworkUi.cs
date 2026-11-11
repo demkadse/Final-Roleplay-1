@@ -91,6 +91,9 @@ public sealed partial class SocialUiModule
             var active = own.ActiveProfile;
             if (active is not null)
             {
+                var additional = FRP1.Plugin.UiProfiles.ExistingAdditionalContent.Read(active).Count;
+                if (additional != 0) Text(additional + T(" vorhandene Zusatzinhalte werden mitgeteilt; bitte vorher im Profil prüfen.",
+                    " existing additional entries will be shared; review them in the profile first."));
                 Text(publication == active.Id ? T("Dieses aktive Profil ist ausdrücklich zum Teilen ausgewählt.", "This active profile is explicitly selected for sharing.") : T("Das aktive Profil ist bisher nur lokal ausgewählt.", "The active profile is currently selected only locally."));
                 if (publication != active.Id && ImGui.Button(T("Dieses aktive Profil zum Teilen verwenden", "Use this active profile for sharing")))
                 {
@@ -164,7 +167,7 @@ public sealed partial class SocialUiModule
             ImGui.EndCombo();
         }
         var target = options.TargetVisible;
-        if (ImGui.Checkbox(T("Frei verschiebbare fremde Zielkarte anzeigen", "Show movable foreign target card"), ref target)) SetOptions(options with { TargetVisible = target });
+        if (ImGui.Checkbox(T("Zusätzliche große RP-Zielkarte anzeigen (optional)", "Show additional large RP target card (optional)"), ref target)) SetOptions(options with { TargetVisible = target });
         var locked = options.TargetLocked;
         if (ImGui.Checkbox(T("Position der Zielkarte sperren", "Lock target-card position"), ref locked)) SetOptions(options with { TargetLocked = locked });
         if (ImGui.Button(T("Zielkartenposition zurücksetzen", "Reset target-card position")))

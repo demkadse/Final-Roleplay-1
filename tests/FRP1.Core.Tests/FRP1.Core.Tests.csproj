@@ -45,6 +45,8 @@
     <Compile Include="../../src/FRP1.Plugin/Localization/LanguageSettingsStore.cs" Link="Plugin/Localization/LanguageSettingsStore.cs" />
     <Compile Include="../../src/FRP1.Plugin/Localization/LanguageSession.cs" Link="Plugin/Localization/LanguageSession.cs" />
     <Compile Include="../../src/FRP1.Plugin/UiProfiles/ExtendedProfileDraft.cs" Link="Plugin/UiProfiles/ExtendedProfileDraft.cs" />
+    <Compile Include="../../src/FRP1.Plugin/UiProfiles/ProfileAreas.cs" Link="Plugin/UiProfiles/ProfileAreas.cs" />
+    <Compile Include="../../src/FRP1.Plugin/RpBar/RpBarContextResolver.cs" Link="Plugin/RpBar/RpBarContextResolver.cs" />
     <Compile Include="../../src/FRP1.Plugin/UiProfiles/PortraitNormalizer.cs" Link="Plugin/UiProfiles/PortraitNormalizer.cs" />
     <Compile Include="../../src/FRP1.Plugin/UiSocial/SocialUiOptions.cs" Link="Plugin/UiSocial/SocialUiOptions.cs" />
     <Compile Include="../../src/FRP1.Plugin/UiSocial/SocialUiRules.cs" Link="Plugin/UiSocial/SocialUiRules.cs" />

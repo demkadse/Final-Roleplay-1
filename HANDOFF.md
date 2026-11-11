@@ -4,6 +4,22 @@ Stand: 2026-11-11
 
 ## Aktueller Arbeitsfokus
 
+**Neue UX ausschließlich lokal:** Alle Editor-/Reader-/MiniHUD-/Hilfeänderungen sind uncommitted und unpushed. Der Nutzer übernimmt Commit und Push; der Agent führt beides nicht aus. Öffentlicher Installerindex und Release-ZIP 0.1.0.0 bleiben unverändert. Die darunterstehende Veröffentlichungshistorie ist kein Nachweis, dass die neue UX bereits ausgeliefert wird.
+
+HEAD bleibt `1ce77e3`. Neue Code-/Testdateien sind zum Teil noch untracked und müssen bei einem späteren Nutzercommit ausdrücklich mit berücksichtigt werden; es wurde nichts dafür gestaged, committed oder gepusht.
+
+Lokale Abschlussprüfung: Release-Build 0 Warnungen/Fehler, Gesamtlauf 500/500 bestanden ohne Fehler/Skips, unabhängige Reviewfreigabe. Ein erster Gesamtlauf hatte den einmaligen bestehenden Theme-I/O-Testfehler; Einzeltest und komplette Wiederholung bestanden. Ursache unbelegt, kein Produktiv-I/O-Fix/Retrymechanismus; Details in [STATUS.md](STATUS.md).
+
+Der lokale Editor und Leser haben dieselben fünf Bereiche aus `ProfileAreas`. Keine sechste Gestaltungs-/JSON-Hauptebene hinzufügen: Gestaltung bleibt Kopf-Popup, JSON in Profilaktionen. Vorhandene Zusatzinhalte sind unter Weitere Charakterdaten über `ExistingAdditionalContent` gezielt entfernbar; Snapshot-/CAS-Schutz bewahren. Ausgeblendete oder deaktivierte Inhalte bleiben öffentliches Schema, keine privaten Notizen. Unbearbeitete `RpLanguages` nicht versehentlich leeren.
+
+MiniHUD-Kontext kommt über `RpBarContextResolver` aus dem tatsächlichen Raw-Target, nicht der gepinnten Social-Zielkarte. Ohne Ziel/bei Selbstziel eigenes Profil, erkannter erlaubter Fremder read-only, sonst neutral ohne Own-Fallback. Zielwechsel darf Entwurf, aktive eigene Zuordnung und Sharing nicht verändern. Hover-/Fokus-Glances müssen trotz abgeschalteter Hilfe vollständig lesbar sein; Kontext-/Policywechsel invalidiert sie sofort.
+
+`Collapsed` ist ein eigener lokaler Leistenwert im rückwärtslesbaren Schema 1. Wiederöffner, Lock/Move/Scale und Viewportgrenzen erhalten. Große Zusatz-Zielkarte nur bei neuen Einstellungen standardmäßig aus; vorhandene gespeicherte Wahl bewahren. Hilfen direkt am Feld/Titel beschriften, keine losen Fragezeichengruppen.
+
+Für einen späteren Installerstand zuerst neue Versionsnummer, Paket und Index vorbereiten. **Das veröffentlichte v0.1.0.0 nicht überschreiben.** Reale Spielabnahme bleibt offen. Kurzanleitung: [Benutzerhandbuch, Abschnitt 17](docs/benutzerhandbuch.md).
+
+## Historisch: veröffentlichter Stand 0.1.0.0
+
 Alle wesentlichen Module sind im nativen Plugin verdrahtet; die frühere Beschreibung als lokaler Editor mit separatem Transport ist überholt. Social-/Nameplate-Icon-Ergänzungen und letzte Anzeige-/Performancekorrekturen sind enthalten. Danach bestehen der vollständige Release-Build mit null Warnungen/Fehlern und die Gesamtsuite mit **467/467 Tests**, ohne Fehler/übersprungene Tests. Das endgültige unabhängige Review ist freigegeben; keine kritischen oder wichtigen Befunde verbleiben. Die separate Probe besteht mit acht echten Loopback-TLS-Prüfgruppen. Reale Spiel-/Netzabnahme ist weiterhin offen.
 
 Das bestehende Repository `demkadse/Final-Roleplay-1`, Branch `master`, ist öffentlich und unter MIT veröffentlicht. Release `v0.1.0.0`, ZIP, Prüfsummen und Installerindex sind anonym erreichbar und verifiziert. Eine lokale Spielinstallation ist nicht erfolgt. Projektanweisungen beachten und fremde/uncommittete Änderungen erhalten. Keine bereits angebundenen Funktionen oder abgeschlossene Veröffentlichung erneut als offen planen. [STATUS.md](STATUS.md) und [TRP3-Funktionsmatrix](docs/trp3-feature-map.md) sind der Einstieg.
@@ -57,7 +73,8 @@ Alle Stores strikt, begrenzt und asynchron halten. Änderungen mit Generationen 
 
 1. Native Spielabnahme einschließlich Social-/Icondarstellung, Fensterbedienung, Kontextmenü, Skalierung und Entladen durchführen, sobald entsprechend beauftragt. Codeprüfung und Review nicht damit gleichsetzen.
 2. Echte Zwei-Spieler-/Netzabnahme als offen führen, solange nicht tatsächlich erfolgt. GitHub-Veröffentlichung ist ausdrücklich beauftragt; Spielstart, lokale Installation und Serverdeployment sind davon nicht automatisch umfasst.
-3. Restliche Sprachlücken und nachgewiesene Fehler gezielt bearbeiten; keine unbeauftragten neuen Produktideen oder Taschen-/Inventarfunktionen hinzufügen. Builds/Tests nur bei neuen Änderungen oder offenen Fragen erneut ausführen.
+3. Commit und Push der lokalen UX ausdrücklich dem Nutzer überlassen. Vor späterer Veröffentlichung die Versions-/Paket-/Indexentscheidung getrennt treffen; keinen alten Releaseasset ersetzen.
+4. Restliche Sprachlücken und nachgewiesene Fehler gezielt bearbeiten; keine unbeauftragten neuen Produktideen oder Taschen-/Inventarfunktionen hinzufügen. Builds/Tests nur bei neuen Änderungen oder offenen Fragen erneut ausführen.
 
 ## Reproduzierbare lokale Prüfung
 

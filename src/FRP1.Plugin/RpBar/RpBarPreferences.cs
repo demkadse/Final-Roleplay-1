@@ -7,6 +7,7 @@ public sealed record RpBarPreferences
     public bool Visible { get; init; } = true;
     public bool Locked { get; init; }
     public bool ShowHints { get; init; } = true;
+    public bool Collapsed { get; init; }
     public float Scale { get; init; } = 1f;
     public float PositionX { get; init; } = 24f;
     public float PositionY { get; init; } = 100f;

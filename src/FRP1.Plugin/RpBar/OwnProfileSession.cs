@@ -350,7 +350,7 @@ public sealed class OwnProfileSession : IDisposable
     private void ThrowIfDisposed() => ObjectDisposedException.ThrowIf(disposed, this);
     private static bool Expected(Exception ex) => ex is IOException or InvalidDataException or UnauthorizedAccessException or ArgumentException or
         InvalidOperationException or OperationCanceledException or OverflowException;
-    private static bool SameLayout(RpBarPreferences a, RpBarPreferences b) => a.Visible == b.Visible && a.Locked == b.Locked && a.ShowHints == b.ShowHints &&
+    private static bool SameLayout(RpBarPreferences a, RpBarPreferences b) => a.Visible == b.Visible && a.Locked == b.Locked && a.ShowHints == b.ShowHints && a.Collapsed == b.Collapsed &&
         a.Scale == b.Scale && a.PositionX == b.PositionX && a.PositionY == b.PositionY;
 
     public void Dispose()

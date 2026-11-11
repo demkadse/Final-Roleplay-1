@@ -1,6 +1,6 @@
 # Architektur
 
-Stand: 2026-11-11. Native Module und Direkttransport sind verbunden; der vollständige Release-Build, 467 Tests und das unabhängige Review sind erfolgreich abgeschlossen. Dies ist keine Spiel-/Netzabnahme.
+Stand: 2026-11-11. Die aktuelle lokale UX besteht Release-Build, 500 Tests und unabhängiges Review, ist aber uncommitted und unpushed. Öffentlicher Installer/ZIP 0.1.0.0 bleiben unverändert; deren 467 Funktionstests, acht Probegruppen und 33 Paketprüfungen sind historische Veröffentlichungsnachweise. Keine Spiel-/Netzabnahme erfolgt.
 
 ## Bausteine
 
@@ -78,6 +78,16 @@ Netzblock unterbindet Austausch; Mute unterdrückt Darstellung. Cachelöschen en
 Die Regeldatei enthält nur die aktuelle bestätigte Version (höchstens 128 Bytes); materielle Änderungen erhöhen die Version. Themes verwenden strikt vier Pflichtfelder und höchstens 1024 Bytes. `rp-bar.json` ist auf 32 KiB und 128 aktive Zuordnungen begrenzt. Alle Stores bleiben asynchron, begrenzt und gegen veraltete Lade-/Schreibergebnisse abgesichert.
 
 ## Lokale Werkzeuge und Abnahme
+
+### Neue lokale UX
+
+`ProfileAreas` legt dieselben fünf gleichrangigen Bereiche für Editor und Leser fest. Gestaltung wird im Kopf-Popup, JSON unter Profilaktionen angeboten; kein zweispaltiges Preview. `ExistingAdditionalContent` macht bestehende Hooks/Extras/Traits/Begleiter sichtbar und entfernt gezielte Einträge nur aus einem geprüften Snapshot. Andere Inhalte einschließlich unbearbeiteter Sprachen bleiben erhalten; das öffentliche Profilschema wird nicht durch Verbergen privatisiert.
+
+`RpBarContextResolver` unterscheidet Own, erlaubtes fremdes Raw-Target und neutralen Zustand. Die gepinnte Social-Karte ist keine Kontextquelle. Zielwechsel schreibt weder eigenen Entwurf noch aktive Zuordnung oder Freigabe. Das kompakte HUD speichert `Collapsed` zusätzlich lokal, ohne die Lesbarkeit früherer Schema-1-Dateien zu verlieren; Layoutgrenzen bleiben erhalten.
+
+Glance-Hover/Fokus liefert volle scrollbare Inhalte unabhängig von `ShowHints`, mit kurzem Mausübergang und optionalem Pin. Kontext-/Policywechsel invalidiert Karten. Feldnahe beschriftete Hilfen verwenden den gemeinsamen Katalog. Große Zusatz-Zielkarte ist nur bei neuen Einstellungen standardmäßig aus; vorhandene Wahl bleibt erhalten.
+
+Commit/Push dieser Änderungen übernimmt der Nutzer. Für ein neues Installerpaket sind zuerst neue Version und Index vorzubereiten; unveröffentlichten Code nicht mit dem öffentlichen 0.1.0.0-Nachweis gleichsetzen.
 
 Automation reagiert auf Login, Kampf-/Dutywechsel und Gebietswechsel mit begrenzten Status-/Verfügbarkeits-/Profilaktionen. Keine Alters-/Netzfreigabe wird dadurch erteilt. Lokale Textentwürfe erzeugen Vorschau/Kopiertext; interne Profilverweise lösen nur vorhandene erlaubte Daten auf, keinen Fremdabruf.
 

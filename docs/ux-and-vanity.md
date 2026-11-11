@@ -1,14 +1,14 @@
 # UX und Profilgestaltung
 
-Stand: 2026-11-11. **Die folgenden Funktionen sind im nativen Plugin verbunden.** Die abschließende Codeprüfung besteht mit 467 Tests, Release ohne Warnungen/Fehler und unabhängiger Reviewfreigabe. Die Webvorschau bleibt illustrative Referenz, kein Pixelversprechen und keine Spielabnahme.
+Stand: 2026-11-11. **Die neue UX ist ausschließlich lokal, uncommitted und unpushed.** Sie besteht den Release-Build ohne Warnungen/Fehler, 500/500 Tests und unabhängiges Review. Öffentliches ZIP/Installerindex 0.1.0.0 sind unverändert; die historischen 467 Funktionstests und 33 Paketprüfungen dieses Releases sind davon getrennt. Commit und Push übernimmt der Nutzer. Die Webvorschau ist kein Pixelversprechen oder Nachweis einer Spielabnahme.
 
 ## Referenz und vorhandene Oberfläche
 
 TRP3 bleibt die primäre Bedienungsreferenz für individuelle lesbare Profile, Profilwechsel und schnellen Zugriff auf RP-Aktionen. Siehe [offizielle Beschreibung](https://github.com/Total-RP/Total-RP-3/blob/main/README.md) und [vollständigen FRP1-Abgleich](trp3-feature-map.md). FRP1 verwendet eigene Implementierung und keine WoW-Oberfläche oder WoW-Assets.
 
-Die Haupttabs **Mein Profil**, **Umgebung**, **Kontakte** und **Einstellungen** bleiben der Einstieg. Integriert sind erweiterter Profileditor, eigenes Journal, drei Layouts, Spielicon-Picker, Portraitzuschnitt, privates Register, Netzwerkbedienung, Mouseover, bewegliche Zielkarte, eigene RP-Leiste, globale Hilfen und lokale Werkzeuge. Die neue DE-/EN-Lokalisierung deckt die neuen Module ab; einige ältere Host- und Hilfetexte sind noch deutsch.
+Die Haupttabs **Mein Profil**, **Umgebung**, **Kontakte** und **Einstellungen** bleiben der Einstieg. Die lokale Überarbeitung vereint Editor und Leser auf fünf Inhaltsbereiche, reduziert die eigene Leiste zum Kontext-MiniHUD und beschriftet feldnahe Hilfen. Register, Netzwerk, Medien und ihre Schutzgrenzen bleiben angebunden. Einige ältere Host- und Hilfetexte sind noch deutsch.
 
-Die weitere große Web-Journalgestaltung und eigene Serif-/UI-Fontintegration werden nicht als pixelgleich übernommen oder fertig abgenommen behauptet. Der aktuelle native Titelrahmen mit Schließen, Ziehen und Größenänderung bleibt erhalten.
+Die weitere Web-Journalgestaltung und eigene Serif-/UI-Fontintegration werden nicht als pixelgleich übernommen oder fertig abgenommen behauptet. Normale Hauptfenster behalten native Fensterbedienung; das neue MiniHUD verwendet bewusst keine Titelzeile.
 
 ## Eigenständiges FRP1-Theme
 
@@ -38,16 +38,13 @@ Ohne Charakter, während anfänglichen Ladens oder bei Ladefehler verwendet FRP1
 
 Rechnerisch geprüfte Farben sind kein Nachweis vollständiger Spielbarrierefreiheit. Reale Schriftwiedergabe, Fokus, Skalierung, Volkzuordnung und Entladen brauchen native Abnahme.
 
-## Profil lesen und gestalten
+## Fünf gleichrangige Bereiche in Editor und Leser
 
-Das Journal zeigt erlaubte eigene und fremde Profile mit drei Layouts: Abschnitte, Chronik und Kompakt. Es verwendet die aktuelle Inhaltskennzeichnung, zulässige Text-/Bilddaten und Empfänger-Standarddarstellung. Profilkopf, Glances, Hintergrund, OOC und ergänzte RP-Felder sind keine ausschließlich geplanten Platzhalter mehr.
+Beide Ansichten verwenden dieselbe Reihenfolge aus `ProfileAreas`: **RP-Status und Kurzprofil**, **OOC Informationen**, **Auf den ersten Blick**, **Weitere Charakterdaten**, **RP-Erfahrung und Absprachen**. Ein kleiner Kopf enthält Name, Titel, Portrait, Icon und Rating. Darunter gibt es einen Inhaltsbereich; die zweispaltige Vorschau entfällt. Gestaltung bleibt Kopf-Popup, JSON liegt unter Profilaktionen und wird kein sechster Hauptbereich.
 
-Öffentlich bearbeitbar sind unter anderem:
-- Status/Verfügbarkeit, Kurzbeschreibung, Pronomen, Ort/FC und OOC-Informationen;
-- fünf Glances, zehn Hooks und freie Felder;
-- bis acht Persönlichkeitseigenschaften, beschriebene RP-Sprachen und Gesprächspräferenzen;
-- bis acht Begleiterprofile mit Name, Beschreibung und Icon;
-- Darstellungswünsche, Spielicon und optionales normalisiertes Portrait.
+Status-/Kurzprofil, OOC, Glances, weitere Beschreibungen und RP-Absprachen sind gezielt erreichbar. Neue Baukästen für Hooks, freie Zusatzfelder, Traits und Begleiter werden nicht mehr angeboten. Bereits vorhandene Inhalte bleiben unter Weitere Charakterdaten vollständig lesbar und über einen geprüften Entwurf gezielt entfernbar. Unbearbeitete Sprachen bleiben unverändert erhalten.
+
+Vor Export und Teilen weisen sichtbare Hinweise auf vorhandene Zusatzinhalte hin. Sie bleiben bis zur tatsächlichen Entfernung öffentliche Profilinhalte. Auch deaktivierte, standardmäßig unsichtbare Glances sind nicht privat; verbergen ist keine Zugriffssperre. Private Informationen gehören weiterhin ins Register.
 
 RP-Präferenzen beschreiben Gesprächsthemen/Spielwünsche; sie sind keine Zustimmung zu Handlungen und kein Altersnachweis. Private Notizen und Beziehungen bleiben im Register, nicht im öffentlichen OOC-Feld.
 
@@ -61,11 +58,17 @@ Begrenztes Rich Text unterstützt Überschriften/Listen sowie `[b]…[/b]`, `[i]
 
 Die **Standarddarstellung** neutralisiert fremde Gestaltung für gute Lesbarkeit und verwendet weiterhin das eigene FRP1-Grundtheme, nicht den Standard-Dalamud-Look. Musik und fremde Schriftdateien sind keine vorhandene Funktion.
 
-## Eigene Leiste und Fremdanzeigen
+## Kontext-MiniHUD und separate Fremdanzeigen
 
-Die bewegliche eigene RP-Leiste bietet ausdrücklich gewähltes aktives Profil, IC/OOC/AFK, Verfügbarkeit, Profilöffnung und fünf eigene Glances per Klick. Position, Sichtbarkeit, Bewegungssperre und Skalierung von 0,75 bis 1,75 sind lokal gespeichert; Logout verbirgt sie nur vorübergehend. Ein erstes Profil wird nicht automatisch aktiv.
+Das neue Mein-RP-HUD verwendet zwei kompakte Zeilen ohne Titelbalken; das Quelllayout hat 280 Pixel Basisbreite vor Skalierung/Viewportbegrenzung. Das ist keine im Spiel gemessene Pixelgröße. Kopf und Icons zeigen Ich-, Ziel- oder neutralen Kontext. Ohne Ziel/bei Selbstziel erscheint das eigene Profil, ein erkanntes erlaubtes fremdes Ziel nur lesend. Unbekannte/NPC-, blockierte, stummgeschaltete, nicht erlaubte Mature-, mehrdeutige oder szenenfremde Ziele bleiben neutral ohne Own-Fallback.
 
-Die davon getrennte **Fremdprofilanzeige ist inzwischen implementiert**: Mouseover, kompakte/ausführliche Darstellung und bewegliche/pinnbare Zielkarte verwenden aktuell erlaubte Daten bestätigter Bindungen. Umgebungsfilter für Status, Verfügbarkeit und leere Profile sowie Cache-/Kontaktaktionen gehören zum Socialmodul. Für bekannte bestätigte Charakterbindungen gibt es außerdem den nativen Kontextmenüeintrag **FRP1-Profil öffnen**; kein globaler Umbau der Spielmenüs.
+Quelle ist das tatsächliche Raw-Target, nicht eine gepinnte separate Zielkarte. Zielwechsel verändert weder Entwurf, eigene aktive Zuordnung noch Sharing. Profilwahl, Einstellungen, Hilfe und bewusstes Öffnen von Details liegen im Kontextmenü. Neue Einstellungen lassen die große Zusatz-Zielkarte standardmäßig aus; bestehende gespeicherte Wahl wird beibehalten.
+
+Einklappen hat einen eigenen lokalen `Collapsed`-Wert und einen kleinen Wiederöffner; das alte Schema 1 bleibt lesbar. Bewegungssperre, Verschieben, Skalierung und sichtbare Viewportgrenzen bleiben erhalten. Ein erstes Profil wird nicht automatisch aktiv.
+
+Glances öffnen bei Hover oder Tastaturfokus den vollständigen ungekürzten Text in einer scrollbaren Karte – auch bei deaktivierten Hilfen. Rund 500 ms Mausübergang und optionales Anheften per Klick erlauben den Wechsel in die Karte. Kontext-/Policywechsel invalidiert den Inhalt.
+
+Die getrennte Fremdprofilanzeige mit Mouseover, kompakter/ausführlicher Darstellung und beweglicher/pinnbarer Zielkarte verwendet weiterhin aktuell erlaubte Daten bestätigter Bindungen. Umgebungsfilter und Cache-/Kontaktaktionen gehören zum Socialmodul. Der native Kontextmenüeintrag **FRP1-Profil öffnen** für bekannte bestätigte Bindungen bleibt erhalten.
 
 Lokale Nameplates/Titel/Farben und optionale kleine Profilicons sind gesondert einschaltbar. Questmarker bleiben unverändert. Die Kartenaktion bezieht sich auf einen bekannten aktuell lokalen Akteur, nicht auf eine globale Spielersuche.
 
@@ -87,7 +90,7 @@ Kontakte bieten private Profil-/Charakternotizen, Favoriten, Beziehungen, Mute u
 
 ## Globale Hilfen und lokale Werkzeuge
 
-Kontextuelle Hilfe über Mauszeiger, Tastaturfokus und Fragezeichen stammt aus einem gemeinsamen Katalog. Der globale Schalter **Hilfshinweise anzeigen** betrifft diese Hilfen; **Hilfe / Erste Schritte**, eigentliche Profil-/Glance-Inhalte und verpflichtende Hinweise bleiben davon unabhängig.
+Kontextuelle Hilfe steht als **? Hilfe: Titel** oder kompaktes **? Hilfe** unmittelbar am Titel/Feld. Tooltip und geöffneter Hilfetext erklären das konkrete Thema; lose Fragezeichengruppen entfallen. Sechs neue Themen ergänzen den gemeinsamen Katalog. Der globale Schalter **Hilfshinweise anzeigen** betrifft diese Hilfen; **Hilfe / Erste Schritte**, eigentliche Profil-/Glance-Inhalte und verpflichtende Hinweise bleiben davon unabhängig.
 
 Automation ist global standardmäßig aus, auf 16 deklarative Regeln beschränkt und führt keine Skripte oder Spielchatbefehle aus. Lokale Rede-/Emote-Entwürfe bieten Vorschau/Kopiertext. Interne Profilverweise öffnen nur bereits vorhandene erlaubte Daten, ohne Fremdabruf oder Chattransport. RP-Sprachen sind Profilbeschreibung, keine Manipulation der Spielsprache.
 
@@ -101,7 +104,7 @@ Audience-Gate und Register-/Binding-/Blockzustand gelten vor Profilnamen, Bilder
 
 ## Verbleibende Abnahme
 
-Der nach den Anzeige-/Performancekorrekturen geprüfte Stand und die Reviewfreigabe sind in [STATUS.md](../STATUS.md) festgehalten; ein gemessener FPS-Gewinn wird nicht behauptet. Im laufenden Spiel zu prüfen sind insbesondere:
+Der lokale 500er-Teststand, die transparente Testhistorie und Reviewfreigabe stehen in [STATUS.md](../STATUS.md). Er ist noch nicht committed, gepusht oder als neues Installerpaket veröffentlicht. Ein späteres Update benötigt neue Version/Paket/Index und darf 0.1.0.0 nicht überschreiben. Im laufenden Spiel zu prüfen sind insbesondere:
 1. Journal-/Icon-/Portraitwiedergabe, tatsächliche Volkzuordnung, Textumbruch, Skalierung und Tastaturfokus.
 2. Eigene Leiste, Fremdmouseover/Zielpin, Nameplate-/Chatdarstellung und Rücknahme beim Deaktivieren/Entladen.
 3. Alterswiderruf, Charakterwechsel, verspätete Picker-/Ladeergebnisse und blockierte/gelöschte Kontakte ohne Inhaltsoffenlegung.

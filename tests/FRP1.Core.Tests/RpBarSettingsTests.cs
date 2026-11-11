@@ -16,6 +16,7 @@ public sealed class RpBarSettingsTests
         Assert.True(preferences.Visible);
         Assert.False(preferences.Locked);
         Assert.True(preferences.ShowHints);
+        Assert.False(preferences.Collapsed);
         Assert.Equal(1f, preferences.Scale);
         Assert.Empty(preferences.ActiveProfiles);
         Assert.Empty(Directory.EnumerateFileSystemEntries(directory.Path));
@@ -27,7 +28,7 @@ public sealed class RpBarSettingsTests
         using var directory = new TestDirectory();
         var profileId = Guid.NewGuid();
         var externalMap = new Dictionary<ulong, Guid> { [1] = profileId, [ulong.MaxValue] = Guid.NewGuid() };
-        var original = new RpBarPreferences { Visible = false, Locked = true, ShowHints = false, Scale = 1.5f, PositionX = -100, PositionY = 800, ActiveProfiles = externalMap };
+        var original = new RpBarPreferences { Visible = false, Locked = true, ShowHints = false, Collapsed = true, Scale = 1.5f, PositionX = -100, PositionY = 800, ActiveProfiles = externalMap };
         var snapshot = RpBarPreferences.Snapshot(original);
         var store = new RpBarSettingsStore(directory.Path);
         var pending = store.SaveAsync(original);
@@ -38,6 +39,7 @@ public sealed class RpBarSettingsTests
         Assert.False(restored.Visible);
         Assert.True(restored.Locked);
         Assert.False(restored.ShowHints);
+        Assert.True(restored.Collapsed);
         Assert.Equal(1.5f, restored.Scale);
         Assert.Equal(-100, restored.PositionX);
         Assert.Equal(800, restored.PositionY);
@@ -145,6 +147,26 @@ public sealed class RpBarSettingsTests
         Assert.Equal(before, await File.ReadAllBytesAsync(Path.Combine(directory.Path, "rp-bar.json")));
         Assert.True((await store.LoadAsync()).Locked);
         Assert.Single(Directory.EnumerateFiles(directory.Path));
+    }
+
+    [Fact]
+    public async Task EarlierRpBarSettingsWithoutCollapsedRemainExpandedAndOtherwiseUnchanged()
+    {
+        using var directory = new TestDirectory();
+        var store = new RpBarSettingsStore(directory.Path);
+        var profileId = Guid.NewGuid();
+        await store.SaveAsync(new() { Locked = true, ShowHints = false, ActiveProfiles = new Dictionary<ulong, Guid> { [1] = profileId } });
+        var path = Path.Combine(directory.Path, "rp-bar.json");
+        var json = JsonNode.Parse(await File.ReadAllBytesAsync(path))!.AsObject();
+        json.Remove("collapsed");
+        var earlier = json.ToJsonString();
+        await File.WriteAllTextAsync(path, earlier);
+        var loaded = await store.LoadAsync();
+        Assert.False(loaded.Collapsed);
+        Assert.True(loaded.Locked);
+        Assert.False(loaded.ShowHints);
+        Assert.Equal(profileId, loaded.ActiveProfiles[1]);
+        Assert.Equal(earlier, await File.ReadAllTextAsync(path));
     }
 
     [Theory]

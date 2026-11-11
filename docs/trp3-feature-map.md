@@ -2,6 +2,8 @@
 
 Stand: 2026-11-11. Die FRP1-Module sind im echten Plugin angebunden. Release-Build ohne Warnungen/Fehler, 467 bestandene Tests und unabhängige Reviewfreigabe belegen den Codeprüfstand; die native Spiel-/Netzabnahme ist ein weiterhin offener eigener Schritt.
 
+Die Matrix hält den Funktionsumfang des **veröffentlichten 0.1.0.0** fest. Die neue lokale Bedienung besteht 500 Tests, ist aber nicht committed/gepusht/veröffentlicht: fünf gleiche Bereiche in Editor/Leser, Kontext-MiniHUD und feldnahe Hilfen; keine neuen Baukästen für vorhandene erweiterte Zusatzdaten. Öffentlicher Installer unverändert. Details: [UX](ux-and-vanity.md), [Status](../STATUS.md).
+
 ## Quelle und Lesart
 
 Grundlagen sind die [offizielle TRP3-Beschreibung](https://github.com/Total-RP/Total-RP-3/blob/main/README.md) und der [offizielle Modulbaum](https://github.com/Total-RP/Total-RP-3/tree/main/totalRP3/Modules). Die Modulnamen sind die Strukturreferenz; die Einordnung unten ist der eigene Abgleich gegen den FRP1-Quellstand, keine Behauptung identischer WoW-Funktionen.

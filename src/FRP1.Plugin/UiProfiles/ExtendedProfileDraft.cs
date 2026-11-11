@@ -6,6 +6,8 @@ namespace FRP1.Plugin.UiProfiles;
 public sealed class ExtendedProfileDraft
 {
     private PortraitThumbnail? portrait;
+    private string originalLanguagesText = "";
+    private IReadOnlyList<string> originalLanguages = Array.Empty<string>();
     public ContentRating ContentRating = ContentRating.General;
     public string EyeColor = "";
     public string Height = "";
@@ -37,6 +39,8 @@ public sealed class ExtendedProfileDraft
         };
         result.PersonalityTraits.AddRange(source.PersonalityTraits.Select(trait => trait with { }));
         result.Companions.AddRange(source.Companions.Select(companion => companion with { }));
+        result.originalLanguagesText = result.LanguagesText;
+        result.originalLanguages = source.RpLanguages.ToArray();
         return result;
     }
 
@@ -46,7 +50,8 @@ public sealed class ExtendedProfileDraft
         return target with
         {
             EyeColor = EyeColor, Height = Height, Weight = Weight, Birthplace = Birthplace, Residence = Residence,
-            RpLanguages = LanguagesText.Split('\n').Select(value => value.Trim()).Where(value => value.Length != 0).ToList(),
+            RpLanguages = LanguagesText == originalLanguagesText ? originalLanguages.ToList() :
+                LanguagesText.Split('\n').Select(value => value.Trim()).Where(value => value.Length != 0).ToList(),
             PersonalityTraits = PersonalityTraits.Select(trait => trait with { }).ToList(),
             Preferences = Preferences with { }, AppearanceStyle = Appearance with { },
             Companions = Companions.Select(companion => companion with { }).ToList(), Portrait = Copy(portrait),

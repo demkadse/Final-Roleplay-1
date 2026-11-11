@@ -47,7 +47,7 @@ public sealed class RpBarSettingsStore
             if (document is null || document.SchemaVersion != 1) throw new InvalidDataException("Unsupported RP bar settings.");
             return RpBarPreferences.Snapshot(new RpBarPreferences
             {
-                Visible = document.Visible, Locked = document.Locked, ShowHints = document.ShowHints, Scale = document.Scale,
+                Visible = document.Visible, Locked = document.Locked, ShowHints = document.ShowHints, Collapsed = document.Collapsed, Scale = document.Scale,
                 PositionX = document.PositionX, PositionY = document.PositionY, ActiveProfiles = document.ActiveProfiles,
             });
         }
@@ -62,7 +62,7 @@ public sealed class RpBarSettingsStore
         var snapshot = RpBarPreferences.Snapshot(value);
         var bytes = JsonSerializer.SerializeToUtf8Bytes(new StoredSettings
         {
-            SchemaVersion = 1, Visible = snapshot.Visible, Locked = snapshot.Locked, ShowHints = snapshot.ShowHints, Scale = snapshot.Scale,
+            SchemaVersion = 1, Visible = snapshot.Visible, Locked = snapshot.Locked, ShowHints = snapshot.ShowHints, Collapsed = snapshot.Collapsed, Scale = snapshot.Scale,
             PositionX = snapshot.PositionX, PositionY = snapshot.PositionY,
             ActiveProfiles = new Dictionary<ulong, Guid>(snapshot.ActiveProfiles),
         }, Options);
@@ -91,6 +91,7 @@ public sealed class RpBarSettingsStore
         [JsonRequired] public bool Visible { get; init; }
         [JsonRequired] public bool Locked { get; init; }
         [JsonRequired] public bool ShowHints { get; init; }
+        public bool Collapsed { get; init; }
         [JsonRequired] public float Scale { get; init; }
         [JsonRequired] public float PositionX { get; init; }
         [JsonRequired] public float PositionY { get; init; }

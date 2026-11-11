@@ -4,6 +4,8 @@ Stand: 2026-11-11 · veröffentlichter früher öffentlicher Teststand 0.1.0.0 (
 
 **Veröffentlicht:** Das bestehende Repository `demkadse/Final-Roleplay-1`, Branch `master`, ist öffentlich und MIT-lizenziert. Installerindex und Releasepaket sind ohne Anmeldung erreichbar und geprüft. Der zuvor geprüfte Codestand besteht 467 Tests und unabhängiges Review; zusätzlich bestehen 33 Offline-Paketprüfungen ohne Fehler. Eine echte Spiel-/LAN-/Internetabnahme steht noch aus.
 
+**Zwei Bedienungsstände:** Kapitel 1–16 beziehen sich auf das veröffentlichte 0.1.0.0. Die neue lokale UX ist nicht committed, nicht gepusht und nicht im Installer; [Abschnitt 17](#17-neue-lokale-ux--noch-nicht-veröffentlicht) erklärt deren fünf Bereiche, MiniHUD und Hilfen. Der lokale Code besteht 500/500 Tests und Review, ersetzt aber keinen veröffentlichten Download.
+
 ## 1. Was FRP1 ist
 
 Final Roleplay 1 ist ein Dalamud-Plugin für Rollenspiel in Final Fantasy XIV. Du beschreibst deinen Charakter, pflegst RP-Status und erste Eindrücke und kannst Profile anderer ausdrücklich gekoppelter FRP1-Nutzer lesen.
@@ -266,4 +268,50 @@ Reale Spielbedienung, Darstellung, LAN/Internet/NAT/CGNAT und umfangreiche Belas
 Projektcode und Dokumentation stehen unter der [MIT-Lizenz](../LICENSE). Das erlaubt auch kommerzielle Nutzung unter Erhalt der Copyright-/Lizenzhinweise. Deine Profile und Bilder werden dadurch nicht automatisch unter MIT gestellt; maßgeblich sind die Rechte der jeweiligen Inhalte.
 
 Technische Details: [Architektur](architecture.md), [Machbarkeit](feasibility.md), [TRP3-Abgleich](trp3-feature-map.md), [Glance-Abgleich](glance-feature-map.md). [Projektstatus](../STATUS.md) und [Release-Notes](release-notes-v0.1.0.0.md) halten Veröffentlichung und Abnahmestand fest.
+
+## 17. Neue lokale UX – noch nicht veröffentlicht
+
+Die folgenden Änderungen gelten ausschließlich für die lokale Überarbeitung vom 2026-11-11. Öffentliches ZIP und Installerindex 0.1.0.0 sind unverändert. Commit und Push übernimmt der Nutzer; für eine spätere Installeraktualisierung sind neue Version und neues Paket nötig.
+
+### Profil bearbeiten und lesen
+
+1. Öffne **Mein Profil** beziehungsweise den Profil-Leser. Beide verwenden dieselben fünf gleichrangigen Bereiche:
+
+| Bereich | Zweck |
+|---|---|
+| RP-Status und Kurzprofil | Status, Verfügbarkeit und kompakte Charakterangaben. |
+| OOC Informationen | Bewusst öffentliche OOC-Angaben. |
+| Auf den ersten Blick | Die aktiven Glance-Eindrücke. Deaktivierte Einträge sind zunächst unsichtbar. |
+| Weitere Charakterdaten | Zusätzliche Charakterbeschreibungen und erhaltene ältere Zusatzinhalte. |
+| RP-Erfahrung und Absprachen | Gesprächs-/Spielpräferenzen, weiterhin ohne automatische Zustimmung zu Handlungen. |
+
+2. Der kleine Profilkopf enthält Name, Titel, Portrait, Icon und Inhaltskennzeichnung. Darunter gibt es einen Inhaltsbereich statt einer zweispaltigen Bearbeiten/Vorschau-Anordnung.
+3. Öffne die Gestaltung am Profilkopf. JSON-Import/-Export befindet sich unter den Profilaktionen; beides ist kein sechster Hauptbereich.
+4. Speichere wie bisher lokal. Änderungen am bereits aktiven und freigegebenen Profil können weiterhin automatisch synchronisieren; Speichern erteilt keine neue Freigabe.
+
+Neue Baukästen für Hooks, freie Zusatzfelder, Traits und Begleiter werden nicht mehr angeboten. Bereits vorhandene Einträge bleiben unter **Weitere Charakterdaten** lesbar. Du kannst einzelne Einträge bewusst aus dem Entwurf entfernen und die Änderung anschließend speichern. Unbearbeitete Sprachen bleiben unverändert erhalten.
+
+**Ausblenden bedeutet nicht privat:** Solange Zusatzinhalte oder deaktivierte Glances im Profildokument stehen, gehören sie weiterhin zu den öffentlichen Profilinhalten und damit zu Export/Teilen. Beachte die sichtbaren Hinweise vor diesen Aktionen. Wirklich private Informationen gehören in das Register.
+
+### Mein RP als MiniHUD
+
+Das lokale **Mein RP** ist jetzt eine kompakte Leiste aus zwei Zeilen ohne Titelbalken. Der kleine Kopf zeigt Icon/Name sowie **Ich**, **Ziel** oder einen neutralen Zustand. Status-, Aktions- und Glance-Icons ersetzen die bisher große eigene Leiste.
+
+- Ohne Ziel oder bei Selbstziel zeigt es das eigene Profil. Profilwahl und Änderungen bleiben ausdrückliche eigene Aktionen.
+- Ein erkannter, erlaubter fremder Charakter wird nur lesend angezeigt.
+- Unbekannte/NPC-, gesperrte, stummgeschaltete, nicht erlaubte Mature-, mehrdeutige oder szenenfremde Ziele zeigen neutralen Inhalt. Es gibt keinen stillen Rückfall auf das eigene Profil.
+- Maßgeblich ist das echte aktuelle Spielziel. Eine separat gepinnte große Zielkarte steuert den HUD-Kontext nicht.
+- Ein Zielwechsel verändert weder deinen Entwurf noch aktives eigenes Profil oder Sharing.
+
+Per Kontextmenü erreichst du Profilwahl, Einstellungen, Hilfe und bewusst angeforderte Details. Die zusätzliche große Zielkarte ist bei neuen Einstellungen standardmäßig aus; vorher gespeicherte Sichtbarkeitsentscheidungen werden beibehalten.
+
+Du kannst das HUD einklappen; der kleine Wiederöffner bleibt erreichbar und der Klappzustand wird getrennt lokal gespeichert. Bewegungssperre, Verschieben, Skalierung und Begrenzung auf die sichtbare Arbeitsfläche bleiben erhalten. Vollständig ausblenden und einklappen sind unterschiedliche Entscheidungen; die bekannten Show-/Toggle-Befehle bleiben verfügbar.
+
+### Vollständige Glances und verständliche Hilfe
+
+Fahre mit der Maus über einen Glance oder fokussiere ihn per Tastatur. Der vollständige Text erscheint ungekürzt in einer scrollbaren Karte, auch bei ausgeschalteten Hilfshinweisen. Ein kurzer Übergang von rund 500 ms erlaubt den Weg mit der Maus zur Karte; ein Klick kann sie anheften. Ziel-/Kontext- oder Freigabewechsel verwirft den Inhalt.
+
+Hilfen stehen jetzt mit **? Hilfe: Titel** oder dem kompakten **? Hilfe** direkt am betroffenen Titel/Feld. Tooltip und geöffneter Hilfetext erklären das konkrete Thema; lose Fragezeichengruppen entfallen. Der globale Hilfeschalter wirkt weiterhin auf diese Hilfen, nicht auf eigentliche Glance-Inhalte oder **Erste Schritte**.
+
+Der lokale Abschluss besteht den Release-Build mit 0 Warnungen/Fehlern, 500/500 Tests und unabhängige Reviewfreigabe. Native Spielabnahme fehlt weiterhin. Die transparente Testhistorie steht in [STATUS.md](../STATUS.md); historische Paket-/Downloadprüfungen des öffentlichen 0.1.0.0 gelten nicht als Veröffentlichung dieser neuen UX.
 

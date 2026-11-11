@@ -6,6 +6,8 @@ FRP1 ist ein Dalamud-Plugin für Charakterbeschreibungen, erste Eindrücke, RP-S
 
 **Stand: 2026-11-11 – veröffentlicht als früher öffentlicher Teststand 0.1.0.0 (Prerelease).** Repository, MIT-Lizenz, Installerindex und Releasepaket sind öffentlich verfügbar. Der geprüfte Code besteht 467 Tests, Release-Build und unabhängiges Review; zusätzlich bestehen 33 Offline-Paketprüfungen. Eine tatsächliche Spielabnahme und reale LAN-/Internet-/NAT-Abnahme sind noch nicht erfolgt.
 
+**Zusätzlicher lokaler UX-Stand:** Die nachfolgend beschriebene neue Fünf-Bereiche-Oberfläche und das MiniHUD sind ausschließlich im Arbeitsverzeichnis überarbeitet, **nicht committed und nicht gepusht**. Sie bestehen den Release-Build ohne Warnungen/Fehler, 500/500 Funktionstests und unabhängiges Review. Das öffentliche ZIP 0.1.0.0 und der öffentliche Installerindex sind unverändert; die Installation über die untenstehende JSON-Adresse enthält diese UX-Änderungen noch nicht. Commit und Push übernimmt der Nutzer.
+
 ## Kein zentraler Server für deine Profile
 
 FRP1 lädt deine Charakterprofile nicht auf eine Website, in eine Cloud oder in eine zentrale Datenbank hoch. Ein öffentliches Profil bleibt zunächst eine lokale Datei. Nur wenn du einen anderen FRP1-Client ausdrücklich koppelst, eine erreichbare direkte Verbindung herstellst und dein Profil für diesen Kontakt freigibst, wird es direkt dorthin übertragen.
@@ -67,6 +69,8 @@ Die ausführliche Schritt-für-Schritt-Anleitung einschließlich Fehlersuche ste
 
 ## Was du gestalten und verwalten kannst
 
+Die folgende Übersicht beschreibt das **veröffentlichte 0.1.0.0**. Änderungen der noch lokalen Bedienung sind im nächsten Abschnitt gesondert erklärt; insbesondere wurden dort keine neuen Baukästen für zusätzliche Profilinhalte beibehalten.
+
 | Bereich | Funktionen |
 |---|---|
 | Charakter | RP-Name/Titel, Volk/Clan, Kurzbeschreibung, Pronomen, Herkunft, Beruf, Aussehen, Persönlichkeit, Hintergrund, freie Felder und OOC-Informationen. |
@@ -84,6 +88,18 @@ Die ausführliche Schritt-für-Schritt-Anleitung einschließlich Fehlersuche ste
 Portraits werden lokal zu metadatenfreien PNG-Miniaturen bis 256 × 256 und 12 KiB normalisiert. Das gesamte öffentliche Profil bleibt höchstens 48 KiB groß. Es gibt keine externen Bildabrufe, eingebetteten Skripte oder automatisches Abspielen fremder Medien.
 
 Die RP-Präferenzen beschreiben Gesprächs- und Spielwünsche. Sie sind keine Zustimmung zu Handlungen und kein Altersnachweis.
+
+## Neue lokale Bedienung – noch nicht im Installer
+
+Editor und Leser verwenden jetzt genau fünf gleichrangige Bereiche: **RP-Status und Kurzprofil**, **OOC Informationen**, **Auf den ersten Blick**, **Weitere Charakterdaten**, **RP-Erfahrung und Absprachen**. Ein kleiner Kopf enthält Name, Titel, Portrait, Icon und Inhaltskennzeichnung; darunter steht ein Inhaltsbereich statt einer zweispaltigen Vorschau. Gestaltung öffnet sich am Kopf, JSON-Funktionen unter Profilaktionen.
+
+Vorhandene Hooks, freie Zusatzfelder, Traits und Begleiter bleiben unter **Weitere Charakterdaten** lesbar und können gezielt aus dem Entwurf entfernt werden. Neue Baukästen dafür fehlen bewusst. Solche Inhalte bleiben bis zur tatsächlichen Entfernung öffentliche Profildaten; auch deaktivierte Glances sind nicht privat. Unbearbeitete RP-Sprachen bleiben erhalten.
+
+**Mein RP** ist lokal ein kompaktes zweizeiliges MiniHUD ohne Titelzeile. Ohne Ziel oder beim eigenen Charakter zeigt es das eigene Profil; bei einem erkannten erlaubten fremden Ziel zeigt es dieses nur lesend. Unbekannte, unzulässige oder mehrdeutige Ziele zeigen einen neutralen Zustand statt des eigenen Profils. Ein Zielwechsel ändert weder Entwurf, aktives eigenes Profil noch Freigaben.
+
+Glance-Inhalte öffnen sich beim Darüberfahren oder Tastaturfokus vollständig in einer scrollbaren Karte – auch bei ausgeschalteten Hilfen. Ein kurzer Mausübergang zur Karte ist möglich; Klick kann sie anheften. Kontext-/Freigabewechsel verwirft sie. Profilwahl, Einstellungen und Hilfe liegen im Kontextmenü; Einklappen speichert einen kleinen Wiederöffner. Beschriftete **? Hilfe: Titel** beziehungsweise **? Hilfe** stehen direkt bei ihrem Feld. Die große Zusatz-Zielkarte bleibt bei neuen Einstellungen zunächst aus und wird bei Bedarf bewusst geöffnet; bestehende gespeicherte Sichtbarkeit bleibt erhalten.
+
+Die ausführliche lokale Kurzanleitung steht in [Handbuch, Abschnitt 17](docs/benutzerhandbuch.md). Für ein späteres Installerupdate sind neue Versionsnummer, Releasepaket und Index nötig; das veröffentlichte 0.1.0.0 wird nicht überschrieben.
 
 ## Wie zwei Spieler Profile austauschen
 

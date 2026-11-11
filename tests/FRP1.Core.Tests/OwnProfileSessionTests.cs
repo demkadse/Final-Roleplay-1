@@ -289,17 +289,19 @@ public sealed class OwnProfileSessionTests
         session.Retry();
         // Poll owns result publication, so this choice precedes applying the retry result
         // even if the worker has already finished its read. No timing or file-lock trick is needed.
-        session.SetPreferences(session.Settings with { ShowHints = false, Scale = 1.4f });
+        session.SetPreferences(session.Settings with { ShowHints = false, Collapsed = true, Scale = 1.4f });
         Assert.False(session.Settings.ShowHints);
         await OwnProfileHarness.PumpUntilAsync(session, () => !session.IsLoading);
         Assert.False(session.Settings.ShowHints);
         Assert.Equal(1.4f, session.Settings.Scale);
+        Assert.True(session.Settings.Collapsed);
         Assert.Equal(profile.Id, session.Settings.ActiveProfiles[1]);
         await OwnProfileHarness.PumpUntilAsync(session, () =>
             !settingsStore.LoadAsync().GetAwaiter().GetResult().ShowHints);
         var persisted = await settingsStore.LoadAsync();
         Assert.False(persisted.ShowHints);
         Assert.Equal(1.4f, persisted.Scale);
+        Assert.True(persisted.Collapsed);
         Assert.Equal(profile.Id, persisted.ActiveProfiles[1]);
         session.Dispose();
         await session.DisposalCompletion;

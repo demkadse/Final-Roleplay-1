@@ -8,7 +8,7 @@ public sealed record SocialUiOptions
 {
     [JsonRequired] public int SchemaVersion { get; init; } = 1;
     [JsonRequired] public bool MouseoverTooltip { get; init; } = true;
-    [JsonRequired] public bool TargetVisible { get; init; } = true;
+    [JsonRequired] public bool TargetVisible { get; init; }
     [JsonRequired] public bool TargetLocked { get; init; }
     [JsonRequired] public bool OnlyKnownEnvironment { get; init; } = true;
     [JsonRequired] public float TargetX { get; init; } = 32;
