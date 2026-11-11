@@ -79,6 +79,13 @@ namespace Frp1.Publish {
 
 function Get-Frp1Digest([byte[]]$Bytes) { [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($Bytes)) }
 
+function ConvertTo-Frp1CanonicalText([byte[]]$Bytes) {
+    # Git on Windows may check text files out with CRLF. Preserve the complete
+    # notice text while keeping our own staged text deterministic across clones.
+    $text = $script:Utf8.GetString($Bytes).TrimStart([char]0xFEFF).Replace("`r`n", "`n")
+    return ,$script:Utf8.GetBytes($text)
+}
+
 function Assert-Frp1Parameters([string]$Version, [string]$Tag, [string]$Repository, [long]$LastUpdateUnix) {
     if ($Version -notmatch '^\d+\.\d+\.\d+\.\d+$' -or -not [version]::TryParse($Version, [ref]([version]$null))) { throw 'Invalid four-component plugin version.' }
     if ($Tag -cne "v$Version") { throw 'Release tag does not match the plugin version.' }
@@ -149,7 +156,7 @@ function Read-Frp1Json([byte[]]$Bytes, [bool]$Array = $false) {
 
 function Get-Frp1LegalFiles([string]$NuGetPackageRoot) {
     $result = [Collections.Generic.Dictionary[string,byte[]]]::new([StringComparer]::Ordinal)
-    $runtime = [IO.File]::ReadAllBytes((Join-Path $script:ProjectRoot 'LICENSES/dotnet-runtime-10.0.14-LICENSE.TXT'))
+    $runtime = ConvertTo-Frp1CanonicalText ([IO.File]::ReadAllBytes((Join-Path $script:ProjectRoot 'LICENSES/dotnet-runtime-10.0.14-LICENSE.TXT')))
     if ((Get-Frp1Digest $runtime) -cne 'CFC21F5E8BD655AE997EEC916138B707B1D290B83272C02A95C9F821B8C87310') { throw 'Official runtime MIT license changed.' }
     $assets = [Collections.Generic.Dictionary[string,byte[]]]::new([StringComparer]::Ordinal)
     foreach ($id in $script:Packages.Keys) {
@@ -168,7 +175,8 @@ function Get-Frp1LegalFiles([string]$NuGetPackageRoot) {
                 }
                 elseif ($file -ne 'LICENSE.TXT') { throw 'Official package notices are missing.' }
                 $relative = "LICENSES/$id/10.0.14/$file"
-                if ((Get-Frp1Digest ([IO.File]::ReadAllBytes((Join-Path $script:ProjectRoot $relative)))) -cne (Get-Frp1Digest $bytes)) { throw 'Checked-in notice differs from the official source.' }
+                if ((Get-Frp1Digest (ConvertTo-Frp1CanonicalText ([IO.File]::ReadAllBytes((Join-Path $script:ProjectRoot $relative))))) -cne
+                    (Get-Frp1Digest (ConvertTo-Frp1CanonicalText $bytes))) { throw 'Checked-in notice differs from the official source.' }
                 $result.Add($relative, $bytes)
             }
             foreach ($name in $script:Assets.Keys) {
@@ -181,7 +189,10 @@ function Get-Frp1LegalFiles([string]$NuGetPackageRoot) {
         }
         finally { $archive.Dispose() }
     }
-    $result.Add('THIRD-PARTY-NOTICES.txt', [IO.File]::ReadAllBytes((Join-Path $script:ProjectRoot 'THIRD-PARTY-NOTICES.txt')))
+    $license = ConvertTo-Frp1CanonicalText ([IO.File]::ReadAllBytes((Join-Path $script:ProjectRoot 'LICENSE')))
+    if ((Get-Frp1Digest $license) -cne '32F09FBA8ABAD3D78A19D9394F282D6EE0233F12C000493A2962186E185DF1E3') { throw 'FRP1 MIT license differs from the approved standard text.' }
+    $result.Add('LICENSE', $license)
+    $result.Add('THIRD-PARTY-NOTICES.txt', (ConvertTo-Frp1CanonicalText ([IO.File]::ReadAllBytes((Join-Path $script:ProjectRoot 'THIRD-PARTY-NOTICES.txt')))))
     return @{ Legal = $result; Assets = $assets }
 }
 
@@ -232,7 +243,7 @@ function Test-Frp1ReleasePackage {
     [CmdletBinding()]
     param([Parameter(Mandatory)][string]$PackagePath, [Parameter(Mandatory)][string]$RepoJsonPath,
         [Parameter(Mandatory)][long]$LastUpdateUnix, [string]$Version = '0.1.0.0', [string]$Tag = 'v0.1.0.0',
-        [string]$Repository = 'demkadse/FinalRoleplay1', [string]$NuGetPackageRoot = (Join-Path ([Environment]::GetFolderPath('UserProfile')) '.nuget/packages'))
+        [string]$Repository = 'demkadse/Final-Roleplay-1', [string]$NuGetPackageRoot = (Join-Path ([Environment]::GetFolderPath('UserProfile')) '.nuget/packages'))
     Assert-Frp1Parameters $Version $Tag $Repository $LastUpdateUnix
     $official = Get-Frp1LegalFiles $NuGetPackageRoot
     $files = Read-Frp1Archive $PackagePath
@@ -267,7 +278,7 @@ function New-Frp1ReleasePackage {
         [string]$InputZip = (Join-Path $script:ProjectRoot 'src/FRP1.Plugin/bin/Release/FRP1.Plugin/latest.zip'),
         [string]$OutputDirectory = (Join-Path $script:ProjectRoot '.release-staging/v0.1.0.0'),
         [string]$NuGetPackageRoot = (Join-Path ([Environment]::GetFolderPath('UserProfile')) '.nuget/packages'),
-        [string]$Version = '0.1.0.0', [string]$Tag = 'v0.1.0.0', [string]$Repository = 'demkadse/FinalRoleplay1')
+        [string]$Version = '0.1.0.0', [string]$Tag = 'v0.1.0.0', [string]$Repository = 'demkadse/Final-Roleplay-1')
     Assert-Frp1Parameters $Version $Tag $Repository $LastUpdateUnix
     $output = [IO.Path]::GetFullPath($OutputDirectory)
     $stage = [IO.Path]::GetFullPath((Join-Path $script:ProjectRoot '.release-staging'))

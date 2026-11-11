@@ -1,6 +1,6 @@
 # UX und Profilgestaltung
 
-Stand: 2026-11-10. **Die folgenden Funktionen sind im nativen Plugin verbunden.** Die abschließende Codeprüfung besteht mit 467 Tests, Release ohne Warnungen/Fehler und unabhängiger Reviewfreigabe. Die Webvorschau bleibt illustrative Referenz, kein Pixelversprechen und keine Spielabnahme.
+Stand: 2026-11-11. **Die folgenden Funktionen sind im nativen Plugin verbunden.** Die abschließende Codeprüfung besteht mit 467 Tests, Release ohne Warnungen/Fehler und unabhängiger Reviewfreigabe. Die Webvorschau bleibt illustrative Referenz, kein Pixelversprechen und keine Spielabnahme.
 
 ## Referenz und vorhandene Oberfläche
 

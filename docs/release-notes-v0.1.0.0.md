@@ -1,11 +1,11 @@
 # FRP1 0.1.0.0 – früher öffentlicher Teststand
 
-Stand: 2026-11-10 · **Veröffentlichung in Vorbereitung, noch nicht als erfolgreich bestätigt.**
+Version 0.1.0.0 · 2026-11-11
 
-Geplant: [demkadse/FinalRoleplay1](https://github.com/demkadse/FinalRoleplay1), Tag `v0.1.0.0`, Asset `FRP1-0.1.0.0.zip`, Installerindex:
+Repository: [demkadse/Final-Roleplay-1](https://github.com/demkadse/Final-Roleplay-1), Branch `master`, Tag `v0.1.0.0`, Asset `FRP1-0.1.0.0.zip`. Installerindex:
 
 ```text
-https://raw.githubusercontent.com/demkadse/FinalRoleplay1/main/repo.json
+https://raw.githubusercontent.com/demkadse/Final-Roleplay-1/master/repo.json
 ```
 
 ## Was FRP1 macht
@@ -41,5 +41,11 @@ Es fehlen eine tatsächliche Spiel-/LAN-/Internetabnahme und umfangreiche Belast
 - Unabhängiges Review: Freigabe ohne kritische oder wichtige Restbefunde.
 - Zusätzliche reale Loopback-Probe: acht Gruppen bestanden.
 
-Die Ergebnisse ersetzen keine tatsächliche Zwei-Spieler-Abnahme im laufenden Spiel. [Installation und Bedienung](benutzerhandbuch.md), [Projektbeschreibung](../README.md), [Status](../STATUS.md).
+Die Ergebnisse ersetzen keine tatsächliche Zwei-Spieler-Abnahme im laufenden Spiel.
+
+## Lizenz
+
+Projektcode und Dokumentation stehen unter [MIT](https://github.com/demkadse/Final-Roleplay-1/blob/master/LICENSE). Nutzerprofile, Bilder und Fremdkomponenten behalten ihre eigenen Rechte beziehungsweise Lizenzbedingungen; keine automatische Mitlizenzierung von Profilinhalten.
+
+[Installation und Bedienung](https://github.com/demkadse/Final-Roleplay-1/blob/master/docs/benutzerhandbuch.md), [Projektbeschreibung](https://github.com/demkadse/Final-Roleplay-1/blob/master/README.md), [Veröffentlichungs- und Abnahmestand](https://github.com/demkadse/Final-Roleplay-1/blob/master/STATUS.md).
 

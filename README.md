@@ -4,7 +4,7 @@
 
 FRP1 ist ein Dalamud-Plugin für Charakterbeschreibungen, erste Eindrücke, RP-Status und Kontakte. Es orientiert sich beim Bedienkonzept an Total RP 3 und übernimmt die lokal beziehungsweise direkt zwischen Clients umsetzbaren Funktionen von Glance in einer eigenen FFXIV-Oberfläche.
 
-**Stand: 2026-11-10 – früher öffentlicher Teststand 0.1.0.0 in Veröffentlichungsvorbereitung.** Der Code besteht 467 Tests, Release-Build und unabhängiges Review. Eine tatsächliche Spielabnahme und reale LAN-/Internet-/NAT-Abnahme sind noch nicht erfolgt.
+**Stand: 2026-11-11 – früher Teststand 0.1.0.0.** Der Quellcode liegt bereits im bestehenden privaten GitHub-Repository; öffentliche Freigabe und Installerverteilung werden vorbereitet. Der Code besteht 467 Tests, Release-Build und unabhängiges Review. Eine tatsächliche Spielabnahme und reale LAN-/Internet-/NAT-Abnahme sind noch nicht erfolgt.
 
 ## Kein zentraler Server für deine Profile
 
@@ -12,9 +12,9 @@ FRP1 lädt deine Charakterprofile nicht auf eine Website, in eine Cloud oder in 
 
 **„Öffentliches Profil“ bedeutet hier ein zum Teilen vorgesehenes Profildokument, keine Veröffentlichung im Internet.** Es wird nicht automatisch auffindbar oder für alle Spieler sichtbar.
 
-Private Profil- und Charakternotizen, Beziehungen, Favoriten, Besuchsverlauf, eigene Charakterzuordnungen, Altersauswahl und persönliche Einstellungen bleiben ausschließlich lokal. Sie sind kein Bestandteil des geteilten Profils und werden nicht an andere Clients geschickt. Für den Inhaltsfilter wird nur das notwendige Empfangsflag übermittelt, ob ein Client Inhalte ab 18 akzeptiert; kein Geburtsdatum und keine vollständige Altersangabe.
+Private Profil- und Charakternotizen, Beziehungen, Favoriten, Besuchsverlauf, lokale Content-IDs, eigene Charakterzuordnungen, Altersauswahl und persönliche Einstellungen bleiben ausschließlich lokal. Sie sind kein Bestandteil des geteilten Profils und werden nicht an andere Clients geschickt. Für den Inhaltsfilter wird nur das notwendige Empfangsflag übermittelt, ob ein Client Inhalte ab 18 akzeptiert; kein Geburtsdatum und keine vollständige Altersangabe.
 
-Es gibt keine FRP1-Accounts, Telemetrie, Relay-, STUN- oder Discoverydienste. Ein aktiver Client nimmt direkte Verbindungen anderer ausdrücklich gekoppelter Clients entgegen. Du musst dafür keinen separaten Serverdienst oder Profildatenspeicher betreiben.
+Es gibt keine FRP1-Accounts, Telemetrie, Relay-, STUN-, Discoverydienste oder IP-Broker. Ein aktiver Client nimmt direkte Verbindungen anderer ausdrücklich gekoppelter Clients entgegen. Du musst dafür keinen separaten Serverdienst oder Profildatenspeicher betreiben.
 
 **GitHub hat eine andere Aufgabe:** Dort werden ausschließlich Plugin-Dateien, Quelltext und der Installerindex für Installation und Updates bereitgestellt. FRP1-Profile werden nicht zu GitHub übertragen. Die Softwaredownloads und FFXIV selbst verwenden selbstverständlich ihre jeweiligen Dienste; „serverfrei“ bezieht sich auf den Austausch und die Speicherung deiner FRP1-Profildaten.
 
@@ -31,14 +31,14 @@ Das Diagramm zeigt die FRP1-Datenwege. FFXIV-Spielverkehr ist kein FRP1-Profiltr
 
 ## Installation über die .json-Adresse
 
-**Die folgende Veröffentlichung wird gerade vorbereitet; Verfügbarkeit des Repositorys und Releasepakets ist noch nicht bestätigt.** Die Anleitung gilt nach erfolgreicher Veröffentlichung.
+**Der Quellcode ist bereits hochgeladen, das bestehende Repository jedoch noch privat. Öffentliche Freigabe, Installerindex und Releasepaket werden vorbereitet und sind noch nicht als öffentlich erreichbar bestätigt.** Die Anleitung gilt nach erfolgreicher öffentlicher Freigabe.
 
 Für Installation und Benutzung ist **kein GitHub-Konto** erforderlich. Nach Veröffentlichung können die öffentliche JSON-Datei und das ZIP-Paket ohne Anmeldung heruntergeladen werden; FRP1 verlangt ebenfalls kein Konto.
 
 Installeradresse für **Custom Plugin Repositories**:
 
 ```text
-https://raw.githubusercontent.com/demkadse/FinalRoleplay1/main/repo.json
+https://raw.githubusercontent.com/demkadse/Final-Roleplay-1/master/repo.json
 ```
 
 1. Nutze XIVLauncher/Dalamud auf Windows mit kompatibler Dalamud API 15. FRP1 ist kein eigenständiges Programm und kein Konsolenplugin.
@@ -50,7 +50,7 @@ https://raw.githubusercontent.com/demkadse/FinalRoleplay1/main/repo.json
 
 Die GitHub-Projektseite oder eine ZIP-Adresse gehört nicht in das Repositoryfeld. Der Index ist eine JSON-Liste, aus der Dalamud die eigentlichen Installations-/Updatepakete lädt. Grundlage ist das [offizielle Dalamud-Verfahren für eigene Repositories](https://dalamud.dev/plugin-publishing/custom-repositories/).
 
-Geplante Projekt-/Releaseziele: [demkadse/FinalRoleplay1](https://github.com/demkadse/FinalRoleplay1), Tag `v0.1.0.0`, Paket `FRP1-0.1.0.0.zip`. Keine Bestätigung einer erfolgreichen Veröffentlichung, solange der Vorbereitungsstatus oben besteht.
+Bestehendes Projekt: [demkadse/Final-Roleplay-1](https://github.com/demkadse/Final-Roleplay-1), Branch `master`. Vorgesehen sind Tag `v0.1.0.0` und Paket `FRP1-0.1.0.0.zip`. Die öffentliche Erreichbarkeit dieser Installerverteilung ist noch nicht bestätigt; es wird kein separates Repository angelegt.
 
 ## Die ersten Minuten
 
@@ -142,5 +142,11 @@ Release-Ausgaben aus dem Entwicklungsbuild: `src/FRP1.Plugin/bin/Release/FRP1.Pl
 
 Weitere Dokumentation: [Benutzerhandbuch](docs/benutzerhandbuch.md), [Release-Notes 0.1.0.0](docs/release-notes-v0.1.0.0.md), [Status](STATUS.md), [Übergabe](HANDOFF.md), [Architektur](docs/architecture.md), [Machbarkeit](docs/feasibility.md), [TRP3-Abgleich](docs/trp3-feature-map.md), [Glance-Abgleich](docs/glance-feature-map.md), [UX/Gestaltung](docs/ux-and-vanity.md).
 
-FRP1 ist eigenständig implementiert; keine Übernahme von TRP3-/Glance-Code oder WoW-Assets. Eine gesonderte Open-Source-Lizenz für den eigenen Code ist noch nicht festgelegt; öffentliche Einsehbarkeit ändert diesen Status nicht. Fremdkomponenten behalten ihre jeweiligen Lizenzbedingungen; siehe [mitgelieferte Hinweise](THIRD-PARTY-NOTICES.txt).
+## Lizenz
+
+FRP1-Projektcode und Dokumentation stehen unter der [MIT-Lizenz](LICENSE). Sie erlaubt auch kommerzielle Nutzung, Änderungen und Weitergabe unter Beibehaltung der Copyright- und Lizenzhinweise. Maßgeblich ist der vollständige Lizenztext.
+
+Diese Projektlizenz gilt **nicht automatisch für Nutzerprofile, Profilbilder oder andere fremde Inhalte**. Über deren Rechte und Freigaben entscheiden die jeweiligen Rechteinhaber. Fremdkomponenten behalten ihre eigenen Bedingungen; siehe [mitgelieferte Hinweise](THIRD-PARTY-NOTICES.txt).
+
+FRP1 ist eigenständig implementiert; keine Übernahme von TRP3-/Glance-Code oder WoW-Assets.
 

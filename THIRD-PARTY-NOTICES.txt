@@ -1,8 +1,10 @@
 FRP1 - bundled third-party software
 ==================================
 
-This document applies only to the third-party components listed below. It
-does not select or grant a license for FRP1 itself.
+This document applies to the third-party components listed below. FRP1
+itself is distributed under the MIT License in the included LICENSE file.
+The complete third-party licenses and notices remain applicable to their
+respective components.
 
 The release includes the following Microsoft NuGet components, version
 10.0.14. Their complete license and third-party notices are included under

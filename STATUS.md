@@ -1,12 +1,14 @@
 # Status
 
-Stand: 2026-11-10
+Stand: 2026-11-11
 
 ## Veröffentlichungsvorbereitung 0.1.0.0
 
-Der Upload ist ausdrücklich beauftragt und wird vorbereitet; ein erfolgreicher öffentlicher Upload ist noch nicht bestätigt. Ziel ist das öffentliche GitHub-Repository [demkadse/FinalRoleplay1](https://github.com/demkadse/FinalRoleplay1), Branch `main`, Tag `v0.1.0.0` und Asset `FRP1-0.1.0.0.zip`.
+Der Quellcode wurde bereits in das bestehende Repository [demkadse/Final-Roleplay-1](https://github.com/demkadse/Final-Roleplay-1) hochgeladen (Branch `master`, bestätigter Ausgangsstand `46ad78e`). Es ist derzeit privat. Seine öffentliche Freigabe, die MIT-Lizenzierung und Veröffentlichung von Tag `v0.1.0.0` mit Asset `FRP1-0.1.0.0.zip` sind ausdrücklich beauftragt; öffentliche Installerverteilung ist noch nicht bestätigt. Es wird kein separates Repository angelegt.
 
-Geplante Installeradresse: `https://raw.githubusercontent.com/demkadse/FinalRoleplay1/main/repo.json`. Nach Veröffentlichung sind JSON/ZIP ohne GitHub-Anmeldung nutzbar. GitHub verteilt ausschließlich Software und Installerindex; FRP1-Profile oder private Daten werden nicht dorthin übertragen.
+Geplante Installeradresse: `https://raw.githubusercontent.com/demkadse/Final-Roleplay-1/master/repo.json`. Nach Veröffentlichung sind JSON/ZIP ohne GitHub-Anmeldung nutzbar. GitHub verteilt ausschließlich Software und Installerindex; FRP1-Profile oder private Daten werden nicht dorthin übertragen.
+
+Eigener Projektcode und Dokumentation sind unter [MIT](LICENSE) lizenziert. Nutzerprofile/Bilder und Fremdkomponenten sind dadurch nicht automatisch mitlizenziert. Die gesonderte Release-Paketprüfung läuft; die untenstehenden 467 Funktionstests und acht Probegruppen sind der zuvor bestätigte Codestand.
 
 Ausführliche Beschreibung und konkrete Installations-/Bedienungsschritte stehen in [README](README.md), [Benutzerhandbuch](docs/benutzerhandbuch.md) und [Release-Notes](docs/release-notes-v0.1.0.0.md). Dies ist ein früher Teststand; reale Spiel-/Netzabnahme bleibt offen.
 
@@ -50,5 +52,5 @@ Der wichtige Chatbefund ist korrigiert und unabhängig regressionsgeprüft: nur 
 
 Native Bedienung, Skalierung, Fokus, Entladen, reale Volkzuordnung, Nameplate-/Chatdarstellung und Portrait-/Iconwiedergabe müssen im laufenden Spiel geprüft werden. Reale LAN-/IPv6-/Internet-/NAT-/CGNAT-Erreichbarkeit und Belastungsprüfung bleiben offen. Die End-to-End-Definition of Done mit zwei Spielern ist dadurch noch nicht abgenommen.
 
-Eine Installation beziehungsweise reale Spiel-/Netzabnahme wurde nicht durchgeführt. Die Veröffentlichung ist vorbereitet, noch nicht als erfolgreich bestätigt. Die Lizenzentscheidung für den eigenen Code bleibt offen. Vollständige Zuordnung der vorhandenen und angepassten Funktionen: [TRP3-Matrix](docs/trp3-feature-map.md), [Glance-Matrix](docs/glance-feature-map.md).
+Eine Installation beziehungsweise reale Spiel-/Netzabnahme wurde nicht durchgeführt. Der Sourceupload ist bestätigt, die öffentliche Installerverteilung noch in Vorbereitung. MIT ist für eigenen Code und Dokumentation beschlossen. Vollständige Zuordnung der vorhandenen und angepassten Funktionen: [TRP3-Matrix](docs/trp3-feature-map.md), [Glance-Matrix](docs/glance-feature-map.md).
 

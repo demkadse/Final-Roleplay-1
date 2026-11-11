@@ -1,4 +1,4 @@
-#requires -Version 7.0
+#requires -Version 7.2
 [CmdletBinding()]
 param(
     [string] $InputZip = (Join-Path $PSScriptRoot '..\..\src\FRP1.Plugin\bin\Release\FRP1.Plugin\latest.zip'),
@@ -18,7 +18,7 @@ $fixtureRoot = Join-Path $PSScriptRoot ('bin\package-tests-' + $runId)
 $stageRoot = Join-Path $projectRoot ('.release-staging\package-tests-' + $runId)
 $version = '0.1.0.0'
 $tag = 'v0.1.0.0'
-$repository = 'demkadse/FinalRoleplay1'
+$repository = 'demkadse/Final-Roleplay-1'
 $assetName = 'FRP1-0.1.0.0.zip'
 $script:passed = 0
 $script:failed = 0
@@ -145,6 +145,7 @@ try {
         Assert-True ($record.InternalName -eq 'FRP1.Plugin') 'Installer internal name differs from the DLL.'
         Assert-True ($record.AssemblyVersion -eq $version) 'Installer assembly version differs from the release.'
         Assert-True ($record.DalamudApiLevel -eq 15) 'Installer API level differs from the tested plugin.'
+        Assert-True ($record.RepoUrl -ceq ('https://github.com/' + $repository)) 'Installer repository differs from the confirmed public repository.'
         $expectedUrl = 'https://github.com/' + $repository + '/releases/download/' + $tag + '/' + $assetName
         foreach ($field in @('DownloadLinkInstall', 'DownloadLinkUpdate', 'DownloadLinkTesting')) {
             Assert-True ($record.$field -ceq $expectedUrl) 'A download field does not point to the exact release asset.'
@@ -192,6 +193,10 @@ try {
                     if ($entry.FullName.EndsWith('.dll', [StringComparison]::OrdinalIgnoreCase)) {
                         $pe = [Reflection.PortableExecutable.PEReader]::new($memory)
                         try {
+                            $assemblyReader = [Reflection.Metadata.PEReaderExtensions]::GetMetadataReader($pe)
+                            $assemblyVersion = $assemblyReader.GetAssemblyDefinition().Version.ToString()
+                            $expectedAssemblyVersion = if ($entry.FullName -ceq 'FRP1.Plugin.dll') { $version } else { '1.0.0.0' }
+                            Assert-True ($assemblyVersion -ceq $expectedAssemblyVersion) 'An own DLL has an unexpected assembly version; Core and Plugin versions are independent.'
                             foreach ($debugEntry in $pe.ReadDebugDirectory()) {
                                 if ($debugEntry.Type -eq [Reflection.PortableExecutable.DebugDirectoryEntryType]::CodeView) {
                                     Assert-NeutralDebugPath ($pe.ReadCodeViewDebugDirectoryData($debugEntry).Path) -AllowFileName
@@ -253,6 +258,29 @@ try {
     Invoke-Check 'Complete original MIT license is bundled' {
         $license = Normalize-Notice (Get-Content -LiteralPath (Join-Path $NuGetPackageRoot 'system.drawing.common\10.0.14\LICENSE.TXT') -Raw)
         Assert-True (@($bundledText | Where-Object { $_.Contains($license, [StringComparison]::Ordinal) }).Count -gt 0) 'The complete original MIT license is missing.'
+    }
+    Invoke-Check 'Own MIT license is bundled completely with the confirmed copyright' {
+        $ownLicense = Normalize-Notice (Get-Content -LiteralPath (Join-Path $projectRoot 'LICENSE') -Raw)
+        Assert-True ($ownLicense.Contains('Copyright (c) 2026 demkadse', [StringComparison]::Ordinal)) 'The own MIT license has an unexpected copyright holder.'
+        Assert-True ($ownLicense.Contains('Permission is hereby granted, free of charge', [StringComparison]::Ordinal)) 'The own license omits the MIT permission grant.'
+        Assert-True ($ownLicense.Contains('THE SOFTWARE IS PROVIDED "AS IS"', [StringComparison]::Ordinal)) 'The own license omits the MIT disclaimer.'
+        $archive = [IO.Compression.ZipFile]::OpenRead($releaseZip)
+        try {
+            $entry = $archive.GetEntry('LICENSE')
+            Assert-True ($null -ne $entry) 'The own license is missing from the release root.'
+            $included = Normalize-Notice ([Text.Encoding]::UTF8.GetString((Read-ZipBytes $entry)))
+            Assert-True ($included -ceq $ownLicense) 'The bundled own license differs from the complete repository license.'
+        }
+        finally { $archive.Dispose() }
+    }
+    Invoke-Check 'Repeated preparation with identical input and timestamp reproduces ZIP and installer hashes' {
+        $repeatedStage = New-StagePath
+        Invoke-Prepare $inputPath $repeatedStage
+        foreach ($name in @($assetName, 'repo.json', 'SHA256SUMS')) {
+            $firstHash = (Get-FileHash -LiteralPath (Join-Path $positiveStage $name) -Algorithm SHA256).Hash
+            $secondHash = (Get-FileHash -LiteralPath (Join-Path $repeatedStage $name) -Algorithm SHA256).Hash
+            Assert-True ($firstHash -ceq $secondHash) 'Repeated preparation changed an artifact despite identical input and timestamp.'
+        }
     }
 
     $fixtureNumber = 0
@@ -317,6 +345,28 @@ try {
         }
         catch { $rejected = $true }
         Assert-True $rejected 'The public validator accepted a release without notices.'
+    }
+    Invoke-Check 'Public validator rejects a release with the own MIT license missing' {
+        $fixture = Join-Path $fixtureRoot 'missing-own-license.zip'
+        New-ArchiveFixture $releaseZip $fixture -Omit @('LICENSE')
+        $rejected = $false
+        try {
+            & $validateScript -PackagePath $fixture -RepoJsonPath $repoJsonPath -NuGetPackageRoot $NuGetPackageRoot `
+                -Version $version -Tag $tag -Repository $repository -LastUpdateUnix $LastUpdateUnix *> $null
+        }
+        catch { $rejected = $true }
+        Assert-True $rejected 'The public validator accepted a release without the own license.'
+    }
+    Invoke-Check 'Public validator rejects a release with a truncated or replaced own license' {
+        $fixture = Join-Path $fixtureRoot 'tampered-own-license.zip'
+        New-ArchiveFixture $releaseZip $fixture -Replace @{ 'LICENSE' = [Text.Encoding]::UTF8.GetBytes("MIT License`nSynthetic incomplete fixture") }
+        $rejected = $false
+        try {
+            & $validateScript -PackagePath $fixture -RepoJsonPath $repoJsonPath -NuGetPackageRoot $NuGetPackageRoot `
+                -Version $version -Tag $tag -Repository $repository -LastUpdateUnix $LastUpdateUnix *> $null
+        }
+        catch { $rejected = $true }
+        Assert-True $rejected 'The public validator accepted a release with the own license replaced.'
     }
     Invoke-Check 'Existing staged files are never overwritten by release preparation' {
         $existing = New-StagePath

@@ -1,6 +1,6 @@
 # TRP3-Funktionsabgleich
 
-Stand: 2026-11-10. Die FRP1-Module sind im echten Plugin angebunden. Release-Build ohne Warnungen/Fehler, 467 bestandene Tests und unabhängige Reviewfreigabe belegen den Codeprüfstand; die native Spiel-/Netzabnahme ist ein weiterhin offener eigener Schritt.
+Stand: 2026-11-11. Die FRP1-Module sind im echten Plugin angebunden. Release-Build ohne Warnungen/Fehler, 467 bestandene Tests und unabhängige Reviewfreigabe belegen den Codeprüfstand; die native Spiel-/Netzabnahme ist ein weiterhin offener eigener Schritt.
 
 ## Quelle und Lesart
 

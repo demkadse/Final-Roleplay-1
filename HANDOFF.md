@@ -1,20 +1,22 @@
 # Übergabe
 
-Stand: 2026-11-10
+Stand: 2026-11-11
 
 ## Aktueller Arbeitsfokus
 
 Alle wesentlichen Module sind im nativen Plugin verdrahtet; die frühere Beschreibung als lokaler Editor mit separatem Transport ist überholt. Social-/Nameplate-Icon-Ergänzungen und letzte Anzeige-/Performancekorrekturen sind enthalten. Danach bestehen der vollständige Release-Build mit null Warnungen/Fehlern und die Gesamtsuite mit **467/467 Tests**, ohne Fehler/übersprungene Tests. Das endgültige unabhängige Review ist freigegeben; keine kritischen oder wichtigen Befunde verbleiben. Die separate Probe besteht mit acht echten Loopback-TLS-Prüfgruppen. Reale Spiel-/Netzabnahme ist weiterhin offen.
 
-Der aktuelle Quellstand wird für die ausdrücklich beauftragte öffentliche GitHub-Veröffentlichung vorbereitet, ist aber noch nicht als erfolgreich hochgeladen bestätigt. Eine lokale Spielinstallation ist nicht erfolgt. Projektanweisungen beachten und fremde/uncommittete Änderungen erhalten. Keine bereits angebundenen Funktionen erneut als offen planen. [STATUS.md](STATUS.md) und [TRP3-Funktionsmatrix](docs/trp3-feature-map.md) sind der Einstieg.
+Der Quellcode ist im bestehenden privaten Repository `demkadse/Final-Roleplay-1`, Branch `master`, Ausgangsstand `46ad78e` hochgeladen. Die ausdrückliche Folgefreigabe umfasst öffentliche Sichtbarkeit und MIT im selben Repository; die öffentliche Installerverteilung ist noch nicht bestätigt. Eine lokale Spielinstallation ist nicht erfolgt. Projektanweisungen beachten und fremde/uncommittete Änderungen erhalten. Keine bereits angebundenen Funktionen erneut als offen planen. [STATUS.md](STATUS.md) und [TRP3-Funktionsmatrix](docs/trp3-feature-map.md) sind der Einstieg.
 
 ## Beauftragte Veröffentlichung
 
-Geplantes öffentliches Ziel: `demkadse/FinalRoleplay1`, Branch `main`, Tag `v0.1.0.0`, Asset `FRP1-0.1.0.0.zip`. Installeradresse: `https://raw.githubusercontent.com/demkadse/FinalRoleplay1/main/repo.json`. Die Veröffentlichung ist bereits autorisiert; keine erneute Nutzerfreigabe als routinemäßigen Zwischenstopp einführen.
+Bestehendes Ziel: `demkadse/Final-Roleplay-1`, Branch `master`, Tag `v0.1.0.0`, Asset `FRP1-0.1.0.0.zip`. Installeradresse: `https://raw.githubusercontent.com/demkadse/Final-Roleplay-1/master/repo.json`. Öffentliche Sichtbarkeit und MIT sind bereits autorisiert; kein neues Repository und keine erneute Nutzerfreigabe als routinemäßigen Zwischenstopp einführen.
 
 Root führt Repository-/Releaseaktionen aus. Erst nach bestätigtem Erfolg Veröffentlichungsvorbereitung in README/STATUS/Handbuch/Release-Notes auf tatsächliche Verfügbarkeit umstellen. Die konkreten Texte sind vorbereitet; weder einen Upload noch einen getesteten öffentlichen Download allein aus lokalen Dateien ableiten.
 
-GitHub ist ausschließlich Softwareverteilung, kein FRP1-Profilbackend. Öffentliche JSON-/ZIP-Dateien benötigen nach Veröffentlichung kein GitHub-Konto; der Pluginbetrieb ebenfalls keinen Account. Öffentliche Profile gehen nur direkt an ausdrücklich gekoppelte/freigegebene FRP1-Clients. Private Notizen, Altersauswahl, Zuordnungen und Einstellungen bleiben lokal. License-/Fremdkomponentenunterlagen erstellt parallel der Entwickler; keine eigene neue Lizenz erfinden.
+GitHub ist ausschließlich Softwareverteilung, kein FRP1-Profilbackend. Öffentliche JSON-/ZIP-Dateien benötigen nach Veröffentlichung kein GitHub-Konto; der Pluginbetrieb ebenfalls keinen Account. Öffentliche Profile gehen nur direkt an ausdrücklich gekoppelte/freigegebene FRP1-Clients. Private Notizen, Altersauswahl, Content-IDs, Zuordnungen und Einstellungen bleiben lokal. Der Publisher ergänzt parallel LICENSE, Paket-/Indexziele und Fremdkomponentenunterlagen; die Dokumentationsrolle ändert diese Dateien nicht.
+
+Projektcode und Dokumentation stehen unter [MIT](LICENSE), einschließlich kommerzieller Weiterverwendung unter Erhalt der Hinweise. Nutzerprofile/Bilder und fremde Inhalte sind davon nicht automatisch erfasst; keine Rechteübertragung dieser Inhalte behaupten. Die Release-Paketprüfung ist zusätzlich zum bestehenden Funktionsteststand auszuwerten.
 
 Neue Nutzerdokumentation: [ausführliches Handbuch](docs/benutzerhandbuch.md), [Release-Notes 0.1.0.0](docs/release-notes-v0.1.0.0.md).
 
@@ -65,5 +67,5 @@ dotnet test FRP1.slnx -c Release --nologo -p:BuildInParallel=false
 dotnet run --project tools/FRP1.Probe -c Release -- --self-test
 ```
 
-Loopback belegt keine NAT-/CGNAT-Erreichbarkeit. Weitere Grenzen: [Machbarkeit](docs/feasibility.md), [Architektur](docs/architecture.md), [UX](docs/ux-and-vanity.md). TRP3-/Glance-Funktionen sind eigenständig implementiert; kein fremder Code/keine WoW-Assets übernommen. Lizenzentscheidung und spätere Open-Source-Veröffentlichung bleiben offen.
+Loopback belegt keine NAT-/CGNAT-Erreichbarkeit. Weitere Grenzen: [Machbarkeit](docs/feasibility.md), [Architektur](docs/architecture.md), [UX](docs/ux-and-vanity.md). TRP3-/Glance-Funktionen sind eigenständig implementiert; kein fremder Code/keine WoW-Assets übernommen. MIT ist beschlossen; öffentliche Erreichbarkeit erst nach tatsächlicher Verifikation bestätigen.
 

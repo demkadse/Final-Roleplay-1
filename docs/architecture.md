@@ -1,6 +1,6 @@
 # Architektur
 
-Stand: 2026-11-10. Native Module und Direkttransport sind verbunden; der vollständige Release-Build, 467 Tests und das unabhängige Review sind erfolgreich abgeschlossen. Dies ist keine Spiel-/Netzabnahme.
+Stand: 2026-11-11. Native Module und Direkttransport sind verbunden; der vollständige Release-Build, 467 Tests und das unabhängige Review sind erfolgreich abgeschlossen. Dies ist keine Spiel-/Netzabnahme.
 
 ## Bausteine
 

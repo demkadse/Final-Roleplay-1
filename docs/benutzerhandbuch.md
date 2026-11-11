@@ -1,8 +1,8 @@
 # FRP1 – Benutzerhandbuch
 
-Stand: 2026-11-10 · vorbereiteter früher öffentlicher Teststand 0.1.0.0.
+Stand: 2026-11-11 · vorbereiteter früher öffentlicher Teststand 0.1.0.0.
 
-**Veröffentlichungsvorbereitung:** Das öffentliche Repository, der Installerindex und das Releasepaket sind vorgesehen, aber noch nicht als veröffentlicht bestätigt. Die folgenden Installationsschritte gelten nach erfolgreicher Veröffentlichung. Der geprüfte Codestand besteht 467 Tests und unabhängiges Review; eine echte Spiel-/LAN-/Internetabnahme steht noch aus.
+**Veröffentlichungsvorbereitung:** Der Quellcode ist bereits im bestehenden Repository `demkadse/Final-Roleplay-1` auf Branch `master` hochgeladen; das Repository ist derzeit privat. Öffentliche Freigabe, Installerindex und Releasepaket sind noch nicht als öffentlich erreichbar bestätigt. Die folgenden Installationsschritte gelten danach. Der geprüfte Codestand besteht 467 Tests und unabhängiges Review; eine echte Spiel-/LAN-/Internetabnahme steht noch aus.
 
 ## 1. Was FRP1 ist
 
@@ -10,7 +10,7 @@ Final Roleplay 1 ist ein Dalamud-Plugin für Rollenspiel in Final Fantasy XIV. D
 
 FRP1 speichert Profile auf den beteiligten Rechnern. Es gibt **keinen FRP1-Profilserver, keine zentrale Profildatenbank, keine Registrierung und keine Cloudprofile**. Öffentliche Profile werden nur direkt zwischen den von dir ausdrücklich gekoppelten und freigegebenen Clients ausgetauscht. „Öffentlich“ bezeichnet das zum Teilen vorgesehene Dokument, nicht eine automatisch öffentliche Internetseite.
 
-Private Notizen, Beziehungen, Favoriten, eigene Zuordnungen, Altersauswahl, Besuchsverlauf und Einstellungen bleiben lokal und werden gar nicht mit anderen Clients geteilt. Die Profildarstellung einer anderen Person kommt aus dem direkten Austausch oder deinem lokalen Cache, nicht aus einer Website.
+Private Notizen, Beziehungen, Favoriten, lokale Content-IDs, eigene Zuordnungen, Altersauswahl, Besuchsverlauf und Einstellungen bleiben lokal und werden gar nicht mit anderen Clients geteilt. Die Profildarstellung einer anderen Person kommt aus dem direkten Austausch oder deinem lokalen Cache, nicht aus einer Website. Es gibt keinen FRP1-IP-Broker oder automatischen Vermittlungsdienst.
 
 GitHub liefert ausschließlich Plugin-Dateien, Quelltext und den Installerindex. **Für Installation und Benutzung brauchst du kein GitHub-Konto.** Die geplanten öffentlichen JSON-/ZIP-Downloads sind nach Veröffentlichung ohne Anmeldung verfügbar. FFXIV und Softwaredownloads nutzen ihre üblichen Dienste; sie werden nicht zu FRP1-Profildatenservern.
 
@@ -21,7 +21,7 @@ Du brauchst einen Windows-FFXIV-Client mit XIVLauncher/Dalamud und kompatibler D
 Geplante Installeradresse:
 
 ```text
-https://raw.githubusercontent.com/demkadse/FinalRoleplay1/main/repo.json
+https://raw.githubusercontent.com/demkadse/Final-Roleplay-1/master/repo.json
 ```
 
 1. Öffne im Spiel die Dalamud-Einstellungen mit `/xlsettings`.
@@ -34,7 +34,7 @@ https://raw.githubusercontent.com/demkadse/FinalRoleplay1/main/repo.json
 
 In das Repositoryfeld gehört die `repo.json`-Adresse, nicht die GitHub-Startseite und nicht das ZIP. Das normale Verfahren beschreibt die [offizielle Dalamud-Dokumentation](https://dalamud.dev/plugin-publishing/custom-repositories/).
 
-Das vorbereitete Release verwendet Tag `v0.1.0.0` und Asset `FRP1-0.1.0.0.zip` unter [demkadse/FinalRoleplay1](https://github.com/demkadse/FinalRoleplay1). Solange der Vorbereitungsstatus gilt, ist eine nicht erreichbare Datei kein bestätigter Installationsfehler deines Rechners.
+Das Release verwendet Tag `v0.1.0.0` und Asset `FRP1-0.1.0.0.zip` im bestehenden [demkadse/Final-Roleplay-1](https://github.com/demkadse/Final-Roleplay-1), Branch `master`. Solange die öffentliche Verteilung noch vorbereitet wird, ist eine nicht erreichbare Datei kein bestätigter Installationsfehler deines Rechners.
 
 ## 3. Erststart: Regeln und tatsächliches Alter
 
@@ -260,6 +260,8 @@ Deaktivieren und lokale Daten löschen sind getrennte Entscheidungen. Eine Deins
 Der Codestand besteht 467 automatisierte Tests, den vollständigen Release-Build ohne Warnungen/Fehler und unabhängiges Review ohne kritische oder wichtige Restbefunde. Die zusätzliche Probe besteht acht Gruppen mit echten Loopback-TLS-Clients.
 
 Reale Spielbedienung, Darstellung, LAN/Internet/NAT/CGNAT und umfangreiche Belastung sind noch nicht abgenommen. Es gibt keine Garantie, dass zwei beliebige Netze ohne weitere Infrastruktur eine direkte Verbindung erlauben.
+
+Projektcode und Dokumentation stehen unter der [MIT-Lizenz](../LICENSE). Das erlaubt auch kommerzielle Nutzung unter Erhalt der Copyright-/Lizenzhinweise. Deine Profile und Bilder werden dadurch nicht automatisch unter MIT gestellt; maßgeblich sind die Rechte der jeweiligen Inhalte.
 
 Technische Details: [Architektur](architecture.md), [Machbarkeit](feasibility.md), [TRP3-Abgleich](trp3-feature-map.md), [Glance-Abgleich](glance-feature-map.md). [Projektstatus](../STATUS.md) und [Release-Notes](release-notes-v0.1.0.0.md) halten Veröffentlichung und Abnahmestand fest.
 

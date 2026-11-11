@@ -1,6 +1,6 @@
 # Machbarkeit und Werkzeugwahl
 
-Stand: 2026-11-10
+Stand: 2026-11-11
 
 ## Umgesetzt: Clients unter sich
 

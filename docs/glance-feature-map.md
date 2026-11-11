@@ -1,6 +1,6 @@
 # Serverfreier Glance-Funktionsabgleich
 
-Stand: 2026-11-10. Die bisher beschriebenen Folgepakete sind im nativen Plugin integriert. Abschließender Release-Build, 467 Tests und unabhängiges Review sind bestanden; die Spielabnahme bleibt offen.
+Stand: 2026-11-11. Die bisher beschriebenen Folgepakete sind im nativen Plugin integriert. Abschließender Release-Build, 467 Tests und unabhängiges Review sind bestanden; die Spielabnahme bleibt offen.
 
 Referenzen: [Glance](https://rphub.co/glance), [offizielles Repository](https://github.com/rphubco/glance), [Profilmodelle](https://raw.githubusercontent.com/rphubco/glance/master/Models/ProfileModels.cs), [Editor](https://raw.githubusercontent.com/rphubco/glance/master/UI/Components/ProfileEditor.cs), [Einstellungen](https://raw.githubusercontent.com/rphubco/glance/master/UI/Windows/Tabs/SettingsTab.cs), [Profiltab](https://raw.githubusercontent.com/rphubco/glance/master/UI/Windows/Tabs/ProfileTab.cs), [Toolbox](https://raw.githubusercontent.com/rphubco/glance/master/UI/Windows/ToolboxWindow.cs). Eigene Implementierung; keine Übernahme des AGPL-3.0-Quellcodes.
 

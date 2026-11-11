@@ -7,7 +7,7 @@ param(
     [string]$NuGetPackageRoot,
     [string]$Version = '0.1.0.0',
     [string]$Tag = 'v0.1.0.0',
-    [string]$Repository = 'demkadse/FinalRoleplay1'
+    [string]$Repository = 'demkadse/Final-Roleplay-1'
 )
 $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path $PSScriptRoot 'ReleasePackage.psm1') -Force
