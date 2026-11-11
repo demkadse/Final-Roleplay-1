@@ -1,0 +1,2 @@
+# Keep generated installer bytes identical to the published SHA256SUMS.
+repo.json -text
