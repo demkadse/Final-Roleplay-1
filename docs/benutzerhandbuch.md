@@ -106,6 +106,8 @@ Wähle das gespeicherte aktive Profil, IC/OOC/AFK und die RP-Verfügbarkeit. Eig
 
 Position, Sichtbarkeit, Bewegungssperre und fensterlokale Skalierung von 0,75 bis 1,75 werden lokal gespeichert. Eine Bewegungssperre sperrt nicht die Buttons. Die Position bleibt auf die sichtbare Arbeitsfläche begrenzt. Logout blendet die Leiste nur vorübergehend aus.
 
+**Wiedereinblenden seit 0.1.1.3:** Ein Fehler konnte eine gerade aktivierte Leiste sofort wieder ausschalten. Aktualisiere auf mindestens 0.1.1.3 und aktiviere die Leistensichtbarkeit erneut oder verwende **Anzeigen und Position zurücksetzen**. Alternativ zeigt `/frpbar` beziehungsweise `/frp bar show` die Leiste an. Eine zuvor ausgeschaltete gespeicherte Wahl wird durch das Update nicht automatisch geändert.
+
 Bei verändertem oder beschäftigtem Editor sind konkurrierende Leistenänderungen gesperrt. Öffne den Editor, speichere oder kläre den Entwurf und versuche es erneut. Ein veralteter Entwurf darf eine zwischenzeitliche Profiländerung nicht überschreiben.
 
 ## 7. Portraits, Icons, Journal und Themes

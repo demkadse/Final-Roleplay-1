@@ -2,9 +2,21 @@
 
 Stand: 2026-11-12
 
-## Aktuell: 0.1.1.2 vollständig geprüft und automatisch veröffentlicht
+## Aktuell: RP-Leistenfix als 0.1.1.3 veröffentlicht
 
-Die UX aus Nutzercommit `62a91a7` ist veröffentlicht. Der öffentliche Installerindex enthält jetzt 0.1.1.2/API 15. Die lokale Benutzerinstallation wurde nicht verändert und steht noch auf 0.1.0.0; das Update erfolgt über Dalamud.
+Quellcommit `809d9961929e38257386f0138015834a59c15726` korrigiert einen Rückkopplungsfehler: Nach Aktivierung der RP-Leiste oder Positionsreset konnte das noch geschlossene Fenster die gespeicherte Sichtbarkeit sofort wieder ausschalten. Die ausdrücklich gewählte Sichtbarkeit ist jetzt die einzige Vorgabe; der vorübergehende Fensterzustand überschreibt sie nicht mehr. Bestehende Profil-/Alters-/Szenenschutzprüfungen bleiben erhalten.
+
+Lokal bestehen Release-Build mit 0 Warnungen/Fehlern und 76/76 gezielte Tests für Profilsitzung, Leisteneinstellungen und Kontext. Unabhängiges Review: Freigabe ohne kritische oder wichtige Restbefunde. Der erfolgreiche [Actions-Lauf 43284625889](https://github.com/demkadse/Final-Roleplay-1/actions/runs/43284625889) bestätigt zusätzlich Build 0 Warnungen/Fehler, 500/500 Funktionstests (34 Sekunden), 33/33 Paketprüfungen und alle 105/105 CI-Prüfungen (Policy33, Publish24, SDK44, Compiler4). Build und Publish sind erfolgreich. Die native Bedienung im laufenden Spiel ist weiterhin nicht geprüft.
+
+Eine schreibfreie Prüfung zeigt inzwischen eine vorhandene lokale Installation 0.1.1.2 und ausgeschaltete Leistensichtbarkeit. Konfiguration und Installation wurden durch diese Prüfung nicht verändert.
+
+[Release v0.1.1.3](https://github.com/demkadse/Final-Roleplay-1/releases/tag/v0.1.1.3) ist öffentlich, als Prerelease markiert und kein Entwurf; Quelle ist `809d9961929e38257386f0138015834a59c15726`. Botcommit `8400b2d` aktualisiert ausschließlich `repo.json`; der lokale Branch ist abgeglichen. Kanonischer Raw-Index, ZIP und `SHA256SUMS` wurden anonym per HTTP 200 geladen, gemeinsam per SHA-256 geprüft und erneut vollständig paketvalidiert. ZIP: 1.072.632 Bytes, SHA-256 `74B8C6A87C0C4B718C38B85CDF7E276DEEB312A19FF4A6716550CB7F13AB6B6B`. JSON SHA-256: `934DC9A00CA5120051925753A50107E32BFACC5B0E043292EEFECD1949536FF8`; LastUpdate `1794509650`.
+
+Nach dem Update auf 0.1.1.3 die Leistensichtbarkeit erneut aktivieren oder **Anzeigen und Position zurücksetzen** verwenden. `/frpbar` beziehungsweise `/frp bar show` zeigt die Leiste ebenfalls an. Die vor dem Fix ausgeschaltete gespeicherte Wahl wird nicht automatisch geändert.
+
+## Vorheriger Stand: 0.1.1.2 vollständig geprüft und automatisch veröffentlicht
+
+Die UX aus Nutzercommit `62a91a7` ist veröffentlicht. Der öffentliche Installerindex enthält 0.1.1.2/API 15. Beim damaligen Veröffentlichungsnachweis stand die unveränderte lokale Benutzerinstallation noch auf 0.1.0.0; die aktuelle schreibfreie Prüfung oben zeigt inzwischen 0.1.1.2.
 
 Der erfolgreiche [Actions-Lauf 43243803893](https://github.com/demkadse/Final-Roleplay-1/actions/runs/43243803893) baut Quellcommit `66cc76829aa185400a0ad136ea631309939574e9`: Build 0 Warnungen/Fehler, 500/500 Funktionstests (35 Sekunden), 33/33 Paketprüfungen und 105/105 CI-Prüfungen. Alle Gruppen sind ausdrücklich im Hosted-Protokoll belegt: 33 Policy, 24 Publishabläufe, 44 SDK und vier Compilerfälle im Vorbereitungsschritt. Buildjob und Publishjob sind erfolgreich (2:19 beziehungsweise 1:26 Minuten).
 
