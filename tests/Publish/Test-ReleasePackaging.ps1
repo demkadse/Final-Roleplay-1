@@ -414,3 +414,4 @@ finally {
 
 Write-Output ('Release packaging checks: ' + $script:passed + ' passed, ' + $script:failed + ' failed.')
 if ($script:failed -ne 0) { throw ('Release packaging verification failed: ' + $script:failed + ' checks.') }
+exit 0
