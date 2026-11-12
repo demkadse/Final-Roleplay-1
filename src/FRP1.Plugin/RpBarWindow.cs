@@ -42,7 +42,6 @@ internal sealed class RpBarWindow : Window, IDisposable
     private bool resetGlanceScroll;
     private bool disposed;
     private bool positionInitialized;
-    private bool visibilityInitialized;
     private bool forcePosition;
     private bool compactStylePushed;
     private Vector2 lastPreferencePosition;
@@ -76,14 +75,13 @@ internal sealed class RpBarWindow : Window, IDisposable
             { feedback = T("Änderung nicht gespeichert. Entwurf und laufende Vorgänge prüfen.", "Change not saved. Check your draft and pending operations."); }
         }
         if (!session.SettingsLoaded) return;
-        if (visibilityInitialized && requestedVisibility == 0 && !IsOpen && session.Settings.Visible)
-            session.SetPreferences(session.Settings with { Visible = false });
         if (requestedVisibility != 0)
         {
             var visible = requestedVisibility == 1 || !session.Settings.Visible;
             session.SetPreferences(session.Settings with { Visible = visible }); requestedVisibility = 0;
         }
-        IsOpen = session.Settings.Visible; visibilityInitialized = true;
+        // The preference is authoritative; IsOpen may still reflect the previous frame.
+        IsOpen = session.Settings.Visible;
         if (!DrawConditions() || session.Settings.Collapsed) ClearGlance();
     }
 
@@ -465,7 +463,6 @@ internal sealed class RpBarWindow : Window, IDisposable
 
     public override void OnClose()
     {
-        if (!disposed && session.SettingsLoaded && session.Settings.Visible) session.SetPreferences(session.Settings with { Visible = false });
         ClearGlance();
     }
     public void Dispose()
