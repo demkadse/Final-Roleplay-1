@@ -2,7 +2,28 @@
 
 Stand: 2026-11-12
 
-## Aktuell: RP-Leistenfix als 0.1.1.3 veröffentlicht
+## Aktuell: kompakter UI-Neubau als 0.2.0.4 veröffentlicht
+
+Die neue Oberfläche ist als 0.2.0.4 öffentlich veröffentlicht und über dieselbe Installeradresse verfügbar. Quellcommit ist `6c2e49115d764ae391922d5c5b3bc4f8fc70413e`; die Pluginversionsbasis bleibt 0.2.0.0, FRP1.Core bleibt 1.0.0.0. Bestehende Installationen über Dalamud aktualisieren und bei Bedarf neu laden. Keine Installation durch den Agenten durchgeführt.
+
+Drei Haupteinstiege **Mein Charakter**, **Kontakte**, **Einstellungen** ersetzen die bisherige Navigation. Das eigene Profil startet als Lesekarte; Bearbeiten besitzt getrennte Aktionen für Speichern, Verwerfen und Vorschau. Editor und Leser haben **Überblick**, **Charakter**, **OOC**; optionale Angaben erscheinen gefüllt oder über **+ Angabe**. Profilvarianten, JSON und Werkzeuge liegen im Menü. Kontakte bündeln Liste, Auswahlaktionen und Umgebung; Netzwerkdetails liegen unter **Erweitert**. Sichtbare Hilfebadges entfallen zugunsten von Hoverhinweisen und zentraler Hilfe.
+
+Die eigene RP-Leiste bleibt immer beim eigenen Profil, unabhängig vom Ziel: eine Zeile mit 210 Pixeln Basisbreite, eingeklappt 32 Pixel. Fremde Informationen bleiben in separater kompakter Ziel-/Mouseoveranzeige. Das Hauptfenster verwendet eine neue Kennung und beginnt bei 560 × 430 Pixeln vor Skalierung und Viewportbegrenzung. Primäre Themes sind Obsidian, Pergament und Nachtblau; alte elf Theme-IDs bleiben ohne Datenmigration lesbar.
+
+Profilschema, private Registerdaten, DPAPI-Identität, Kopplungen und direkte Clientfreigaben bleiben erhalten. Audience-, Block-, Trust-, Revisions-/Hash- und Sichtbarkeitsschutz bleiben maßgeblich. Die früheren Vorgaben für fünf Profilbereiche, zielabhängiges eigenes HUD und elf sichtbare Volksthemes wurden vom Nutzer ausdrücklich aufgehoben; historische Beschreibungen unten sind keine aktuellen Umsetzungsvorgaben.
+
+Lokaler Vorabnachweis: 42 gezielte Tests und 510/510 vollständige Funktionstests (27 Sekunden, keine Fehler/Skips), voller Release-Solutionbuild gegen gepinntes API 15/.NET-SDK 10.0.401 mit 0 Warnungen/Fehlern (2,35 Sekunden) und 33/33 lokale Paketprüfungen für 0.2.0.0. Unabhängiges Review: Freigabe ohne kritische oder wichtige Restbefunde. Der erfolgreiche [Hosted-Lauf 43296113100](https://github.com/demkadse/Final-Roleplay-1/actions/runs/43296113100) bestätigt zusätzlich Build 0 Warnungen/Fehler, 510/510 Funktionstests (35 Sekunden), 33/33 Paketprüfungen und alle 105/105 CI-Prüfungen (Policy33, Publish24, SDK44, Compiler4). Build und Publish sind erfolgreich. Native Spiel-/Skalierungs- und reale Netzabnahme bleiben offen. Datiertes Quellbackup vor Neubau: `.release-staging/ui-rebuild-backup-20261112T194250Z`, Ausgangscommit `b9d2bb7`, SHA-256 `378594B3D74ABA2A49CE85E11CDA83F6A281621CBFBF0F188AAD4B4172F46885`.
+
+Öffentlicher Nachweis: [Release v0.2.0.4](https://github.com/demkadse/Final-Roleplay-1/releases/tag/v0.2.0.4) ist öffentlich, als Prerelease markiert und kein Entwurf. Botcommit `f2071ac` aktualisiert ausschließlich `repo.json`; der lokale Branch ist abgeglichen. Die kanonische Raw-JSON-Adresse liefert anonym HTTP 200 und Version 0.2.0.4. ZIP und `SHA256SUMS` sind ebenfalls anonym geladen, gemeinsam per SHA-256 geprüft und mit `Test-ReleasePackage` erneut vollständig validiert.
+
+| Datei / Feld | Nachweis für 0.2.0.4 |
+|---|---|
+| ZIP-Größe | 1.079.993 Bytes |
+| ZIP SHA-256 | `00F3974603E8442B4574EBFCD116B7A02A8F21A74B965B3D575BD11FE9A00AE2` |
+| JSON SHA-256 | `0C77B7CB19AE8259E2344BD3BD6009924C439CED6410AEC0DE2F02B1BDDD11D5` |
+| LastUpdate | `1794513688` |
+
+## Vorheriger Stand: RP-Leistenfix als 0.1.1.3 veröffentlicht
 
 Quellcommit `809d9961929e38257386f0138015834a59c15726` korrigiert einen Rückkopplungsfehler: Nach Aktivierung der RP-Leiste oder Positionsreset konnte das noch geschlossene Fenster die gespeicherte Sichtbarkeit sofort wieder ausschalten. Die ausdrücklich gewählte Sichtbarkeit ist jetzt die einzige Vorgabe; der vorübergehende Fensterzustand überschreibt sie nicht mehr. Bestehende Profil-/Alters-/Szenenschutzprüfungen bleiben erhalten.
 

@@ -2,7 +2,7 @@
 
 Stand: 2026-11-11. Die FRP1-Module sind im echten Plugin angebunden. Release-Build ohne Warnungen/Fehler, 467 bestandene Tests und unabhängige Reviewfreigabe belegen den Codeprüfstand; die native Spiel-/Netzabnahme ist ein weiterhin offener eigener Schritt.
 
-Die Matrix beschreibt die vorhandenen Module. Die vereinfachte Bedienung mit fünf gleichen Bereichen, Kontext-MiniHUD und feldnahen Hilfen ist seit 0.1.1.1 veröffentlicht und im aktuellen 0.1.1.2 enthalten. Neue Zusatzdaten-Baukästen entfallen, vorhandene Inhalte bleiben erhalten und gezielt entfernbar. Die Releaseautomatik ist erfolgreich gehostet geprüft. Details: [UX](ux-and-vanity.md), [Status](../STATUS.md).
+Aktueller veröffentlichter UI-Stand 0.2.0.4: drei Hauptwege Mein Charakter/Kontakte/Einstellungen, Profilbereiche Überblick/Charakter/OOC, eigene Lesekarte mit getrenntem Editmodus und einzeilige immer eigene RP-Leiste. Zielinformationen bleiben separat. Drei primäre Themes ersetzen die breite Auswahl; alte IDs und Daten bleiben erhalten. Frühere Fünf-Bereiche-/Ziel-HUD-Beschreibungen sind historisch. Hosted-Build, 510 Funktionstests, 33 Paketprüfungen und 105 CI-Prüfungen bestanden. Aktuelle Bedienung: [UX](ux-and-vanity.md), [Status](../STATUS.md).
 
 ## Quelle und Lesart
 
@@ -36,7 +36,7 @@ Grundlagen sind die [offizielle TRP3-Beschreibung](https://github.com/Total-RP/T
 | [Register](https://github.com/Total-RP/Total-RP-3/tree/main/totalRP3/Modules/Register) | Umgesetzt: privates Register, Profil-/Charakternotizen, Favoriten, Beziehungen, Mute/Netzblock, Suche und gespeicherte Profilbesuche. | Kein automatisches Protokoll aller vorbeilaufenden Figuren; keine zentrale Datenbank. |
 | [TargetFrame](https://github.com/Total-RP/Total-RP-3/tree/main/totalRP3/Modules/TargetFrame) | Angepasst: eigene bewegliche Zielkarte, Zielpin, zulässiges Profil und lokale Aktionen. | Keine Musik und keine umfassende Modifikation aller FFXIV-Unitframes. |
 | [Toolbar](https://github.com/Total-RP/Total-RP-3/tree/main/totalRP3/Modules/Toolbar) | Umgesetzt: eigene bewegliche RP-Leiste für Profil, IC/OOC/AFK, Verfügbarkeit und eigene Glances. | Lokale explizite Zuordnung; kein erstes Profil still aktivieren. |
-| [TooltipSkins](https://github.com/Total-RP/Total-RP-3/tree/main/totalRP3/Modules/TooltipSkins) | Angepasst: elf FRP1-Themes sowie kompakte/ausführliche zulässige Mouseoveransicht. | Keine WoW-Skins/-Assets; Standarddarstellung bleibt das eigene lesbare FRP1-Theme. |
+| [TooltipSkins](https://github.com/Total-RP/Total-RP-3/tree/main/totalRP3/Modules/TooltipSkins) | Angepasst: drei primäre FRP1-Themes, rückwärtslesbare alte IDs und kompakte zulässige Mouseoveransicht mit vollständigen Glances bei Bedarf. | Keine WoW-Skins/-Assets; Standarddarstellung bleibt das eigene lesbare FRP1-Theme. |
 | [UnitPopups](https://github.com/Total-RP/Total-RP-3/tree/main/totalRP3/Modules/UnitPopups) | Angepasst: nativer Kontextmenüeintrag **FRP1-Profil öffnen** für bekannte bestätigte Charakterbindungen; weitere Profil-/Kontaktaktionen in Zielkarte, Umgebung und Register. | Kein globaler Umbau aller FFXIV-Kontextmenüs. |
 
 ## Nicht als vorhanden ausgeben

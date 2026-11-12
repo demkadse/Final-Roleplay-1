@@ -1,114 +1,65 @@
 # UX und Profilgestaltung
 
-Stand: 2026-11-12. **Die neue UX ist veröffentlicht und im Installerpaket 0.1.1.2 enthalten.** Der erfolgreiche GitHub-Lauf besteht Build ohne Warnungen/Fehler, 500/500 Funktionstests, 33/33 Paketprüfungen und 105/105 CI-Prüfungen. Öffentliche JSON-/ZIP-/Prüfsummendownloads sind validiert. Die Webvorschau ist kein Pixelversprechen oder Nachweis einer Spielabnahme.
+Stand: 2026-11-12. **Die neue Oberfläche ist als 0.2.0.4 veröffentlicht.** [Hosted-Lauf 43296113100](https://github.com/demkadse/Final-Roleplay-1/actions/runs/43296113100) besteht Build und Publish: 0 Warnungen/Fehler, 510/510 Funktionstests, 33/33 Paketprüfungen und alle 105/105 CI-Prüfungen ausdrücklich belegt. Lokal bestanden zuvor 42 gezielte und 510/510 vollständige Tests sowie unabhängiges Review. Öffentliche JSON-/ZIP-/Prüfsummendownloads sind validiert. Native Spiel-/Skalierungsabnahme bleibt offen.
 
-## Referenz und vorhandene Oberfläche
+## Aktuelle Gestaltungsvorgaben
 
-TRP3 bleibt die primäre Bedienungsreferenz für individuelle lesbare Profile, Profilwechsel und schnellen Zugriff auf RP-Aktionen. Siehe [offizielle Beschreibung](https://github.com/Total-RP/Total-RP-3/blob/main/README.md) und [vollständigen FRP1-Abgleich](trp3-feature-map.md). FRP1 verwendet eigene Implementierung und keine WoW-Oberfläche oder WoW-Assets.
+Der Nutzer hat die früheren Vorgaben für fünf Profilbereiche, zielabhängiges eigenes HUD und elf sichtbare Volksthemes ausdrücklich durch freie Neugestaltung mit möglichst kompakter Bedienung ersetzt. Maßgeblich ist die folgende Oberfläche. Frühere Beschreibungen in der Veröffentlichungshistorie sind keine weiter geltenden Umsetzungsvorgaben.
 
-Die Haupttabs **Mein Profil**, **Umgebung**, **Kontakte** und **Einstellungen** bleiben der Einstieg. Die lokale Überarbeitung vereint Editor und Leser auf fünf Inhaltsbereiche, reduziert die eigene Leiste zum Kontext-MiniHUD und beschriftet feldnahe Hilfen. Register, Netzwerk, Medien und ihre Schutzgrenzen bleiben angebunden. Einige ältere Host- und Hilfetexte sind noch deutsch.
+Die Hauptnavigation hat drei Einstiege: **Mein Charakter**, **Kontakte**, **Einstellungen**. Ein kleineres Hauptfenster mit neuer Fensterkennung beginnt im Quelllayout bei 560 × 430 Pixeln und bleibt an den verfügbaren Viewport begrenzt. Das sind Layoutwerte vor Skalierung, keine im Spiel gemessenen Abmessungen. Ruhige Flächen, schmale Abstände und bedarfsweise sichtbare Inhalte reduzieren die ständig belegte Fläche.
 
-Die weitere Web-Journalgestaltung und eigene Serif-/UI-Fontintegration werden nicht als pixelgleich übernommen oder fertig abgenommen behauptet. Normale Hauptfenster behalten native Fensterbedienung; das neue MiniHUD verwendet bewusst keine Titelzeile.
+## Mein Charakter: lesen, dann gezielt bearbeiten
 
-## Eigenständiges FRP1-Theme
+Die eigene Profilkarte öffnet standardmäßig lesend. **Bearbeiten** wechselt in einen getrennten Entwurf mit **Speichern**, **Verwerfen** und **Vorschau**. Die eigene Lesekarte und das Journal für geöffnete Profile haben getrennten Zustand; ein fremdes geöffnetes Profil darf den eigenen Leser nicht ersetzen.
 
-FRP1 gestaltet seine eigenen Fensterflächen, Panels, Texte, Akzente, Fokusmarkierungen, Eingaben, Buttons, Tabs und Innenrahmen. Diese Styles umfassen auch Hinweise und Einstellungen und werden nach dem FRP1-Draw zurückgenommen; andere Plugins bleiben unberührt. Dezente Ecklinien sind über **Dekoration reduzieren** abschaltbar.
+Editor und Leser verwenden drei Bereiche:
 
-Der Hintergrund liegt innerhalb des FRP1-Fensters. Außerhalb bleibt die Spiellandschaft sichtbar; kein erzwungener Vollbildhintergrund oder Szenen-Overlay. Texturen/Icons kommen lokal, Profilmedien lokal oder nach Freigabe direkt vom Peer. Keine URL-/Fontserverabrufe oder WoW-Assets.
-
-Unter **Einstellungen → Darstellung** ist Automatik oder freie manuelle Wahl möglich. Automatik ist ein Modus, keine zwölfte Palette. Jedes Volkstheme ist auch für andere Charaktere frei wählbar.
-
-| Zuordnung | Palette |
+| Bereich | Inhalt |
 |---|---|
-| Hyur | Schiefer und Bronze |
-| Elezen | Blaugrau und Silber |
-| Lalafell | Honig und Creme |
-| Miqo’te | Pflaume und Roségold |
-| Roegadyn | Petrol und Kupfer |
-| Au Ra | Tinte und Jade |
-| Hrothgar | Anthrazit und Bernstein |
-| Viera | Moos und Violett |
-| Frei: Obsidian | Graphit und Silber |
-| Frei: Pergament | Helles Papier und dunkler Text |
-| Frei: Mondlicht | Nachtblau und Silber |
+| Überblick | Profilkopf, Status, Kurzbeschreibung und erste Eindrücke. |
+| Charakter | Weitere Charakterangaben und bereits vorhandene zusätzliche Inhalte. |
+| OOC | Bewusst öffentliche Spielerinformationen, RP-Erfahrung und Absprachen. |
 
-Automatik liest das Volk des lokalen Spielcharakters aus `IPlayerState.Race.RowId`, nicht aus dem frei bearbeitbaren RP-Profil. Manuelle Wahl bleibt bis zur Rückkehr zur Automatik aktiv und wird je Content-ID lokal gespeichert. Fremde Profile ändern das Empfängertheme nicht.
+Optionale Angaben erscheinen, wenn sie befüllt sind, oder werden über **+ Angabe** ergänzt. Profilvarianten, JSON-Import/-Export und lokale Werkzeuge liegen im Menü. Bestehende Hooks, freie Zusatzfelder, Traits, Begleiter und Sprachen werden durch die neue Anordnung nicht gelöscht. Bereits vorhandene Zusatzinhalte bleiben lesbar und bewusst entfernbar; Entwurf-/Revision-/Hashschutz bleibt erhalten.
 
-Ohne Charakter, während anfänglichen Ladens oder bei Ladefehler verwendet FRP1 Obsidian; eine bereits bewusst gewählte ungespeicherte Auswahl bleibt während der Sitzung erhalten und bietet Speicherwiederholung. Alte asynchrone Ergebnisse dürfen neuere Charakter-/Auswahlzustände nicht ersetzen. Dateien werden nicht still nach Fehler überschrieben.
+Der kompakte Leser verwendet ein 40-Pixel-Portrait im Kopf und kleine horizontal angeordnete Glance-Icons. Hover, Tastaturfokus oder angeheftete Klickkarte liefern den vollständigen Text mit Scrollmöglichkeit. Eigentümer-, Kontext- und aktuelle Freigabeprüfungen verwerfen überholte Inhalte. Ausblenden oder Einklappen macht Profilinhalte nicht privat; private Informationen gehören ins Register.
 
-Rechnerisch geprüfte Farben sind kein Nachweis vollständiger Spielbarrierefreiheit. Reale Schriftwiedergabe, Fokus, Skalierung, Volkzuordnung und Entladen brauchen native Abnahme.
+## Eigene RP-Leiste und fremde Informationen
 
-## Fünf gleichrangige Bereiche in Editor und Leser
+Die eigene RP-Leiste zeigt immer das eigene aktive Profil, unabhängig vom aktuellen Ziel. Sie ist im Quelllayout einzeilig mit 210 Pixeln Basisbreite; eingeklappt bleibt ein 32-Pixel-Wiederöffner. Bewegungssperre, Skalierung, Viewportbegrenzung und rückwärtslesbarer lokaler Klappzustand bleiben erhalten. Ein erstes Profil wird nicht automatisch aktiviert.
 
-Beide Ansichten verwenden dieselbe Reihenfolge aus `ProfileAreas`: **RP-Status und Kurzprofil**, **OOC Informationen**, **Auf den ersten Blick**, **Weitere Charakterdaten**, **RP-Erfahrung und Absprachen**. Ein kleiner Kopf enthält Name, Titel, Portrait, Icon und Rating. Darunter gibt es einen Inhaltsbereich; die zweispaltige Vorschau entfällt. Gestaltung bleibt Kopf-Popup, JSON liegt unter Profilaktionen und wird kein sechster Hauptbereich.
+Die gespeicherte Sichtbarkeit ist weiterhin maßgeblich. Ein vorübergehend geschlossenes Fenster darf sie nicht wieder ausschalten; der Fix aus 0.1.1.3 bleibt erhalten. Zielwechsel verändert weder die eigenen Leisteninhalte noch Entwurf, aktive Zuordnung oder Sharing.
 
-Status-/Kurzprofil, OOC, Glances, weitere Beschreibungen und RP-Absprachen sind gezielt erreichbar. Neue Baukästen für Hooks, freie Zusatzfelder, Traits und Begleiter werden nicht mehr angeboten. Bereits vorhandene Inhalte bleiben unter Weitere Charakterdaten vollständig lesbar und über einen geprüften Entwurf gezielt entfernbar. Unbearbeitete Sprachen bleiben unverändert erhalten.
+Fremde Angaben erscheinen getrennt in kompakter Ziel-/Mouseoveranzeige. Vollständige Glances sind dort bei Bedarf zugänglich. Ausschließlich aktuell erlaubte Daten bestätigter Bindungen dürfen erscheinen; Audience-, Block-, Mute-, Szene- und Zuordnungsprüfungen bleiben erhalten. Die getrennte große Zusatz-Zielkarte ist bei neuen Einstellungen zunächst aus; vorhandene Entscheidungen bleiben erhalten.
 
-Vor Export und Teilen weisen sichtbare Hinweise auf vorhandene Zusatzinhalte hin. Sie bleiben bis zur tatsächlichen Entfernung öffentliche Profilinhalte. Auch deaktivierte, standardmäßig unsichtbare Glances sind nicht privat; verbergen ist keine Zugriffssperre. Private Informationen gehören weiterhin ins Register.
+## Drei primäre Themes
 
-RP-Präferenzen beschreiben Gesprächsthemen/Spielwünsche; sie sind keine Zustimmung zu Handlungen und kein Altersnachweis. Private Notizen und Beziehungen bleiben im Register, nicht im öffentlichen OOC-Feld.
+Die normale Auswahl bietet **Obsidian**, **Pergament** und **Nachtblau**. Die bisherigen elf Theme-IDs bleiben lesbar; es findet keine Datenmigration statt. Die internen Volkzuordnungen bleiben für gespeicherte Einstellungen kompatibel, verwenden jedoch eine gemeinsame ruhige Standardpalette. Der bisherige Schlüssel `mondlicht` bezeichnet nun das sichtbare Theme Nachtblau.
 
-### Grafische Icons, Portrait und Rich Text
+Themes gestalten ausschließlich FRP1-Flächen. Styles werden nach dem Zeichnen zurückgenommen und verändern keine anderen Plugins. Fremde Profile bestimmen das lokale Empfängertheme nicht. Standarddarstellung neutralisiert fremde Gestaltung für Lesbarkeit. Keine externen Fonts, URL-Bilder oder WoW-Assets werden geladen.
 
-Ein grafischer Picker mit Suche/Kategorien verwendet lokale Spielressourcen; normale Nutzer müssen keine Icon-ID eingeben. Eigene Glancevorlagen dienen als bearbeitbare Ausgangspunkte, nicht als neue Datenquelle anderer Spieler.
+## Kontakte, Umgebung und Verbindung
 
-Die Portraitwahl liest ein begrenztes lokales Bild, bietet Zuschnitt und erzeugt eine metadatenfreie PNG-Miniatur bis 256 × 256 und 12 KiB. Das gesamte übertragene Profil bleibt höchstens 48 KiB groß. Es gibt weder externes Bildhosting noch automatische URL-Abrufe.
+**Kontakte** verbindet die Liste mit Aktionen für den ausgewählten Eintrag. Die Umgebung ist dort untergeordnet erreichbar. Private Notizen, Beziehungen, Favoriten, Mute, Netzblock, bestätigte Charakterbindung, Cacheverwaltung und Verlauf geöffneter Profile bleiben vorhanden. Vorbeilaufende Figuren werden nicht automatisch protokolliert.
 
-Begrenztes Rich Text unterstützt Überschriften/Listen sowie `[b]…[/b]`, `[i]…[/i]` und `[color=#RRGGBB]…[/color]`. Inhalt bleibt geparster Text mit Größen-/Token-/Tiefegrenzen; kein HTML, Skript, eingebetteter Fremdinhalt oder Autoplay.
+Technische Netzwerkdetails stehen unter **Erweitert**. Start/Stop, Einladung, Kopplung, Vertrauen und Profilfreigabe bleiben ausdrücklich getrennte Entscheidungen. Dauerhafte DPAPI-Identität, private Registerdaten und bestehende Kopplungen werden weiterverwendet. Keine Registrierung, Cloud, zentrale Profildatenbank, Relay-, STUN- oder Discoverydienste kommen hinzu. GitHub verteilt ausschließlich Software und Installerindex.
 
-Die **Standarddarstellung** neutralisiert fremde Gestaltung für gute Lesbarkeit und verwendet weiterhin das eigene FRP1-Grundtheme, nicht den Standard-Dalamud-Look. Musik und fremde Schriftdateien sind keine vorhandene Funktion.
+## Hilfe und lokale Werkzeuge
 
-## Kontext-MiniHUD und separate Fremdanzeigen
+Dauerhaft sichtbare Fragezeichen-/Hilfebadges entfallen. Kontextuelle Hover-/Fokushinweise erläutern die jeweilige Bedienung; die zentrale Hilfe bleibt erreichbar. Abschaltbare Bedienhilfen und eigentliche Profil-/Glance-Inhalte sind getrennt. Verpflichtende Profilregeln und Alterswahl bleiben unabhängig davon bestehen.
 
-Das neue Mein-RP-HUD verwendet zwei kompakte Zeilen ohne Titelbalken; das Quelllayout hat 280 Pixel Basisbreite vor Skalierung/Viewportbegrenzung. Das ist keine im Spiel gemessene Pixelgröße. Kopf und Icons zeigen Ich-, Ziel- oder neutralen Kontext. Ohne Ziel/bei Selbstziel erscheint das eigene Profil, ein erkanntes erlaubtes fremdes Ziel nur lesend. Unbekannte/NPC-, blockierte, stummgeschaltete, nicht erlaubte Mature-, mehrdeutige oder szenenfremde Ziele bleiben neutral ohne Own-Fallback.
+Werkzeuge liegen im Menü. Automationen bleiben standardmäßig aus und auf höchstens 16 deklarative Regeln begrenzt; keine Skripte oder Spielchatbefehle. Rede-/Emote-Werkzeuge erzeugen lokale Textentwürfe. Interne Verweise öffnen nur vorhandene erlaubte Daten, ohne Fremdabruf.
 
-Quelle ist das tatsächliche Raw-Target, nicht eine gepinnte separate Zielkarte. Zielwechsel verändert weder Entwurf, eigene aktive Zuordnung noch Sharing. Profilwahl, Einstellungen, Hilfe und bewusstes Öffnen von Details liegen im Kontextmenü. Neue Einstellungen lassen die große Zusatz-Zielkarte standardmäßig aus; bestehende gespeicherte Wahl wird beibehalten.
+## Daten- und Schutzgrenzen
 
-Einklappen hat einen eigenen lokalen `Collapsed`-Wert und einen kleinen Wiederöffner; das alte Schema 1 bleibt lesbar. Bewegungssperre, Verschieben, Skalierung und sichtbare Viewportgrenzen bleiben erhalten. Ein erstes Profil wird nicht automatisch aktiv.
+Das öffentliche Profilschema und lokale Speicherformate bleiben erhalten. Speichern, Aktivieren und Teilen sind getrennt; Speichern erteilt keine neue Peerfreigabe. Bereits aktive freigegebene Änderungen können weiterhin synchronisieren. Der gemeinsame eigene Profilschreiber serialisiert konkurrierende Änderungen und prüft Revision/Hash.
 
-Glances öffnen bei Hover oder Tastaturfokus den vollständigen ungekürzten Text in einer scrollbaren Karte – auch bei deaktivierten Hilfen. Rund 500 ms Mausübergang und optionales Anheften per Klick erlauben den Wechsel in die Karte. Kontext-/Policywechsel invalidiert den Inhalt.
+Profilregeln gelten unverändert: allgemein gekennzeichnete Inhalte einschließlich Name, Glances und Bildern müssen jugendfrei sein. Aktive Alterswahl pro Sitzung und zusätzliches Mature-Opt-in bleiben notwendig; Selbstauskunft ist keine Altersverifikation. Widerruf sperrt Anzeigen und verspätete Ergebnisse. Themes, Beziehungen und Hilfebestätigungen erteilen keine Freigabe.
 
-Die getrennte Fremdprofilanzeige mit Mouseover, kompakter/ausführlicher Darstellung und beweglicher/pinnbarer Zielkarte verwendet weiterhin aktuell erlaubte Daten bestätigter Bindungen. Umgebungsfilter und Cache-/Kontaktaktionen gehören zum Socialmodul. Der native Kontextmenüeintrag **FRP1-Profil öffnen** für bekannte bestätigte Bindungen bleibt erhalten.
+Private Notizen, Content-IDs, Zuordnungen und Einstellungen bleiben lokal. Profilbilder werden weiterhin zu begrenzten metadatenfreien PNG-Miniaturen verarbeitet. Chatnamensersetzung verwendet ausschließlich General-Profile; Nameplates und Karte ändern keine Spielpakete oder Questmarker.
 
-Lokale Nameplates/Titel/Farben und optionale kleine Profilicons sind gesondert einschaltbar. Questmarker bleiben unverändert. Die Kartenaktion bezieht sich auf einen bekannten aktuell lokalen Akteur, nicht auf eine globale Spielersuche.
+## Noch offene Abnahme
 
-Chatnamensersetzung verwendet ausschließlich General-Profile, weil einmal ausgegebener Chat nicht verlässlich zurückgenommen werden kann. Mature-Namen bleiben auch mit Erwachsenenfreigabe aus dem bleibenden Chat ausgeschlossen.
+510 bestandene Funktionstests ersetzen keine Bedienprüfung im Spiel. Offen bleiben Darstellung bei verschiedenen Skalierungen und Viewports, Fokus und Tastaturbedienung, Leser-/Editorwechsel, Glance-Karten, Ein-/Ausklappen und Entladen. Reale Zwei-Spieler-/LAN-/Internet-/NAT-Abnahme bleibt ebenfalls offen. Bestätigte Build-/Review-/Releaseergebnisse stehen in [STATUS.md](../STATUS.md).
 
-## Speicherzustände und Freigaben
-
-Ein gemeinsamer eigener Profilschreiber prüft erwartete Revision/Hash und serialisiert Editor-, Leisten- und Automationsänderungen. Bei verändertem/beschäftigtem Editor verhindern Sperren konkurrierende Leistenänderungen; unveränderter Status erzeugt keine unnötige Speicherung.
-
-Speichern erteilt keine neue Peerfreigabe. Änderungen am bereits aktiven und für einen Kontakt freigegebenen Profil synchronisieren weiterhin automatisch. Import erstellt eine neue lokale Kopie. Spät eintreffende Iconpicker-/Medienergebnisse werden bei Savebeginn beziehungsweise Kontextwechsel ungültig; sie dürfen keinen anderen Entwurf verändern.
-
-Eine vollständig neu gestaltete einheitliche Dreiwege-Navigation wird nicht allein aus diesen Sperren abgeleitet. Maßgeblich ist der vorhandene native Ablauf, nicht jede frühere Webmockup-Interaktion.
-
-## Netzwerk und privates Register
-
-Die Oberfläche kann Netzwerk explizit starten/stoppen, Einladungen erstellen/einfügen, Peers koppeln, verbinden/trennen und Profile gesondert freigeben. Dauerhafte DPAPI-Identität und private Kopplungen ersetzen die frühere flüchtige Demoidentität. Optionaler Listenport und numerische Einladungsadresse konfigurieren keine Router/Firewall und fragen keine öffentliche IP ab.
-
-Kontakte bieten private Profil-/Charakternotizen, Favoriten, Beziehungen, Mute und Netzblock sowie bestätigte fremde Charakterbindung. Suche und Cacheverwaltung sind angebunden. Der Besuchsverlauf erfasst tatsächlich geöffnete Profile; keine automatische Aufzeichnung aller vorbeilaufenden Figuren. Cachelöschen ist kein Netzblock: weiterhin erlaubte Gegenstellen können das Profil erneut liefern.
-
-## Globale Hilfen und lokale Werkzeuge
-
-Kontextuelle Hilfe steht als **? Hilfe: Titel** oder kompaktes **? Hilfe** unmittelbar am Titel/Feld. Tooltip und geöffneter Hilfetext erklären das konkrete Thema; lose Fragezeichengruppen entfallen. Sechs neue Themen ergänzen den gemeinsamen Katalog. Der globale Schalter **Hilfshinweise anzeigen** betrifft diese Hilfen; **Hilfe / Erste Schritte**, eigentliche Profil-/Glance-Inhalte und verpflichtende Hinweise bleiben davon unabhängig.
-
-Automation ist global standardmäßig aus, auf 16 deklarative Regeln beschränkt und führt keine Skripte oder Spielchatbefehle aus. Lokale Rede-/Emote-Entwürfe bieten Vorschau/Kopiertext. Interne Profilverweise öffnen nur bereits vorhandene erlaubte Daten, ohne Fremdabruf oder Chattransport. RP-Sprachen sind Profilbeschreibung, keine Manipulation der Spielsprache.
-
-## Regeln und Alter vor jeder Darstellung
-
-Kanonische Profilregeln erscheinen vor der getrennten Altersauswahl und bleiben später in den Einstellungen lesbar. Ihre lokale Bestätigung bleibt für die aktuelle Regelversion gespeichert; Alterswahl und zusätzliches Mature-Opt-in werden pro Pluginsitzung neu verlangt.
-
-Allgemein gekennzeichnete Profile müssen einschließlich Name, Titel, Glances und Bild jugendfrei sein. Richtig kennzeichnen, reales Alter wahrheitsgemäß angeben; keine sexualisierten Minderjährigendarstellungen, unerlaubten privaten Daten Dritter, Belästigung oder Inhalte ohne Nutzungsrechte. Es gibt keine zentrale Sanktionierung und keine verifizierte Alterskontrolle.
-
-Audience-Gate und Register-/Binding-/Blockzustand gelten vor Profilnamen, Bildern/Decodierung, Icon, Vorschau, Journal, Tooltip und Zielkarte. Widerruf invalidiert Ansichten und verspätete Ergebnisse. Ein Theme, eine Beziehung, eine Profilpräferenz oder eine Hilfebestätigung kann diese Freigabe nicht erteilen.
-
-## Verbleibende Abnahme
-
-Der 500er-Teststand, die transparente Testhistorie und Reviewfreigabe stehen in [STATUS.md](../STATUS.md). Die UX ist mit 0.1.1.2 veröffentlicht; die [Releaseautomatik](auto-release.md) ist erfolgreich gehostet geprüft. Historische Releaseassets werden nicht überschrieben. Im laufenden Spiel zu prüfen sind insbesondere:
-1. Journal-/Icon-/Portraitwiedergabe, tatsächliche Volkzuordnung, Textumbruch, Skalierung und Tastaturfokus.
-2. Eigene Leiste, Fremdmouseover/Zielpin, Nameplate-/Chatdarstellung und Rücknahme beim Deaktivieren/Entladen.
-3. Alterswiderruf, Charakterwechsel, verspätete Picker-/Ladeergebnisse und blockierte/gelöschte Kontakte ohne Inhaltsoffenlegung.
-4. Reale direkte Verbindung und automatische Änderungen zwischen zwei Spielern in LAN und unterschiedlichen Netzen.
-
-Taschen-/Inventarsysteme und TRP3 Extended sind ausdrücklich vom Auftrag ausgeschlossen. WoW-/MSP-Import und Musik sind nicht implementiert. Lokale UI-Klick-/Bestätigungstöne sind eine davon getrennte, ebenfalls noch nicht implementierte Funktion. Die Funktionszuordnung steht in der [TRP3-Matrix](trp3-feature-map.md) und im [Glance-Abgleich](glance-feature-map.md).
-
+Taschen-/Inventarsysteme, WoW-/MSP-Import und Musik sind nicht implementiert. Eigene TRP3-orientierte Bedienung bedeutet keine Übernahme fremden Codes oder fremder Assets. Weitere Zuordnung: [TRP3-Matrix](trp3-feature-map.md), [Glance-Abgleich](glance-feature-map.md).

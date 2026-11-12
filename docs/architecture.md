@@ -1,6 +1,6 @@
 # Architektur
 
-Stand: 2026-11-12. Die neue UX mit fünf Bereichen und kompaktem HUD ist mit 0.1.1.2 öffentlich über den Installer verfügbar. Der erfolgreiche Hosted-Lauf besteht Build ohne Warnungen/Fehler, 500 Funktionstests, 33 Paketprüfungen und 105 CI-Prüfungen. JSON/ZIP/Prüfsummen sind anonym erreichbar und validiert. Keine Spiel-/Netzabnahme erfolgt.
+Stand: 2026-11-12. Der kompakte UI-Neubau ist als 0.2.0.4 veröffentlicht. Gepinnter API-15-/SDK-10.0.401-Build ohne Warnungen/Fehler, 510/510 Funktionstests, 33/33 Paketprüfungen und 105/105 CI-Prüfungen sind im erfolgreichen Hosted-Lauf belegt. Lokale Vorabprüfungen und unabhängiges Review bestanden. Keine native Spiel-/Netzabnahme erfolgt.
 
 ## Bausteine
 
@@ -81,13 +81,13 @@ Die Regeldatei enthält nur die aktuelle bestätigte Version (höchstens 128 Byt
 
 ### Neue lokale UX
 
-`ProfileAreas` legt dieselben fünf gleichrangigen Bereiche für Editor und Leser fest. Gestaltung wird im Kopf-Popup, JSON unter Profilaktionen angeboten; kein zweispaltiges Preview. `ExistingAdditionalContent` macht bestehende Hooks/Extras/Traits/Begleiter sichtbar und entfernt gezielte Einträge nur aus einem geprüften Snapshot. Andere Inhalte einschließlich unbearbeiteter Sprachen bleiben erhalten; das öffentliche Profilschema wird nicht durch Verbergen privatisiert.
+`ProfileAreas` legt drei Bereiche Überblick/Charakter/OOC fest. Die Hauptnavigation hat Mein Charakter/Kontakte/Einstellungen. Eigenes Profil und Journal haben getrennten Lesestatus; eigener Standardmodus ist Lesekarte, Bearbeiten öffnet einen Entwurf mit Speichern/Verwerfen/Vorschau. Optionale Angaben sind bedarfsweise sichtbar. Profilvarianten, JSON und Werkzeuge liegen im Menü. `ExistingAdditionalContent` erhält Zusatzinhalte und erlaubt bewusste Entfernung aus einem geprüften Snapshot. Profilschema und private Speicherung bleiben unverändert.
 
-`RpBarContextResolver` unterscheidet Own, erlaubtes fremdes Raw-Target und neutralen Zustand. Die gepinnte Social-Karte ist keine Kontextquelle. Zielwechsel schreibt weder eigenen Entwurf noch aktive Zuordnung oder Freigabe. Das kompakte HUD speichert `Collapsed` zusätzlich lokal, ohne die Lesbarkeit früherer Schema-1-Dateien zu verlieren; Layoutgrenzen bleiben erhalten.
+`RpBarContextResolver` liefert für die eigene Leiste ausschließlich den eigenen Zustand. Raw-Target und gepinnte Social-Karte ändern deren Profil nicht; Fremdinformationen bleiben im Socialmodul. Zielwechsel schreibt weder eigenen Entwurf noch aktive Zuordnung oder Freigabe. Das einzeilige HUD speichert `Collapsed` rückwärtslesbar im Schema 1; Wiederöffner, Layoutgrenzen und alleinige Sichtbarkeitsvorgabe aus den Einstellungen bleiben erhalten.
 
-Glance-Hover/Fokus liefert volle scrollbare Inhalte unabhängig von `ShowHints`, mit kurzem Mausübergang und optionalem Pin. Kontext-/Policywechsel invalidiert Karten. Feldnahe beschriftete Hilfen verwenden den gemeinsamen Katalog. Große Zusatz-Zielkarte ist nur bei neuen Einstellungen standardmäßig aus; vorhandene Wahl bleibt erhalten.
+Glance-Hover/Fokus liefert volle scrollbare Inhalte unabhängig von `ShowHints`, mit kurzem Mausübergang und optionalem Pin. Owner-/Policywechsel invalidiert Karten. Sichtbare Hilfebadges entfallen, Hoverhinweise und zentrale Hilfe verwenden weiter den gemeinsamen Katalog. Drei primäre Themes bieten Obsidian/Pergament/Nachtblau; alte elf IDs bleiben lesbar. Große Zusatz-Zielkarte ist nur bei neuen Einstellungen standardmäßig aus; vorhandene Wahl bleibt erhalten.
 
-Die UX ist im veröffentlichten Installerpaket enthalten. Die Releaseautomatik veröffentlicht nach relevanten Master-Pushes neue Version/Paket/Index. Pluginversion wird über `Frp1Version` gesetzt, FRP1.Core behält 1.0.0.0. Nur ein nach Build/Test/öffentlicher Paketprüfung erfolgreicher Publishjob darf mit eingebautem `GITHUB_TOKEN` ausschließlich den Index zurückschreiben; kein Profilbackend und kein zusätzlicher PAT. Details: [Releaseautomatik](auto-release.md).
+Die neue UI ist im öffentlichen Installerpaket 0.2.0.4 enthalten. Die Releaseautomatik veröffentlicht nach relevanten Master-Pushes neue Version/Paket/Index. Pluginversionbasis 0.2.0.0 über `Frp1Version`, FRP1.Core weiterhin 1.0.0.0. Nur nach Build/Test/öffentlicher Paketprüfung erfolgreicher Publishjob darf mit eingebautem `GITHUB_TOKEN` ausschließlich den Index zurückschreiben; kein Profilbackend und kein zusätzlicher PAT. Details: [Releaseautomatik](auto-release.md).
 
 Automation reagiert auf Login, Kampf-/Dutywechsel und Gebietswechsel mit begrenzten Status-/Verfügbarkeits-/Profilaktionen. Keine Alters-/Netzfreigabe wird dadurch erteilt. Lokale Textentwürfe erzeugen Vorschau/Kopiertext; interne Profilverweise lösen nur vorhandene erlaubte Daten auf, keinen Fremdabruf.
 

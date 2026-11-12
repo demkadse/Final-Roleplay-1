@@ -1,10 +1,10 @@
 # FRP1 – Benutzerhandbuch
 
-Stand: 2026-11-12 · veröffentlichter früher öffentlicher Teststand 0.1.1.2 (Prerelease).
+Stand: 2026-11-12 · veröffentlichter früher öffentlicher Teststand 0.2.0.4 (Prerelease).
 
-**Veröffentlicht:** Repository, MIT-Lizenz, Installerindex und Releasepaket 0.1.1.2 sind öffentlich und ohne Anmeldung erreichbar. Der erfolgreiche GitHub-Lauf besteht Build ohne Warnungen/Fehler, 500/500 Funktionstests, 33/33 Paketprüfungen und 105/105 CI-Prüfungen. Eine echte Spiel-/LAN-/Internetabnahme steht noch aus.
+**Veröffentlicht:** Repository, MIT-Lizenz, Installerindex und Releasepaket 0.2.0.4 sind öffentlich und ohne Anmeldung erreichbar. Der erfolgreiche GitHub-Lauf besteht Build ohne Warnungen/Fehler, 510/510 Funktionstests, 33/33 Paketprüfungen und 105/105 CI-Prüfungen. Eine echte Spiel-/LAN-/Internetabnahme steht noch aus.
 
-**Bedienung seit 0.1.1.1:** [Abschnitt 17](#17-bedienung-seit-0111) erklärt die aktuelle Oberfläche mit fünf Bereichen, kompaktem einklappbarem Mein-RP-HUD und feldnahen Hilfen. Er ersetzt die älteren Bedienungsbeschreibungen in Kapitel 1–16, soweit diese noch zusätzliche Baukästen oder die große eigene Leiste zeigen. Bestehende Inhalte bleiben erhalten und gezielt entfernbar. Abschnitt 18 beschreibt die erfolgreich eingeführte Releaseautomatik.
+**Aktuelle Bedienung:** [Abschnitt 19](#19-kompakte-bedienung-seit-0204) beschreibt das veröffentlichte 0.2.0.4: drei Hauptwege und Profilbereiche, eigene Lesekarte, einzeilige zielunabhängige eigene Leiste und drei primäre Themes. Kapitel 1–18 halten ältere Bedienung und die Entwicklungshistorie fest; für Layout und Zugangswege ist Abschnitt 19 maßgeblich. Daten und Freigaben bleiben erhalten.
 
 ## 1. Was FRP1 ist
 
@@ -271,9 +271,9 @@ Projektcode und Dokumentation stehen unter der [MIT-Lizenz](../LICENSE). Das erl
 
 Technische Details: [Architektur](architecture.md), [Machbarkeit](feasibility.md), [TRP3-Abgleich](trp3-feature-map.md), [Glance-Abgleich](glance-feature-map.md). [Projektstatus](../STATUS.md) und [Release-Notes](release-notes-v0.1.0.0.md) halten Veröffentlichung und Abnahmestand fest.
 
-## 17. Bedienung seit 0.1.1.1
+## 17. Historische Bedienung von 0.1.1.1 bis 0.1.1.3
 
-Die folgenden Änderungen sind seit 0.1.1.1 im Installer enthalten. Der aktuelle vollständig geprüfte Stand ist 0.1.1.2. Bei noch installierter Version 0.1.0.0 öffne den Dalamud-Installer, aktualisiere die Repositoryliste und installiere das verfügbare Update; die JSON-Adresse bleibt gleich.
+Dieser Abschnitt hält die historische Bedienung von 0.1.1.1 bis 0.1.1.3 fest. Für das aktuelle 0.2.0.4 gelten die Anleitungen in Abschnitt 19; fünf Profilbereiche, zielabhängige eigene Leiste und Hilfebadges sind dort abgelöst. Die Installeradresse bleibt gleich.
 
 ### Profil bearbeiten und lesen
 
@@ -325,3 +325,33 @@ Maintainer prüfen den Lauf im [Actions-Bereich](https://github.com/demkadse/Fin
 
 Nach einem solchen Botcommit muss der Maintainer seinen lokalen Branch vor dem nächsten Push abgleichen, beispielsweise mit `git pull --ff-only`; bei Abweichungen erst prüfen, nicht Force-Push verwenden. Der erfolgreiche [Lauf 43243803893](https://github.com/demkadse/Final-Roleplay-1/actions/runs/43243803893) prüft alle Testgruppen und veröffentlicht 0.1.1.2. Versions-/Sicherheitsdetails und Fehlersuche: [Releaseautomatik](auto-release.md).
 
+
+## 19. Kompakte Bedienung seit 0.2.0.4
+
+Dieser Abschnitt beschreibt das veröffentlichte 0.2.0.4. Aktualisiere über die bestehende JSON-Adresse im Dalamud-Installer und lade das Plugin bei Bedarf neu. Konfigurationslöschung oder Datenmigration sind nicht erforderlich. Die frühere Vorgabe für fünf Bereiche und eine zielabhängige eigene Leiste wurde ausdrücklich aufgehoben.
+
+### Drei Wege und eine lesbare eigene Karte
+
+Öffne `/frp`. Die Hauptnavigation bietet **Mein Charakter**, **Kontakte**, **Einstellungen**. Das eigene Profil erscheint zuerst als Lesekarte. Wähle **Bearbeiten**, um Angaben zu ändern; **Speichern**, **Verwerfen** und **Vorschau** gehören zum getrennten Bearbeitungsmodus.
+
+| Profilbereich | Zweck |
+|---|---|
+| Überblick | Profilkopf, Status, Kurzbeschreibung und erste Eindrücke. |
+| Charakter | Weitere Charakterdaten und erhaltene zusätzliche Inhalte. |
+| OOC | Bewusst öffentliche Spielerinformationen und RP-Absprachen. |
+
+Optionale Felder erscheinen, wenn sie bereits Inhalt haben. Ergänze weitere über **+ Angabe**. Profilvarianten, JSON und lokale Werkzeuge liegen im Menü. Vorhandene zusätzliche Inhalte, Sprachen und Medien bleiben erhalten; speichere eine bewusst gewünschte Entfernung wie bisher. Ausgeblendete Angaben bleiben Profilinhalte und werden dadurch nicht privat.
+
+### Kleine eigene Leiste, fremde Angaben getrennt
+
+`/frpbar` öffnet die eigene RP-Leiste. Sie bleibt immer beim eigenen aktiven Profil, auch wenn du einen anderen Charakter anvisierst. Die Leiste hat eine Zeile und einen kleinen Wiederöffner nach dem Einklappen. Bewegungssperre, Skalierung und Position bleiben lokal. Eine aktivierte Sichtbarkeit wird durch ein vorübergehend geschlossenes Fenster nicht wieder ausgeschaltet.
+
+Fremde Inhalte erscheinen getrennt als kompakte Ziel-/Mouseoveranzeige. Kleine Glance-Icons öffnen bei Hover oder Tastaturfokus vollständige scrollbare Texte; per Klick kann die Karte angeheftet werden. Profil-/Kontext- und Freigabewechsel schließen veraltete Inhalte. Diese Profiltexte bleiben unabhängig von abschaltbaren Bedienhilfen zugänglich.
+
+### Kontakte, Gestaltung und Hilfe
+
+**Kontakte** zeigt Liste und Aktionen zum ausgewählten Kontakt; die Umgebung ist dort ebenfalls erreichbar. Private Notizen, Favoriten, Beziehungen, Mute und Netzblock bleiben getrennte Entscheidungen. Technische Verbindungseinstellungen stehen unter **Erweitert**. Kopplung, Vertrauen und Profilfreigabe bleiben ausdrücklich erforderlich; die Umgestaltung erteilt keine Freigabe.
+
+Die primäre Themeauswahl bietet **Obsidian**, **Pergament**, **Nachtblau**. Frühere Theme-IDs bleiben lesbar, ohne Datenmigration. Dauerhaft sichtbare Fragezeichen entfallen; Hover-/Fokushinweise und zentrale Hilfe erklären die Bedienung. Profilregeln und aktive Alterswahl bleiben unabhängig davon verpflichtend.
+
+Das kleinere Hauptfenster und die kompakte Leiste sind im Code viewportbegrenzt. Tatsächliche Darstellung, Fokus, Skalierung und Bedienung im Spiel bleiben zu prüfen. Datenformate, private Speicherung und direkter Clientaustausch sind unverändert; es kommen keine Registrierung oder zentralen Profildienste hinzu. Aktuelle Prüf-/Releaseergebnisse: [STATUS.md](../STATUS.md), Gestaltungsdetails: [UX](ux-and-vanity.md).

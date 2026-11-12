@@ -4,11 +4,13 @@
 
 FRP1 ist ein Dalamud-Plugin für Charakterbeschreibungen, erste Eindrücke, RP-Status und Kontakte. Es orientiert sich beim Bedienkonzept an Total RP 3 und übernimmt die lokal beziehungsweise direkt zwischen Clients umsetzbaren Funktionen von Glance in einer eigenen FFXIV-Oberfläche.
 
-**Stand: 2026-11-12 – veröffentlicht als früher öffentlicher Teststand 0.1.1.3 (Prerelease).** Repository, MIT-Lizenz, Installerindex und Releasepaket sind öffentlich verfügbar. Der erfolgreiche GitHub-Lauf besteht Build mit 0 Warnungen/Fehlern, 500/500 Funktionstests, 33/33 Paketprüfungen und 105/105 CI-Prüfungen. Eine tatsächliche Spielabnahme und reale LAN-/Internet-/NAT-Abnahme sind noch nicht erfolgt.
+**Stand: 2026-11-12 – veröffentlicht als früher öffentlicher Teststand 0.2.0.4 (Prerelease).** Repository, MIT-Lizenz, Installerindex und Releasepaket sind öffentlich verfügbar. Der erfolgreiche GitHub-Lauf besteht Build mit 0 Warnungen/Fehlern, 510/510 Funktionstests, 33/33 Paketprüfungen und 105/105 CI-Prüfungen. Native Bedienungs-/Skalierungsabnahme und reale LAN-/Internet-/NAT-Abnahme stehen noch aus.
 
-**Im aktuellen Installerpaket:** Fünf-Bereiche-Oberfläche, kompaktes einklappbares Mein-RP-HUD, vollständige Glance-Mouseoverinhalte und feldnahe Hilfen sind jetzt im Installerpaket enthalten. Die Updateautomatik hat Release und Index erfolgreich veröffentlicht. Eine vorhandene ältere Installation aktualisiert der Nutzer über den Dalamud-Installer; eine lokale Installation wurde durch uns nicht durchgeführt.
+**Im aktuellen Installerpaket:** Drei Hauptwege **Mein Charakter**, **Kontakte**, **Einstellungen**; eigene Lesekarte mit getrenntem Bearbeiten, drei Profilbereiche **Überblick**, **Charakter**, **OOC**, einzeilige zielunabhängige eigene RP-Leiste und drei primäre Themes. Fremde Angaben bleiben in kompakter Ziel-/Mouseoveranzeige; vollständige Glances sind per Hover/Fokus/Klickpin zugänglich.
 
 **RP-Leiste wieder einblenden:** 0.1.1.3 korrigiert ein sofortiges erneutes Ausschalten nach dem Aktivieren. Nach dem Update die Leistensichtbarkeit erneut aktivieren oder **Anzeigen und Position zurücksetzen** wählen; alternativ `/frpbar` beziehungsweise `/frp bar show` verwenden. Die gespeicherte ausgeschaltete Wahl wird durch das Update nicht automatisch verändert.
+
+**Auf 0.2.0.4 aktualisieren:** Verwende dieselbe untenstehende JSON-Adresse im Dalamud-Installer. Aktualisiere das Plugin und lade es bei Bedarf neu. Profildaten, alte Theme-IDs, private Registerdaten, Kopplungen und Freigaben bleiben erhalten; eine Konfigurationslöschung ist nicht erforderlich. Aktuelle Anleitung: [Handbuch, Abschnitt 19](docs/benutzerhandbuch.md#19-kompakte-bedienung-seit-0204), [UX](docs/ux-and-vanity.md). Eine Installation oder native Spielabnahme wurde durch uns nicht durchgeführt.
 
 ## Kein zentraler Server für deine Profile
 
@@ -54,7 +56,7 @@ https://raw.githubusercontent.com/demkadse/Final-Roleplay-1/master/repo.json
 
 Die GitHub-Projektseite oder eine ZIP-Adresse gehört nicht in das Repositoryfeld. Der Index ist eine JSON-Liste, aus der Dalamud die eigentlichen Installations-/Updatepakete lädt. Grundlage ist das [offizielle Dalamud-Verfahren für eigene Repositories](https://dalamud.dev/plugin-publishing/custom-repositories/).
 
-Projekt: [demkadse/Final-Roleplay-1](https://github.com/demkadse/Final-Roleplay-1), Branch `master`. Das [Release v0.1.1.3](https://github.com/demkadse/Final-Roleplay-1/releases/tag/v0.1.1.3) enthält [FRP1-0.1.1.3.zip](https://github.com/demkadse/Final-Roleplay-1/releases/download/v0.1.1.3/FRP1-0.1.1.3.zip) und [SHA256-Prüfsummen](https://github.com/demkadse/Final-Roleplay-1/releases/download/v0.1.1.3/SHA256SUMS). Das Release ist ein öffentlicher früher Teststand/Prerelease und kein Entwurf.
+Projekt: [demkadse/Final-Roleplay-1](https://github.com/demkadse/Final-Roleplay-1), Branch `master`. Das [Release v0.2.0.4](https://github.com/demkadse/Final-Roleplay-1/releases/tag/v0.2.0.4) enthält [FRP1-0.2.0.4.zip](https://github.com/demkadse/Final-Roleplay-1/releases/download/v0.2.0.4/FRP1-0.2.0.4.zip) und [SHA256-Prüfsummen](https://github.com/demkadse/Final-Roleplay-1/releases/download/v0.2.0.4/SHA256SUMS). Das Release ist ein öffentlicher früher Teststand/Prerelease und kein Entwurf.
 
 ## Die ersten Minuten
 
@@ -80,7 +82,7 @@ Die Übersicht nennt die vorhandenen Module. Seit 0.1.1.1 gilt die im nächsten 
 | Journal und Medien | Drei Leselayouts, begrenztes Rich Text, Standarddarstellung, grafischer Spielicon-Picker und lokaler Portraitzuschnitt. |
 | Begleiter | Begrenzte Beschreibungen eigener Begleiter; keine Veränderung tatsächlicher Pets oder Mounts. |
 | Eigene RP-Leiste | Profilwechsel, Status, Verfügbarkeit, Journalzugriff und anklickbare eigene Glances; beweglich, sperrbar und lokal skalierbar. |
-| Gestaltung | Acht Volkspaletten und drei freie Themes; automatische lokale Zuordnung oder freie manuelle Wahl. |
+| Gestaltung | Drei primäre Themes Obsidian, Pergament und Nachtblau; bisherige elf Theme-IDs bleiben ohne Datenmigration lesbar. |
 | Privates Register | Profil-/Charakternotizen, Favoriten, Beziehungen, Stummschaltung, Netzblock, Suche und Verlauf geöffneter Profile. |
 | Spielanzeigen | Mouseover, bewegliche/pinnbare Zielkarte, nativer Kontextmenüeintrag, optionale lokale Nameplates/Titel/Farben/Profilicons und General-Chatnamen. |
 | Umgebung/Karte | Aktuell sichtbare bekannte Akteure, Filter, Anvisieren und Karte für einen bekannten lokalen Akteur. Keine weltweite Suche. |
@@ -93,15 +95,13 @@ Die RP-Präferenzen beschreiben Gesprächs- und Spielwünsche. Sie sind keine Zu
 
 ## Aktuelle Bedienung
 
-Editor und Leser verwenden jetzt genau fünf gleichrangige Bereiche: **RP-Status und Kurzprofil**, **OOC Informationen**, **Auf den ersten Blick**, **Weitere Charakterdaten**, **RP-Erfahrung und Absprachen**. Ein kleiner Kopf enthält Name, Titel, Portrait, Icon und Inhaltskennzeichnung; darunter steht ein Inhaltsbereich statt einer zweispaltigen Vorschau. Gestaltung öffnet sich am Kopf, JSON-Funktionen unter Profilaktionen.
+**Mein Charakter** öffnet die eigene Lesekarte. **Bearbeiten** bietet Speichern, Verwerfen und Vorschau. **Überblick**, **Charakter** und **OOC** bündeln die Inhalte; weitere optionale Felder ergänzt **+ Angabe**. Profilvarianten, JSON und lokale Werkzeuge liegen im Menü.
 
-Vorhandene Hooks, freie Zusatzfelder, Traits und Begleiter bleiben unter **Weitere Charakterdaten** lesbar und können gezielt aus dem Entwurf entfernt werden. Neue Baukästen dafür fehlen bewusst. Solche Inhalte bleiben bis zur tatsächlichen Entfernung öffentliche Profildaten; auch deaktivierte Glances sind nicht privat. Unbearbeitete RP-Sprachen bleiben erhalten.
+Die eigene RP-Leiste ist einzeilig, einklappbar und bleibt beim eigenen aktiven Profil. Fremde Informationen erscheinen separat als kompakte Ziel-/Mouseoveranzeige. Kleine Glance-Icons liefern bei Hover, Fokus oder Klickpin vollständige scrollbare Texte.
 
-**Mein RP** ist lokal ein kompaktes zweizeiliges MiniHUD ohne Titelzeile. Ohne Ziel oder beim eigenen Charakter zeigt es das eigene Profil; bei einem erkannten erlaubten fremden Ziel zeigt es dieses nur lesend. Unbekannte, unzulässige oder mehrdeutige Ziele zeigen einen neutralen Zustand statt des eigenen Profils. Ein Zielwechsel ändert weder Entwurf, aktives eigenes Profil noch Freigaben.
+**Kontakte** bündelt Liste, Auswahlaktionen und Umgebung. Netzwerkdetails liegen unter **Erweitert**. Die primäre Gestaltung bietet Obsidian, Pergament und Nachtblau; ältere Theme-IDs bleiben lesbar. Kontextuelle Hoverhinweise und zentrale Hilfe ersetzen sichtbare Hilfebadges. Vorhandene Daten, Kopplungen und Freigaben bleiben erhalten.
 
-Glance-Inhalte öffnen sich beim Darüberfahren oder Tastaturfokus vollständig in einer scrollbaren Karte – auch bei ausgeschalteten Hilfen. Ein kurzer Mausübergang zur Karte ist möglich; Klick kann sie anheften. Kontext-/Freigabewechsel verwirft sie. Profilwahl, Einstellungen und Hilfe liegen im Kontextmenü; Einklappen speichert einen kleinen Wiederöffner. Beschriftete **? Hilfe: Titel** beziehungsweise **? Hilfe** stehen direkt bei ihrem Feld. Die große Zusatz-Zielkarte bleibt bei neuen Einstellungen zunächst aus und wird bei Bedarf bewusst geöffnet; bestehende gespeicherte Sichtbarkeit bleibt erhalten.
-
-Die Kurzanleitung steht in [Handbuch, Abschnitt 17](docs/benutzerhandbuch.md). Die folgenden UX-Funktionen sind seit 0.1.1.1 veröffentlicht. Die Automatik erzeugt nach erfolgreichem Build-, Prüf- und Publishlauf neue Version/Paket/Index; vorhandene Releaseassets werden nicht überschrieben.
+Die genaue Bedienung steht in [Handbuch, Abschnitt 19](docs/benutzerhandbuch.md#19-kompakte-bedienung-seit-0204). Native Bedienung, Fokus und Skalierung im Spiel sind noch nicht abgenommen.
 
 ## Wie zwei Spieler Profile austauschen
 
@@ -144,13 +144,13 @@ Die GitHub-Actions-Einrichtung ist mit Nutzercommit `ffe036c` eingeführt. Relev
 
 Die CI-Version entsteht aus Basis `0.1.1` und Laufnummer minus eins als vierter Komponente: Lauf 1 verwendet `0.1.1.0`, Lauf 2 `0.1.1.1`. Erst nach erfolgreicher Veröffentlichung und anonymer Paket-/Hashprüfung schreibt ein Bot ausschließlich den erzeugten `repo.json`-Index zurück. Die Installeradresse bleibt unverändert. Es wird nur das integrierte `GITHUB_TOKEN` benötigt, kein zusätzliches PAT, Profilserver oder Nutzerkonto.
 
-Die Automatik veröffentlicht mit Quellcommit `809d996` erfolgreich: [Lauf 43284625889](https://github.com/demkadse/Final-Roleplay-1/actions/runs/43284625889) besteht Build und Publish. Die Protokolle bestätigen ausdrücklich 500/500 Funktionstests, 33/33 Paketfälle, 33 Policyfälle, 24 Publishabläufe, 44 SDK-Fälle und vier Compilerregressionen. Frühere Fehler bei CI-Pfaden und der vollständigen Ausführung des Testschritts sind korrigiert und unabhängig reviewgeprüft. Details: [Releaseautomatik](docs/auto-release.md).
+Die Automatik veröffentlicht Quellcommit `6c2e491` erfolgreich: [Lauf 43296113100](https://github.com/demkadse/Final-Roleplay-1/actions/runs/43296113100) besteht Build und Publish. Die Protokolle bestätigen ausdrücklich 510/510 Funktionstests, 33/33 Paketfälle, 33 Policyfälle, 24 Publishabläufe, 44 SDK-Fälle und vier Compilerregressionen. Anonyme JSON-/ZIP-/Prüfsummendownloads und erneute vollständige Paketvalidierung sind erfolgreich. Details: [Status](STATUS.md), [Releaseautomatik](docs/auto-release.md).
 
 Softwareupdates laufen über den normalen Dalamud-Installer und die Repositoryadresse; FRP1 betreibt keinen eigenen automatischen Updater und keinen Profilserver. Profiländerungen zwischen bereits verbundenen freigegebenen Peers sind davon unabhängig.
 
 Historischer Stand 0.1.0.0: 467/467 Funktionstests, Build mit 0 Warnungen/Fehlern, unabhängige Reviewfreigabe und acht Probegruppen mit zwei echten Loopback-TLS-Clients. Dieser Nachweis bleibt getrennt vom neuen 500er-Prüfstand.
 
-Die öffentliche JSON-Adresse liefert Version 0.1.1.3/API 15. JSON, ZIP und Prüfsummen wurden anonym geladen, gemeinsam per SHA-256 geprüft und erneut paketvalidiert. Das ist eine Distributionsprüfung, keine Spiel-/Netzabnahme.
+Die öffentliche JSON-Adresse liefert Version 0.2.0.4/API 15. JSON, ZIP und Prüfsummen wurden anonym geladen, gemeinsam per SHA-256 geprüft und erneut paketvalidiert. Das ist eine Distributionsprüfung, keine Spiel-/Netzabnahme.
 
 **Nicht tatsächlich abgenommen:** Bedienung/Renderdarstellung im laufenden Spiel, reales LAN/Internet, NAT/CGNAT und umfangreiche Belastung. Dies ist ein früher Teststand, keine Zusicherung reibungsloser Verbindung zwischen beliebigen zwei Spielern.
 
@@ -166,7 +166,7 @@ dotnet test FRP1.slnx -c Release --nologo -p:BuildInParallel=false
 dotnet run --project tools/FRP1.Probe -c Release -- --self-test
 ```
 
-Release-Ausgaben aus dem Entwicklungsbuild: `src/FRP1.Plugin/bin/Release/FRP1.Plugin.dll` und `src/FRP1.Plugin/bin/Release/FRP1.Plugin/latest.zip`. Das aktuelle veröffentlichte Installerpaket heißt `FRP1-0.1.1.3.zip`.
+Release-Ausgaben aus dem Entwicklungsbuild: `src/FRP1.Plugin/bin/Release/FRP1.Plugin.dll` und `src/FRP1.Plugin/bin/Release/FRP1.Plugin/latest.zip`. Das aktuelle veröffentlichte Installerpaket heißt `FRP1-0.2.0.4.zip`.
 
 Weitere Dokumentation: [Benutzerhandbuch](docs/benutzerhandbuch.md), [Release-Notes 0.1.0.0](docs/release-notes-v0.1.0.0.md), [Status](STATUS.md), [Übergabe](HANDOFF.md), [Architektur](docs/architecture.md), [Machbarkeit](docs/feasibility.md), [TRP3-Abgleich](docs/trp3-feature-map.md), [Glance-Abgleich](docs/glance-feature-map.md), [UX/Gestaltung](docs/ux-and-vanity.md).
 
