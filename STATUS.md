@@ -2,6 +2,8 @@
 
 Stand: 2026-11-12
 
+**Planungsrunde am 2026-11-12 abgeschlossen:** [Integrationsplan](docs/integrationen-plan.md) für Honorific, Moodles, Glamourer, Customize+, Lifestream und eigene FRP1-IPC fertig. Planinhalt vollständig, alle vier Reviewanforderungen eingearbeitet; abschließender Reviewer-Abgleich der zuletzt ergänzten Queue-Klarstellung noch offen. Kontrollierter Checkpoint am 2026-11-12; am 2026-11-13 zuerst diesen einen Abgleich abschließen, danach WP1/Honorific lesen beginnen. Keine Integration implementiert, keine Builds/Tests/Runtimeänderungen. Produktstand `89b5e42` / öffentlich 0.2.0.4 unverändert. Nächster Schritt am 2026-11-13: zuerst den offenen Reviewer-Abgleich zur Queue-Klarstellung abschließen; anschließend Gitstatus/HEAD prüfen, WP1 und Honorific-Read-API-Spike; erstes MVP einschließlich bewusstem Entwurfsimport und minimalem Opt-in-/Importknopf. Bei Budgetstopp mit diesem Wiedereinstieg fortsetzen.
+
 ## Aktuell: kompakter UI-Neubau als 0.2.0.4 veröffentlicht
 
 Die neue Oberfläche ist als 0.2.0.4 öffentlich veröffentlicht und über dieselbe Installeradresse verfügbar. Quellcommit ist `6c2e49115d764ae391922d5c5b3bc4f8fc70413e`; die Pluginversionsbasis bleibt 0.2.0.0, FRP1.Core bleibt 1.0.0.0. Bestehende Installationen über Dalamud aktualisieren und bei Bedarf neu laden. Keine Installation durch den Agenten durchgeführt.
