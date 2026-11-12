@@ -6,7 +6,7 @@ FRP1 ist ein Dalamud-Plugin für Charakterbeschreibungen, erste Eindrücke, RP-S
 
 **Stand: 2026-11-12 – veröffentlicht als früher öffentlicher Teststand 0.1.0.0 (Prerelease).** Repository, MIT-Lizenz, Installerindex und Releasepaket sind öffentlich verfügbar. Der geprüfte Code besteht 467 Tests, Release-Build und unabhängiges Review; zusätzlich bestehen 33 Offline-Paketprüfungen. Eine tatsächliche Spielabnahme und reale LAN-/Internet-/NAT-Abnahme sind noch nicht erfolgt.
 
-**Neuerer UX-Quellstand:** Fünf-Bereiche-Oberfläche und MiniHUD sind inzwischen im Nutzercommit `62a91a7` („rework“) enthalten. Der geprüfte UX-Stand besteht 500/500 Funktionstests, Release-Build und unabhängiges Review, ist aber noch nicht als Installerupdate ausgeliefert. Öffentliches ZIP/Index 0.1.0.0 bleiben bis zu einer erfolgreichen neuen Veröffentlichung unverändert. Die neue Releaseautomatik wird zunächst nur lokal vorbereitet; Commit und Push ihrer Einrichtung übernimmt der Nutzer.
+**Neuerer UX-Quellstand:** Fünf-Bereiche-Oberfläche und MiniHUD sind inzwischen im Nutzercommit `62a91a7` („rework“) enthalten. Der geprüfte UX-Stand besteht 500/500 Funktionstests, Release-Build und unabhängiges Review, ist aber noch nicht als Installerupdate ausgeliefert. Die Automatik ist mit `ffe036c` auf GitHub eingeführt; ihr erster Lauf bestand Build und Tests, scheiterte aber vor Publish bei der Paketprüfung. Öffentliches ZIP/Index bleiben bis zur erfolgreichen neuen Veröffentlichung 0.1.0.0.
 
 ## Kein zentraler Server für deine Profile
 
@@ -99,7 +99,7 @@ Vorhandene Hooks, freie Zusatzfelder, Traits und Begleiter bleiben unter **Weite
 
 Glance-Inhalte öffnen sich beim Darüberfahren oder Tastaturfokus vollständig in einer scrollbaren Karte – auch bei ausgeschalteten Hilfen. Ein kurzer Mausübergang zur Karte ist möglich; Klick kann sie anheften. Kontext-/Freigabewechsel verwirft sie. Profilwahl, Einstellungen und Hilfe liegen im Kontextmenü; Einklappen speichert einen kleinen Wiederöffner. Beschriftete **? Hilfe: Titel** beziehungsweise **? Hilfe** stehen direkt bei ihrem Feld. Die große Zusatz-Zielkarte bleibt bei neuen Einstellungen zunächst aus und wird bei Bedarf bewusst geöffnet; bestehende gespeicherte Sichtbarkeit bleibt erhalten.
 
-Die Kurzanleitung steht in [Handbuch, Abschnitt 17](docs/benutzerhandbuch.md). Der vorhandene Sourcecommit allein ersetzt noch kein Installerpaket. Die unten beschriebene Automatik wird erst nach Nutzercommit/-push ihrer Einrichtung wirksam und erzeugt danach neue Version/Paket/Index; das veröffentlichte 0.1.0.0 wird nicht überschrieben.
+Die Kurzanleitung steht in [Handbuch, Abschnitt 17](docs/benutzerhandbuch.md). Der vorhandene Sourcecommit allein ersetzt noch kein Installerpaket. Die unten beschriebene Automatik erzeugt erst nach erfolgreichem Build-, Prüf- und Publishlauf neue Version/Paket/Index; das veröffentlichte 0.1.0.0 wird nicht überschrieben.
 
 ## Wie zwei Spieler Profile austauschen
 
@@ -138,11 +138,11 @@ Chatnamensersetzung verwendet ausschließlich allgemein gekennzeichnete Profile,
 
 ### Vorbereitete Releaseautomatik für eigene Master-Pushes
 
-Die neue GitHub-Actions-Einrichtung liegt zunächst nur lokal. **Vor dem Nutzercommit/-push gibt es dadurch noch keinen neuen gehosteten Lauf und kein automatisches Installerupdate.** Danach sollen relevante Quellcode-, Build-, Test-, Workflow- oder Lizenzänderungen auf `master` Build, Tests, Paketprüfung und Veröffentlichung starten. Reine Dokumentations-/Indexänderungen erzeugen keine Releaseschleife; ein bewusster manueller Start ist auf `master` möglich.
+Die GitHub-Actions-Einrichtung ist mit Nutzercommit `ffe036c` eingeführt. Relevante Quellcode-, Build-, Test-, Workflow- oder Lizenzänderungen auf `master` starten Build, Tests, Paketprüfung und Veröffentlichung. Reine Dokumentations-/Indexänderungen erzeugen keine Releaseschleife; ein bewusster manueller Start ist auf `master` möglich.
 
 Die CI-Version entsteht aus Basis `0.1.1` und Laufnummer minus eins als vierter Komponente: Lauf 1 verwendet `0.1.1.0`, Lauf 2 `0.1.1.1`. Erst nach erfolgreicher Veröffentlichung und anonymer Paket-/Hashprüfung schreibt ein Bot ausschließlich den erzeugten `repo.json`-Index zurück. Die Installeradresse bleibt unverändert. Es wird nur das integrierte `GITHUB_TOKEN` benötigt, kein zusätzliches PAT, Profilserver oder Nutzerkonto.
 
-Die Einrichtung besteht lokal den Build gegen das frisch verifizierte API-15-SDK, 500/500 Funktionstests, 33/33 Paketprüfungen und 101/101 zusätzliche CI-Prüfungen. Die statische Workflowprüfung mit actionlint ist ohne Befund; das unabhängige Review ist ohne kritische oder wichtige Restbefunde freigegeben. Ein echter gehosteter Lauf ist erst nach dem Nutzerpush prüfbar. Für Ablauf, Schutz vor alten Läufen/Wiederholungen, Actions-Fehlersuche und Branchabgleich nach einem Botcommit siehe [Releaseautomatik](docs/auto-release.md).
+Die Einrichtung bestand lokal den Build gegen das frisch verifizierte API-15-SDK, 500/500 Funktionstests, 33/33 Paketprüfungen und 101/101 zusätzliche CI-Prüfungen sowie actionlint und unabhängiges Review. Im ersten echten [Actions-Lauf](https://github.com/demkadse/Final-Roleplay-1/actions/runs/43239620147) bestanden Build und 500/500 Funktionstests erneut; die Paketprüfung stoppte bei `Unmapped embedded PDB source path.`, Publish wurde übersprungen. Die CI-Pfadzuordnung ist korrigiert: 4/4 Compilerregressionen, 33/33 erneute Paketprüfungen und actionlint bestehen; das Fixreview ist freigegeben. Ein neuer erfolgreicher Hosted-Publishlauf steht noch aus. Für Ablauf, Schutz vor alten Läufen/Wiederholungen, Actions-Fehlersuche und Branchabgleich nach einem Botcommit siehe [Releaseautomatik](docs/auto-release.md).
 
 Softwareupdates laufen über den normalen Dalamud-Installer und die Repositoryadresse; FRP1 betreibt keinen eigenen automatischen Updater und keinen Profilserver. Profiländerungen zwischen bereits verbundenen freigegebenen Peers sind davon unabhängig.
 

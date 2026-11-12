@@ -21,6 +21,7 @@ $version = Get-Frp1CiVersion -BaseVersion $base -RunNumber $RunNumber
 $timestampText = & git -C $root show -s --format=%ct $SourceSha
 if ($LASTEXITCODE -ne 0 -or $timestampText -notmatch '^\d{10}$') { throw 'Cannot read source commit timestamp.' }
 $timestamp = [long]$timestampText
+& (Join-Path $root 'tests/CI/Test-CiSourcePaths.ps1') | Out-Host
 $parameters = @{ LastUpdateUnix = $timestamp; Version = $version; Tag = "v$version"; OutputDirectory = $OutputDirectory }
 if ($InputZip) { $parameters.InputZip = $InputZip }
 if ($NuGetPackageRoot) { $parameters.NuGetPackageRoot = $NuGetPackageRoot }

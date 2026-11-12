@@ -9,4 +9,10 @@
     <Deterministic>true</Deterministic>
     <PathMap>$(MSBuildThisFileDirectory)=/_/FRP1/</PathMap>
   </PropertyGroup>
+  <Target Name="MapFrp1SourceRoot" AfterTargets="InitializeSourceRootMappedPaths" Condition="'$(Configuration)' == 'Release'">
+    <ItemGroup>
+      <!-- Keep the compiler's CI mapping and Source Link on the same neutral root. -->
+      <SourceRoot Update="$(MSBuildThisFileDirectory)" MappedPath="/_/FRP1/" />
+    </ItemGroup>
+  </Target>
 </Project>

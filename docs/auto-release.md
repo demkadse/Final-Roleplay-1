@@ -1,8 +1,8 @@
 # Automatische Installer-Releases nach einem Nutzerpush
 
-Stand: 2026-11-12 · **Einrichtung lokal abgeschlossen und geprüft.** Die neue Automatik ist ohne Nutzercommit/-push noch nicht auf GitHub eingeführt oder als Hosted-Lauf geprüft. Das öffentliche Installerrelease bleibt bis zur erfolgreichen neuen Veröffentlichung 0.1.0.0.
+Stand: 2026-11-12 · **Automatik auf GitHub eingeführt; erster Lauf bei Paketprüfung gestoppt.** Nutzercommit `ffe036c` („update1“) aktiviert die Einrichtung. Im [Lauf 43239620147](https://github.com/demkadse/Final-Roleplay-1/actions/runs/43239620147) bestanden Build und 500/500 Funktionstests; die Paketprüfung scheiterte mit `Unmapped embedded PDB source path.`, Publish wurde übersprungen. Das öffentliche Installerrelease bleibt bis zur erfolgreichen neuen Veröffentlichung 0.1.0.0.
 
-Der UX-Quellstand ist bereits im Nutzercommit `62a91a7` („rework“) enthalten. Dieser Commit allein ersetzt kein Release-ZIP und aktualisiert keinen Installerindex. Der Nutzer übernimmt Sourcecommit und Push der neuen Workflow-/CI-Einrichtung und aktiviert sie damit.
+Der UX-Quellstand ist bereits im Nutzercommit `62a91a7` („rework“) enthalten. Ein Sourcecommit allein ersetzt kein Release-ZIP und aktualisiert keinen Installerindex. Die CI-Pfadzuordnung für eingebettete PDB-Quelldateien ist korrigiert und durch 4/4 Compilerregressionen, erneute 33/33 Paketprüfungen und unabhängiges Fixreview geprüft; Commit und Push dieses Fixes sind vom Nutzer ausdrücklich beauftragt. Ein erfolgreicher neuer Publishlauf ist noch nicht nachgewiesen.
 
 ## Was nach Einführung automatisch passiert
 
@@ -30,8 +30,8 @@ https://raw.githubusercontent.com/demkadse/Final-Roleplay-1/master/repo.json
 
 ## Kurzanleitung für den Maintainer
 
-1. Die vorbereiteten Änderungen einschließlich Workflow, CI-Hilfen, Build-/Paketänderungen und Tests prüfen und selbst committen.
-2. Den eigenen `master`-Stand abgleichen und selbst pushen. Erst damit wird die neue Automatik eingeführt beziehungsweise ausgelöst.
+1. Änderungen einschließlich Workflow, CI-Hilfen, Build-/Paketänderungen und Tests prüfen und committen. Die Automatik ist seit `ffe036c` eingeführt.
+2. Den eigenen `master`-Stand abgleichen und pushen. Ein relevanter Push löst die Automatik aus.
 3. Im [Actions-Bereich des Repositorys](https://github.com/demkadse/Final-Roleplay-1/actions) den passenden Lauf zum eigenen Sourcecommit öffnen.
 4. Build-/Testjob und anschließenden Publishjob prüfen. Ein erfolgreicher Sourcepush allein ist kein erfolgreicher Installerrelease.
 5. Nach erfolgreichem Publish Release, ZIP und aktualisierten Index prüfen. Das Release bleibt als früher Teststand/Prerelease gekennzeichnet.
@@ -83,7 +83,7 @@ GitHub baut und verteilt Software sowie Installerindex; es wird kein FRP1-Profil
 
 Die lokale Einrichtung besteht den Release-Build gegen das frisch verifizierte API-15.0.4-`DALAMUD_HOME` ohne Warnungen/Fehler, 500/500 Funktionstests, 33/33 Paketprüfungen und 101/101 zusätzliche CI-Prüfungen: 33 Versions-/Releasepolicyfälle, 24 simulierte Veröffentlichungsabläufe und 44 SDK-/Pfad-/Metadatenfälle. Kandidat 0.1.1.0 ist paketvalidiert; ZIP, Index und Prüfsummen sind bei zwei lokalen Erstellungen byteidentisch. actionlint 1.7.12 meldet keine Workflowfehler. Das abschließende unabhängige Review ist ohne kritische oder wichtige Restbefunde freigegeben.
 
-Ein lokaler CI-/Paketprüflauf ersetzt keinen tatsächlichen gehosteten Actionslauf. Der erste gehostete Lauf ist erst nach Nutzercommit/-push der Einrichtung prüfbar. Bestätigte Einzelheiten stehen in [STATUS.md](../STATUS.md).
+Ein lokaler CI-/Paketprüflauf ersetzt keinen tatsächlichen gehosteten Actionslauf. Der erste echte Lauf deckte trotz erfolgreicher lokaler Prüfungen einen Unterschied bei der PDB-Pfadzuordnung auf und veröffentlichte kein neues Paket. Nach der Korrektur muss ein neuer Actionslauf einschließlich Publish erfolgreich abgeschlossen werden. Bestätigte Einzelheiten stehen in [STATUS.md](../STATUS.md).
 
 Spiel-/LAN-/Internet-/NAT-/CGNAT-Abnahme bleibt weiterhin offen. [Benutzerhandbuch](benutzerhandbuch.md), [Architektur](architecture.md), [Übergabe](../HANDOFF.md).
 

@@ -2,13 +2,13 @@
 
 Stand: 2026-11-12
 
-## Aktuell: Releaseautomatik lokal eingerichtet und geprüft
+## Aktuell: Erster GitHub-Lauf bis zur Paketprüfung erfolgreich
 
 Der UX-Quellstand ist im Nutzercommit `62a91a7` („rework“) enthalten. Das bedeutet noch keine neue Installerveröffentlichung: öffentlich bleibt 0.1.0.0, bis ein neuer Lauf erfolgreich veröffentlicht.
 
-Workflow und CI-Hilfen werden zunächst nur lokal eingerichtet. Der Nutzer übernimmt Sourcecommit und Push. Erst nach Einführung auf `master` können relevante Pushes beziehungsweise ein manueller Master-Start die Automatik auslösen; ein gehosteter Lauf wurde nicht gestartet.
+Die Releaseautomatik ist mit Nutzercommit `ffe036c` („update1“) auf GitHub eingeführt. Im echten [Actions-Lauf 43239620147](https://github.com/demkadse/Final-Roleplay-1/actions/runs/43239620147) bestanden Build und 500/500 Funktionstests. Die anschließende Paketprüfung brach mit `Unmapped embedded PDB source path.` ab; der Publishjob wurde übersprungen. Öffentliches Installerpaket und lokale Installation bleiben deshalb bei 0.1.0.0.
 
-Vorbereitet sind gepinnte Windows-/SDK-/API-15-Buildgrundlage, Funktionstests, Paket-/Lizenz-/Hashprüfung, neue unveränderliche Releases und erst danach ein verifizierter Botcommit ausschließlich für `repo.json`. Versionbasis `0.1.1`, vierte Komponente Laufnummer minus eins. Ein Hosted-Lauf ist nicht erfolgt. Details: [Releaseautomatik](docs/auto-release.md).
+Die CI-Pfadzuordnung für eingebettete PDB-Quelldateien ist gezielt korrigiert: Unter aktivierten CI-Bedingungen bestehen Build mit 0 Warnungen/Fehlern und Paketstagingprüfung; PDB und SourceLink verwenden `/_/FRP1/*`. Die strikte Paketvalidierung bleibt unverändert. Vier echte Compilerregressionen (CI an/aus, portable/eingebettete PDB) bestehen 4/4; mit den alten Buildproperties scheitern gezielt alle vier Fälle wie erwartet. Zusätzlich bestehen erneut 33/33 Paketprüfungen und actionlint. Das unabhängige Fixreview ist ohne kritische oder wichtige Restbefunde freigegeben. Die vier neuen Fälle ergänzen die bisherigen 101 CI-Prüfungen; diese 101 und die 500 Funktionstests wurden für den gezielten Fix nicht redundant wiederholt. Der Nutzer hat Commit und Push dieses Fixes ausdrücklich beauftragt; ein erfolgreicher neuer Publishlauf ist noch nicht nachgewiesen. Die bereits geprüften Schutzgrenzen und die Versionbasis `0.1.1` mit Laufnummer minus eins als vierter Komponente bleiben bestehen. Details: [Releaseautomatik](docs/auto-release.md).
 
 Nachgewiesen, ausschließlich lokal: frisch geladenes offizielles Dalamud 15.0.4/API 15 mit SHA-/Metadatenprüfung, .NET-SDK 10.0.401, Locked-Restore und ganzer Release-Build gegen dieses `DALAMUD_HOME` mit 0 Warnungen/Fehlern; 500/500 Funktionstests bestanden (26 Sekunden). FRP1.Core bleibt 1.0.0.0. Zusätzlich bestehen 33/33 Paketprüfungen und 101/101 Offline-CI-Prüfungen: 33 Versions-/Releasepolicyfälle, 24 Veröffentlichungsabläufe und 44 SDK-/Pfad-/Metadatenfälle. Die unabhängige statische Workflowprüfung mit actionlint 1.7.12 besteht ohne Meldungen. Das abschließende unabhängige Review ist ohne kritische oder wichtige Restbefunde freigegeben; daraus wird kein gehosteter Erfolg abgeleitet.
 
