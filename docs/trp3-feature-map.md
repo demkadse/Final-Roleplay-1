@@ -2,7 +2,7 @@
 
 Stand: 2026-11-11. Die FRP1-Module sind im echten Plugin angebunden. Release-Build ohne Warnungen/Fehler, 467 bestandene Tests und unabhängige Reviewfreigabe belegen den Codeprüfstand; die native Spiel-/Netzabnahme ist ein weiterhin offener eigener Schritt.
 
-Die Matrix hält den Funktionsumfang des **veröffentlichten 0.1.0.0** fest. Die neuere Bedienung besteht 500 Tests und ist im Nutzercommit 62a91a7 enthalten, aber noch nicht als Installerupdate veröffentlicht: fünf gleiche Bereiche, Kontext-MiniHUD und feldnahe Hilfen ohne neue Zusatzdaten-Baukästen. Releaseautomatik zunächst lokal vorbereitet; öffentlicher Installer bis zum erfolgreichen Lauf unverändert. Details: [UX](ux-and-vanity.md), [Status](../STATUS.md).
+Die Matrix beschreibt die vorhandenen Module. Die vereinfachte Bedienung mit fünf gleichen Bereichen, Kontext-MiniHUD und feldnahen Hilfen ist seit 0.1.1.1 veröffentlicht und im aktuellen 0.1.1.2 enthalten. Neue Zusatzdaten-Baukästen entfallen, vorhandene Inhalte bleiben erhalten und gezielt entfernbar. Die Releaseautomatik ist erfolgreich gehostet geprüft. Details: [UX](ux-and-vanity.md), [Status](../STATUS.md).
 
 ## Quelle und Lesart
 

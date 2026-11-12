@@ -1,6 +1,6 @@
 # UX und Profilgestaltung
 
-Stand: 2026-11-11. **Die neuere UX ist im Nutzercommit 62a91a7 enthalten, aber noch nicht als Installerupdate ausgeliefert.** Sie besteht den Release-Build ohne Warnungen/Fehler, 500/500 Tests und unabhängiges Review. Öffentliches ZIP/Index 0.1.0.0 bleiben bis zur erfolgreichen neuen Veröffentlichung unverändert. Die neue Releaseautomatik ist zunächst nur lokal vorbereitet und benötigt den Nutzercommit/-push ihrer Einrichtung; historische Prüfungen sind kein Hosted-Nachweis. Die Webvorschau ist kein Pixelversprechen oder Nachweis einer Spielabnahme.
+Stand: 2026-11-12. **Die neue UX ist veröffentlicht und im Installerpaket 0.1.1.2 enthalten.** Der erfolgreiche GitHub-Lauf besteht Build ohne Warnungen/Fehler, 500/500 Funktionstests, 33/33 Paketprüfungen und 105/105 CI-Prüfungen. Öffentliche JSON-/ZIP-/Prüfsummendownloads sind validiert. Die Webvorschau ist kein Pixelversprechen oder Nachweis einer Spielabnahme.
 
 ## Referenz und vorhandene Oberfläche
 
@@ -104,7 +104,7 @@ Audience-Gate und Register-/Binding-/Blockzustand gelten vor Profilnamen, Bilder
 
 ## Verbleibende Abnahme
 
-Der 500er-Teststand, die transparente Testhistorie und Reviewfreigabe des Nutzercommits stehen in [STATUS.md](../STATUS.md). Er ist noch nicht als neues Installerpaket veröffentlicht. Die vorbereitete [Releaseautomatik](auto-release.md) soll nach ihrer Einführung neue Version/Paket/Index erzeugen und darf 0.1.0.0 nicht überschreiben. Im laufenden Spiel zu prüfen sind insbesondere:
+Der 500er-Teststand, die transparente Testhistorie und Reviewfreigabe stehen in [STATUS.md](../STATUS.md). Die UX ist mit 0.1.1.2 veröffentlicht; die [Releaseautomatik](auto-release.md) ist erfolgreich gehostet geprüft. Historische Releaseassets werden nicht überschrieben. Im laufenden Spiel zu prüfen sind insbesondere:
 1. Journal-/Icon-/Portraitwiedergabe, tatsächliche Volkzuordnung, Textumbruch, Skalierung und Tastaturfokus.
 2. Eigene Leiste, Fremdmouseover/Zielpin, Nameplate-/Chatdarstellung und Rücknahme beim Deaktivieren/Entladen.
 3. Alterswiderruf, Charakterwechsel, verspätete Picker-/Ladeergebnisse und blockierte/gelöschte Kontakte ohne Inhaltsoffenlegung.

@@ -4,9 +4,9 @@ Stand: 2026-11-12
 
 ## Aktueller Arbeitsfokus
 
-**Releaseautomatik auf GitHub eingeführt; CI-Pfadfix in Arbeit.** Nutzercommit `ffe036c` („update1“) enthält die Automatik. Echter [Lauf 43239620147](https://github.com/demkadse/Final-Roleplay-1/actions/runs/43239620147): Build und 500/500 Funktionstests erfolgreich, Paketprüfung mit `Unmapped embedded PDB source path.` fehlgeschlagen, Publish übersprungen. Öffentliches ZIP/Index und lokale Installation bleiben 0.1.0.0. Der Nutzer hat Commit und Push des jetzt beauftragten Fixes ausdrücklich autorisiert.
+**Releaseautomatik erfolgreich abgeschlossen: 0.1.1.2 veröffentlicht.** [Lauf 43243803893](https://github.com/demkadse/Final-Roleplay-1/actions/runs/43243803893) zu `66cc76829aa185400a0ad136ea631309939574e9` besteht Build und Publish. Explizit belegt: 0 Warnungen/Fehler, 500/500 Funktionstests, 33/33 Paketprüfungen und 105/105 CI-Prüfungen (Policy33, Publish24, SDK44, Compiler4). Botcommit `14f92bb` aktualisiert ausschließlich `repo.json`; der lokale Branch wurde bereits per Fast-forward abgeglichen. Die öffentliche Version ist 0.1.1.2, die unveränderte lokale Benutzerinstallation noch 0.1.0.0.
 
-Aktueller Ausgangs-HEAD für den Fix ist `ffe036c`; der frühere UX-Quellstand stammt aus `62a91a7`. CI-Pfadzuordnung und gezielte Regressionstests sind korrigiert und reviewfreigegeben; als Nächstes den tatsächlichen Actionslauf einschließlich Publish prüfen. Nicht aus einem Sourcecommit auf eine neue Installerverfügbarkeit schließen.
+Quellrelease `v0.1.1.2` basiert auf `66cc768`; `14f92bb` ist der anschließende Indexcommit. Der Nutzer hat Commit und Push der Fixes ausdrücklich autorisiert; diese Arbeit ist erfolgt. Historische Fehler und die unabhängigen Fixprüfungen stehen in [STATUS.md](STATUS.md). Keine neue lokale Installation oder Spielabnahme durchgeführt.
 
 Abschlussprüfung des UX-Quellstands: Release-Build 0 Warnungen/Fehler, Gesamtlauf 500/500 bestanden ohne Fehler/Skips, unabhängige Reviewfreigabe. Ein erster Gesamtlauf hatte den einmaligen bestehenden Theme-I/O-Testfehler; Einzeltest und komplette Wiederholung bestanden. Ursache unbelegt, kein Produktiv-I/O-Fix/Retrymechanismus; Details in [STATUS.md](STATUS.md). Die gesonderte Prüfung der Releaseautomatik folgt weiter unten.
 
@@ -16,13 +16,13 @@ MiniHUD-Kontext kommt über `RpBarContextResolver` aus dem tatsächlichen Raw-Ta
 
 `Collapsed` ist ein eigener lokaler Leistenwert im rückwärtslesbaren Schema 1. Wiederöffner, Lock/Move/Scale und Viewportgrenzen erhalten. Große Zusatz-Zielkarte nur bei neuen Einstellungen standardmäßig aus; vorhandene gespeicherte Wahl bewahren. Hilfen direkt am Feld/Titel beschriften, keine losen Fragezeichengruppen.
 
-Für den nächsten Installerstand erzeugt die vorbereitete Automatik nach ihrer Einführung neue Version, Paket und Index. **Das veröffentlichte v0.1.0.0 nicht überschreiben und repo.json nicht von Hand versionieren.** Reale Spielabnahme bleibt offen. UX: [Benutzerhandbuch, Abschnitt 17](docs/benutzerhandbuch.md); Pipeline: [Releaseautomatik](docs/auto-release.md).
+Die Automatik erzeugt nach relevanten Master-Pushes neue Version, Paket und Index. Vorhandene Releaseassets nicht überschreiben und `repo.json` nicht von Hand versionieren. Reale Spielabnahme bleibt offen. UX: [Benutzerhandbuch, Abschnitt 17](docs/benutzerhandbuch.md); Pipeline: [Releaseautomatik](docs/auto-release.md).
 
 Die Pipelineversion verwendet Basis `0.1.1` und `GITHUB_RUN_NUMBER - 1` als vierte Komponente; `Frp1Version` überschreibt nur die Pluginversion, FRP1.Core bleibt bei 1.0.0.0. Windows/.NET-SDK 10.0.401 und offizielles API-15.0.4-`DALAMUD_HOME` sind festzuhalten, kein stiller Wechsel auf „latest“/API 17. Zwei Jobs: Build nur lesend ohne persistierte Checkout-Credentials; Publish erst nach Erfolg mit `contents: write` über eingebautes `GITHUB_TOKEN`, kein PAT.
 
 Release-Assets nicht überschreiben: identische Wiederholung wiederverwenden/no-op, abweichender Hash stoppen. Source-Head-/CAS-Prüfung muss veraltete Läufe vom Index fernhalten. `repo.json` erst nach öffentlichem ZIP-Download und Hashprüfung aktualisieren; Fehler dürfen den bisherigen Installerindex nicht unbrauchbar machen. Botcommit darf ausschließlich `repo.json` ändern. Dokumentations-/Indexpushes dürfen keine Releaseschleife auslösen.
 
-Nach einem Botcommit den lokalen Branch vor dem nächsten Push abgleichen, etwa `git pull --ff-only`; bei Abweichungen prüfen statt Force-Push. Die bisherige lokale Einrichtung bestand den frischen API-15-Build ohne Warnungen/Fehler, 500/500 Funktionstests, 33/33 Paketprüfungen und 101/101 CI-Prüfungen (Policy 33, Publishabläufe 24, SDK 44). Kandidatenprüfung und actionlint waren erfolgreich, zwei Erstellungen erzeugten identische ZIP-/Index-/Prüfsummendateien; das unabhängige Automatikreview war freigegeben. Der erste echte Lauf scheiterte dennoch an der CI-Pfadzuordnung. Der gezielte Fix besteht CI-Build ohne Warnungen/Fehler, Paketstaging, 33/33 Paketprüfungen, actionlint und 4/4 echte Compilerregressionen (CI an/aus, portable/eingebettete PDB). Die alten Buildproperties scheitern in allen vier Negativkontrollen; PDB und SourceLink verwenden mit dem Fix `/_/FRP1/*`. Das Fixreview ist ohne kritische oder wichtige Restbefunde freigegeben. Die bisherigen 101 CI-Fälle und 500 Funktionstests wurden für diesen gezielten Fix nicht erneut lokal ausgeführt. Ein neuer Hosted-Publishnachweis steht noch aus.
+Nach einem Botcommit den lokalen Branch vor dem nächsten Push abgleichen, etwa `git pull --ff-only`; bei Abweichungen prüfen statt Force-Push. Der erfolgreiche Hosted-Lauf und anonyme JSON-/ZIP-/Prüfsummendownloads sind jetzt nachgewiesen. ZIP umfasst 1.072.587 Bytes, SHA-256 `7B9C95D6977F100C14116CB5B2F567D7BA950D1431FA34CDDE179EBD2E910728`. Gemeinsame erneute Paketvalidierung erfolgreich. Die früheren lokalen Prüfungen und Fixregressionen sind in STATUS dokumentiert; reale Spiel-/Netzabnahme bleibt offen.
 
 ## Historisch: veröffentlichter Stand 0.1.0.0
 
@@ -79,7 +79,7 @@ Alle Stores strikt, begrenzt und asynchron halten. Änderungen mit Generationen 
 
 1. Native Spielabnahme einschließlich Social-/Icondarstellung, Fensterbedienung, Kontextmenü, Skalierung und Entladen durchführen, sobald entsprechend beauftragt. Codeprüfung und Review nicht damit gleichsetzen.
 2. Echte Zwei-Spieler-/Netzabnahme als offen führen, solange nicht tatsächlich erfolgt. GitHub-Veröffentlichung ist ausdrücklich beauftragt; Spielstart, lokale Installation und Serverdeployment sind davon nicht automatisch umfasst.
-3. Commit und Push der lokalen UX ausdrücklich dem Nutzer überlassen. Vor späterer Veröffentlichung die Versions-/Paket-/Indexentscheidung getrennt treffen; keinen alten Releaseasset ersetzen.
+3. Eine vorhandene lokale Installation 0.1.0.0 durch den Nutzer im Dalamud-Installer auf den veröffentlichten Stand aktualisieren lassen. Kein manuelles Ersetzen alter Releaseassets; Updateverteilung ist bereits verifiziert.
 4. Restliche Sprachlücken und nachgewiesene Fehler gezielt bearbeiten; keine unbeauftragten neuen Produktideen oder Taschen-/Inventarfunktionen hinzufügen. Builds/Tests nur bei neuen Änderungen oder offenen Fragen erneut ausführen.
 
 ## Reproduzierbare lokale Prüfung

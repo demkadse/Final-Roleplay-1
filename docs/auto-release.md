@@ -1,8 +1,8 @@
 # Automatische Installer-Releases nach einem Nutzerpush
 
-Stand: 2026-11-12 · **Automatik auf GitHub eingeführt; erster Lauf bei Paketprüfung gestoppt.** Nutzercommit `ffe036c` („update1“) aktiviert die Einrichtung. Im [Lauf 43239620147](https://github.com/demkadse/Final-Roleplay-1/actions/runs/43239620147) bestanden Build und 500/500 Funktionstests; die Paketprüfung scheiterte mit `Unmapped embedded PDB source path.`, Publish wurde übersprungen. Das öffentliche Installerrelease bleibt bis zur erfolgreichen neuen Veröffentlichung 0.1.0.0.
+Stand: 2026-11-12 · **Automatik erfolgreich auf GitHub geprüft; 0.1.1.2 veröffentlicht.** [Lauf 43243803893](https://github.com/demkadse/Final-Roleplay-1/actions/runs/43243803893) zu Quellcommit `66cc768` besteht Build und Publish. Die Protokolle belegen 0 Warnungen/Fehler, 500/500 Funktionstests, 33/33 Paketprüfungen und alle 105/105 CI-Prüfungen.
 
-Der UX-Quellstand ist bereits im Nutzercommit `62a91a7` („rework“) enthalten. Ein Sourcecommit allein ersetzt kein Release-ZIP und aktualisiert keinen Installerindex. Die CI-Pfadzuordnung für eingebettete PDB-Quelldateien ist korrigiert und durch 4/4 Compilerregressionen, erneute 33/33 Paketprüfungen und unabhängiges Fixreview geprüft; Commit und Push dieses Fixes sind vom Nutzer ausdrücklich beauftragt. Ein erfolgreicher neuer Publishlauf ist noch nicht nachgewiesen.
+Fünf Profilbereiche, kompaktes einklappbares HUD und feldnahe Hilfen sind jetzt im öffentlichen Installerpaket enthalten. [Release v0.1.1.2](https://github.com/demkadse/Final-Roleplay-1/releases/tag/v0.1.1.2) ist öffentlich, als Prerelease markiert und kein Entwurf. Botcommit `14f92bb` aktualisiert ausschließlich den Installerindex. JSON, ZIP und Prüfsummen sind anonym geladen, gemeinsam per SHA-256 geprüft und erneut paketvalidiert. Eine lokale Benutzerinstallation 0.1.0.0 wird durch den Nutzer über Dalamud aktualisiert; keine Installation erfolgte durch den Agenten.
 
 ## Was nach Einführung automatisch passiert
 
@@ -83,7 +83,7 @@ GitHub baut und verteilt Software sowie Installerindex; es wird kein FRP1-Profil
 
 Die lokale Einrichtung besteht den Release-Build gegen das frisch verifizierte API-15.0.4-`DALAMUD_HOME` ohne Warnungen/Fehler, 500/500 Funktionstests, 33/33 Paketprüfungen und 101/101 zusätzliche CI-Prüfungen: 33 Versions-/Releasepolicyfälle, 24 simulierte Veröffentlichungsabläufe und 44 SDK-/Pfad-/Metadatenfälle. Kandidat 0.1.1.0 ist paketvalidiert; ZIP, Index und Prüfsummen sind bei zwei lokalen Erstellungen byteidentisch. actionlint 1.7.12 meldet keine Workflowfehler. Das abschließende unabhängige Review ist ohne kritische oder wichtige Restbefunde freigegeben.
 
-Ein lokaler CI-/Paketprüflauf ersetzt keinen tatsächlichen gehosteten Actionslauf. Der erste echte Lauf deckte trotz erfolgreicher lokaler Prüfungen einen Unterschied bei der PDB-Pfadzuordnung auf und veröffentlichte kein neues Paket. Nach der Korrektur muss ein neuer Actionslauf einschließlich Publish erfolgreich abgeschlossen werden. Bestätigte Einzelheiten stehen in [STATUS.md](../STATUS.md).
+Historie: Der erste GitHub-Lauf stoppte an einer PDB-Pfadabweichung. Der SourceRoot-Fix ermöglichte Release 0.1.1.1, doch ein vorzeitiges erfolgreiches Skriptende ließ die 101 Helferprüfungen aus. Der anschließende Exitcode-Fix ist durch frische Shellproben für Erfolg und Fehler sowie unabhängiges Review abgesichert. Der neue Lauf belegt ausdrücklich Paket33, Policy33, Publish24, SDK44 und Compiler4. Erst diese Protokolle begründen den vollständigen Hosted-Nachweis. Einzelheiten: [STATUS.md](../STATUS.md).
 
 Spiel-/LAN-/Internet-/NAT-/CGNAT-Abnahme bleibt weiterhin offen. [Benutzerhandbuch](benutzerhandbuch.md), [Architektur](architecture.md), [Übergabe](../HANDOFF.md).
 

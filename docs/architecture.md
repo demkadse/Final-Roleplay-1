@@ -1,6 +1,6 @@
 # Architektur
 
-Stand: 2026-11-11. Die UX des Nutzercommits 62a91a7 besteht Release-Build, 500 Tests und unabhängiges Review, ist aber noch nicht als Installerupdate ausgeliefert. Öffentlicher Index/ZIP 0.1.0.0 bleiben bis zur erfolgreichen neuen Veröffentlichung unverändert. Die neue Automatik ist zunächst nur lokal vorbereitet; bisherige Prüfungen sind kein Nachweis eines Hosted-Laufs. Keine Spiel-/Netzabnahme erfolgt.
+Stand: 2026-11-12. Die neue UX mit fünf Bereichen und kompaktem HUD ist mit 0.1.1.2 öffentlich über den Installer verfügbar. Der erfolgreiche Hosted-Lauf besteht Build ohne Warnungen/Fehler, 500 Funktionstests, 33 Paketprüfungen und 105 CI-Prüfungen. JSON/ZIP/Prüfsummen sind anonym erreichbar und validiert. Keine Spiel-/Netzabnahme erfolgt.
 
 ## Bausteine
 
@@ -87,7 +87,7 @@ Die Regeldatei enthält nur die aktuelle bestätigte Version (höchstens 128 Byt
 
 Glance-Hover/Fokus liefert volle scrollbare Inhalte unabhängig von `ShowHints`, mit kurzem Mausübergang und optionalem Pin. Kontext-/Policywechsel invalidiert Karten. Feldnahe beschriftete Hilfen verwenden den gemeinsamen Katalog. Große Zusatz-Zielkarte ist nur bei neuen Einstellungen standardmäßig aus; vorhandene Wahl bleibt erhalten.
 
-Die UX ist im Nutzercommit enthalten. Commit/Push der neuen Workflow-/CI-Einrichtung übernimmt der Nutzer; erst danach kann die Automatik neue Version/Paket/Index veröffentlichen. Pluginversion wird über `Frp1Version` gesetzt, FRP1.Core behält 1.0.0.0. Nur ein nach Build/Test/öffentlicher Paketprüfung erfolgreicher Publishjob darf mit eingebautem `GITHUB_TOKEN` ausschließlich den Index zurückschreiben; kein Profilbackend und kein zusätzlicher PAT. Details: [Releaseautomatik](auto-release.md).
+Die UX ist im veröffentlichten Installerpaket enthalten. Die Releaseautomatik veröffentlicht nach relevanten Master-Pushes neue Version/Paket/Index. Pluginversion wird über `Frp1Version` gesetzt, FRP1.Core behält 1.0.0.0. Nur ein nach Build/Test/öffentlicher Paketprüfung erfolgreicher Publishjob darf mit eingebautem `GITHUB_TOKEN` ausschließlich den Index zurückschreiben; kein Profilbackend und kein zusätzlicher PAT. Details: [Releaseautomatik](auto-release.md).
 
 Automation reagiert auf Login, Kampf-/Dutywechsel und Gebietswechsel mit begrenzten Status-/Verfügbarkeits-/Profilaktionen. Keine Alters-/Netzfreigabe wird dadurch erteilt. Lokale Textentwürfe erzeugen Vorschau/Kopiertext; interne Profilverweise lösen nur vorhandene erlaubte Daten auf, keinen Fremdabruf.
 

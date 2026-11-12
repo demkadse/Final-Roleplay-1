@@ -1,10 +1,10 @@
 # FRP1 – Benutzerhandbuch
 
-Stand: 2026-11-11 · veröffentlichter früher öffentlicher Teststand 0.1.0.0 (Prerelease).
+Stand: 2026-11-12 · veröffentlichter früher öffentlicher Teststand 0.1.1.2 (Prerelease).
 
-**Veröffentlicht:** Das bestehende Repository `demkadse/Final-Roleplay-1`, Branch `master`, ist öffentlich und MIT-lizenziert. Installerindex und Releasepaket sind ohne Anmeldung erreichbar und geprüft. Der zuvor geprüfte Codestand besteht 467 Tests und unabhängiges Review; zusätzlich bestehen 33 Offline-Paketprüfungen ohne Fehler. Eine echte Spiel-/LAN-/Internetabnahme steht noch aus.
+**Veröffentlicht:** Repository, MIT-Lizenz, Installerindex und Releasepaket 0.1.1.2 sind öffentlich und ohne Anmeldung erreichbar. Der erfolgreiche GitHub-Lauf besteht Build ohne Warnungen/Fehler, 500/500 Funktionstests, 33/33 Paketprüfungen und 105/105 CI-Prüfungen. Eine echte Spiel-/LAN-/Internetabnahme steht noch aus.
 
-**Zwei Bedienungsstände:** Kapitel 1–16 beziehen sich auf das veröffentlichte 0.1.0.0. Die neuere UX ist inzwischen im Nutzercommit `62a91a7` enthalten, aber noch nicht als Installerupdate ausgeliefert; [Abschnitt 17](#17-neue-lokale-ux--noch-nicht-veröffentlicht) erklärt fünf Bereiche, MiniHUD und Hilfen. Ihr 500er-Teststand ersetzt kein veröffentlichtes Downloadpaket. Die neue Automatik wird erst nach Nutzercommit/-push ihrer Einrichtung wirksam; siehe Abschnitt 18.
+**Bedienung seit 0.1.1.1:** [Abschnitt 17](#17-bedienung-seit-0111) erklärt die aktuelle Oberfläche mit fünf Bereichen, kompaktem einklappbarem Mein-RP-HUD und feldnahen Hilfen. Er ersetzt die älteren Bedienungsbeschreibungen in Kapitel 1–16, soweit diese noch zusätzliche Baukästen oder die große eigene Leiste zeigen. Bestehende Inhalte bleiben erhalten und gezielt entfernbar. Abschnitt 18 beschreibt die erfolgreich eingeführte Releaseautomatik.
 
 ## 1. Was FRP1 ist
 
@@ -269,9 +269,9 @@ Projektcode und Dokumentation stehen unter der [MIT-Lizenz](../LICENSE). Das erl
 
 Technische Details: [Architektur](architecture.md), [Machbarkeit](feasibility.md), [TRP3-Abgleich](trp3-feature-map.md), [Glance-Abgleich](glance-feature-map.md). [Projektstatus](../STATUS.md) und [Release-Notes](release-notes-v0.1.0.0.md) halten Veröffentlichung und Abnahmestand fest.
 
-## 17. Neue lokale UX – noch nicht veröffentlicht
+## 17. Bedienung seit 0.1.1.1
 
-Die folgenden Änderungen sind im Nutzercommit `62a91a7` vom 2026-11-11 enthalten, aber noch nicht im Installer. Öffentliches ZIP und Index 0.1.0.0 bleiben bis zur erfolgreichen neuen Veröffentlichung unverändert. Die zunächst lokal vorbereitete Releaseautomatik benötigt erst ihren Nutzercommit/-push und einen erfolgreichen Lauf; ein Sourcecommit allein reicht nicht.
+Die folgenden Änderungen sind seit 0.1.1.1 im Installer enthalten. Der aktuelle vollständig geprüfte Stand ist 0.1.1.2. Bei noch installierter Version 0.1.0.0 öffne den Dalamud-Installer, aktualisiere die Repositoryliste und installiere das verfügbare Update; die JSON-Adresse bleibt gleich.
 
 ### Profil bearbeiten und lesen
 
@@ -313,13 +313,13 @@ Fahre mit der Maus über einen Glance oder fokussiere ihn per Tastatur. Der voll
 
 Hilfen stehen jetzt mit **? Hilfe: Titel** oder dem kompakten **? Hilfe** direkt am betroffenen Titel/Feld. Tooltip und geöffneter Hilfetext erklären das konkrete Thema; lose Fragezeichengruppen entfallen. Der globale Hilfeschalter wirkt weiterhin auf diese Hilfen, nicht auf eigentliche Glance-Inhalte oder **Erste Schritte**.
 
-Der lokale Abschluss besteht den Release-Build mit 0 Warnungen/Fehlern, 500/500 Tests und unabhängige Reviewfreigabe. Native Spielabnahme fehlt weiterhin. Die transparente Testhistorie steht in [STATUS.md](../STATUS.md); historische Paket-/Downloadprüfungen des öffentlichen 0.1.0.0 gelten nicht als Veröffentlichung dieser neuen UX.
+Der aktuelle GitHub-Lauf besteht Build mit 0 Warnungen/Fehlern, 500/500 Funktionstests, 33/33 Paketprüfungen und 105/105 CI-Prüfungen. Das öffentliche Paket ist zusätzlich anonym heruntergeladen und erneut paketvalidiert. Native Spielabnahme fehlt weiterhin. Die transparente Test- und Veröffentlichungshistorie steht in [STATUS.md](../STATUS.md).
 
-## 18. Vorbereitete automatische Softwareupdates nach einem Master-Push
+## 18. Automatische Softwareupdates nach einem Master-Push
 
-Die neue GitHub-Actions-Einrichtung liegt zunächst nur lokal. Erst wenn der Nutzer Workflow/CI-Hilfen selbst auf `master` committet und pusht, kann ein relevanter Push Build, Tests, Paket und Prerelease auslösen. Ein grüner Sourcepush ohne erfolgreichen Actionslauf liefert kein neues Installerpaket.
+Die GitHub-Actions-Einrichtung ist eingeführt und hat 0.1.1.2 erfolgreich veröffentlicht. Relevante Master-Pushes starten Build, Tests, Paket und Prerelease; reine Dokumentations- oder Indexänderungen erzeugen keinen neuen Release. Ein Sourcepush allein liefert erst nach erfolgreichem Actionslauf ein neues Installerpaket.
 
 Maintainer prüfen den Lauf im [Actions-Bereich](https://github.com/demkadse/Final-Roleplay-1/actions). Nach erfolgreicher Veröffentlichung und öffentlicher Hashprüfung schreibt ein Bot nur den erzeugten `repo.json`-Index zurück. Die Installeradresse bleibt gleich; normale Nutzer verwenden danach das übliche Dalamud-Update und benötigen weiterhin kein GitHub-Konto.
 
-Nach einem solchen Botcommit muss der Maintainer seinen lokalen Branch vor dem nächsten Push abgleichen, beispielsweise mit `git pull --ff-only`; bei Abweichungen erst prüfen, nicht Force-Push verwenden. Die lokale Einrichtung besteht Build, 500 Funktionstests, 33 Paketprüfungen und 101 zusätzliche CI-Prüfungen; das unabhängige Review ist ohne kritische oder wichtige Restbefunde freigegeben. Ein erster gehosteter Lauf ist erst nach Nutzercommit/-push prüfbar. Versions-/Sicherheitsdetails und Fehlersuche: [Releaseautomatik](auto-release.md).
+Nach einem solchen Botcommit muss der Maintainer seinen lokalen Branch vor dem nächsten Push abgleichen, beispielsweise mit `git pull --ff-only`; bei Abweichungen erst prüfen, nicht Force-Push verwenden. Der erfolgreiche [Lauf 43243803893](https://github.com/demkadse/Final-Roleplay-1/actions/runs/43243803893) prüft alle Testgruppen und veröffentlicht 0.1.1.2. Versions-/Sicherheitsdetails und Fehlersuche: [Releaseautomatik](auto-release.md).
 

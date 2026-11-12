@@ -2,21 +2,30 @@
 
 Stand: 2026-11-12
 
-## Aktuell: Erster GitHub-Lauf bis zur Paketprüfung erfolgreich
+## Aktuell: 0.1.1.2 vollständig geprüft und automatisch veröffentlicht
 
-Der UX-Quellstand ist im Nutzercommit `62a91a7` („rework“) enthalten. Das bedeutet noch keine neue Installerveröffentlichung: öffentlich bleibt 0.1.0.0, bis ein neuer Lauf erfolgreich veröffentlicht.
+Die UX aus Nutzercommit `62a91a7` ist veröffentlicht. Der öffentliche Installerindex enthält jetzt 0.1.1.2/API 15. Die lokale Benutzerinstallation wurde nicht verändert und steht noch auf 0.1.0.0; das Update erfolgt über Dalamud.
 
-Die Releaseautomatik ist mit Nutzercommit `ffe036c` („update1“) auf GitHub eingeführt. Im echten [Actions-Lauf 43239620147](https://github.com/demkadse/Final-Roleplay-1/actions/runs/43239620147) bestanden Build und 500/500 Funktionstests. Die anschließende Paketprüfung brach mit `Unmapped embedded PDB source path.` ab; der Publishjob wurde übersprungen. Öffentliches Installerpaket und lokale Installation bleiben deshalb bei 0.1.0.0.
+Der erfolgreiche [Actions-Lauf 43243803893](https://github.com/demkadse/Final-Roleplay-1/actions/runs/43243803893) baut Quellcommit `66cc76829aa185400a0ad136ea631309939574e9`: Build 0 Warnungen/Fehler, 500/500 Funktionstests (35 Sekunden), 33/33 Paketprüfungen und 105/105 CI-Prüfungen. Alle Gruppen sind ausdrücklich im Hosted-Protokoll belegt: 33 Policy, 24 Publishabläufe, 44 SDK und vier Compilerfälle im Vorbereitungsschritt. Buildjob und Publishjob sind erfolgreich (2:19 beziehungsweise 1:26 Minuten).
 
-Die CI-Pfadzuordnung für eingebettete PDB-Quelldateien ist gezielt korrigiert: Unter aktivierten CI-Bedingungen bestehen Build mit 0 Warnungen/Fehlern und Paketstagingprüfung; PDB und SourceLink verwenden `/_/FRP1/*`. Die strikte Paketvalidierung bleibt unverändert. Vier echte Compilerregressionen (CI an/aus, portable/eingebettete PDB) bestehen 4/4; mit den alten Buildproperties scheitern gezielt alle vier Fälle wie erwartet. Zusätzlich bestehen erneut 33/33 Paketprüfungen und actionlint. Das unabhängige Fixreview ist ohne kritische oder wichtige Restbefunde freigegeben. Die vier neuen Fälle ergänzen die bisherigen 101 CI-Prüfungen; diese 101 und die 500 Funktionstests wurden für den gezielten Fix nicht redundant wiederholt. Der Nutzer hat Commit und Push dieses Fixes ausdrücklich beauftragt; ein erfolgreicher neuer Publishlauf ist noch nicht nachgewiesen. Die bereits geprüften Schutzgrenzen und die Versionbasis `0.1.1` mit Laufnummer minus eins als vierter Komponente bleiben bestehen. Details: [Releaseautomatik](docs/auto-release.md).
+Historie: Lauf 43239620147 zu `ffe036c` scheiterte nach Build/Tests an `Unmapped embedded PDB source path.`. SourceRoot-Fix `44c2263` korrigierte PDB und SourceLink auf `/_/FRP1/*`; vier Compilerregressionen und ihre Negativkontrollen bestätigten den Fix. Lauf 43242243046 veröffentlichte danach 0.1.1.1 mit der neuen UX, führte aber wegen eines vorzeitigen erfolgreichen Testskriptendes die 101 Helferprüfungen nicht aus. Fix `66cc768` setzt den erfolgreichen Skriptausgang ausdrücklich auf 0. Frische Shellproben bestätigten danach Paket33 plus Helfer101 und eine nachfolgende Kontrollmarkierung; ein absichtlich falscher Versionsfall stoppt mit Exit 1 vor den Helfern. Beide Fixes sind ohne kritische oder wichtige Restbefunde reviewfreigegeben. Der neue Lauf prüft alle Gruppen und veröffentlicht 0.1.1.2.
 
 Nachgewiesen, ausschließlich lokal: frisch geladenes offizielles Dalamud 15.0.4/API 15 mit SHA-/Metadatenprüfung, .NET-SDK 10.0.401, Locked-Restore und ganzer Release-Build gegen dieses `DALAMUD_HOME` mit 0 Warnungen/Fehlern; 500/500 Funktionstests bestanden (26 Sekunden). FRP1.Core bleibt 1.0.0.0. Zusätzlich bestehen 33/33 Paketprüfungen und 101/101 Offline-CI-Prüfungen: 33 Versions-/Releasepolicyfälle, 24 Veröffentlichungsabläufe und 44 SDK-/Pfad-/Metadatenfälle. Die unabhängige statische Workflowprüfung mit actionlint 1.7.12 besteht ohne Meldungen. Das abschließende unabhängige Review ist ohne kritische oder wichtige Restbefunde freigegeben; daraus wird kein gehosteter Erfolg abgeleitet.
 
 Kandidat 0.1.1.0 ist vollständig paketvalidiert. Sein ZIP umfasst 1.072.715 Bytes mit SHA-256 `3D8631338B00A89B065EF3BB305D5EA3DB3D9FA5F9289640B331F9DCE940216D`. Zwei lokale Erstellungen ergeben byteidentische ZIP-, Index- und Prüfsummendateien. Die Prüfung belegt die lokale Erstellung und Wiederholbarkeit; der öffentliche 0.1.0.0-Index wurde nicht verändert.
 
-## UX-Quellstand 62a91a7 – noch nicht als Installerupdate ausgeliefert
+Öffentlicher Nachweis: [Release v0.1.1.2](https://github.com/demkadse/Final-Roleplay-1/releases/tag/v0.1.1.2) ist ein öffentliches Prerelease, kein Entwurf, und verweist auf Quellcommit `66cc768`. Botcommit `14f92bb` ändert ausschließlich `repo.json`; der lokale Branch ist abgeglichen. Die kanonische Raw-JSON-Adresse liefert anonym HTTP 200 und 0.1.1.2. ZIP und `SHA256SUMS` wurden ebenfalls anonym geladen, gemeinsam per SHA-256 geprüft und mit `Test-ReleasePackage` erneut erfolgreich validiert.
 
-Die UX-Änderungen sind im Nutzercommit enthalten. Öffentliches Release-ZIP 0.1.0.0 und Root-`repo.json` bleiben bis zur erfolgreichen neuen Veröffentlichung unverändert; die Veröffentlichungshistorie weiter unten beschreibt nicht automatisch den neueren Sourcecommit.
+| Datei / Feld | Nachweis für 0.1.1.2 |
+|---|---|
+| ZIP-Größe | 1.072.587 Bytes |
+| ZIP SHA-256 | `7B9C95D6977F100C14116CB5B2F567D7BA950D1431FA34CDDE179EBD2E910728` |
+| JSON SHA-256 | `5446762ED99309BDFEF603BB803F6AB5A4B1918B6A80BDA78598B9921F31DE99` |
+| LastUpdate | `1794495856` |
+
+## UX seit veröffentlichtem 0.1.1.1, vollständig geprüfter Stand 0.1.1.2
+
+Fünf Bereiche, kompaktes HUD und feldnahe Hilfen sind im öffentlichen Installerpaket 0.1.1.2 enthalten; erstmals ausgeliefert wurden sie mit 0.1.1.1. Die historische 0.1.0.0-Veröffentlichung bleibt weiter unten getrennt dokumentiert.
 
 - Editor und Leser teilen genau fünf gleichrangige Bereiche: RP-Status und Kurzprofil; OOC Informationen; Auf den ersten Blick; Weitere Charakterdaten; RP-Erfahrung und Absprachen.
 - Kleiner Profilkopf, ein Inhaltsbereich, Gestaltung im Kopf-Popup und JSON unter Profilaktionen. Keine zweispaltige Vorschau oder Neuanlagebaukästen für Hooks/Extras/Traits/Begleiter.
@@ -85,5 +94,5 @@ Der wichtige Chatbefund ist korrigiert und unabhängig regressionsgeprüft: nur 
 
 Native Bedienung, Skalierung, Fokus, Entladen, reale Volkzuordnung, Nameplate-/Chatdarstellung und Portrait-/Iconwiedergabe müssen im laufenden Spiel geprüft werden. Reale LAN-/IPv6-/Internet-/NAT-/CGNAT-Erreichbarkeit und Belastungsprüfung bleiben offen. Die End-to-End-Definition of Done mit zwei Spielern ist dadurch noch nicht abgenommen.
 
-Eine Installation beziehungsweise reale Spiel-/Netzabnahme wurde nicht durchgeführt. Quellcode, MIT-Lizenz und Installerverteilung des bisherigen 0.1.0.0 sind veröffentlicht und auf Erreichbarkeit geprüft; die neuere UX ist im Nutzercommit enthalten, aber noch nicht als neues Release ausgeliefert. Die neue Automatik bleibt bis zum Nutzercommit/-push ihrer Einrichtung lokal. Vollständige Zuordnung: [TRP3-Matrix](docs/trp3-feature-map.md), [Glance-Matrix](docs/glance-feature-map.md).
+Eine Installation beziehungsweise reale Spiel-/Netzabnahme wurde nicht durchgeführt. Quellcode, MIT-Lizenz und Installerverteilung 0.1.1.2 sind veröffentlicht und auf Erreichbarkeit und Paketintegrität geprüft. Vollständige Zuordnung: [TRP3-Matrix](docs/trp3-feature-map.md), [Glance-Matrix](docs/glance-feature-map.md).
 
