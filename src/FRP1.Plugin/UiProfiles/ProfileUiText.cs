@@ -9,6 +9,10 @@ internal static class ProfileUiText
     private static readonly IReadOnlyDictionary<string, string> English = new ReadOnlyDictionary<string, string>(
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            ["Überblick"] = "Overview", ["OOC"] = "OOC", ["Darstellung"] = "Appearance",
+            ["Ab 18"] = "Adults only", ["Allgemein"] = "General audiences", ["Eindruck"] = "Glance",
+            ["+ Angabe"] = "+ Detail", ["Entfernen"] = "Remove", ["RP-Sprachen"] = "RP languages",
+            ["Portrait"] = "Portrait",
             ["Die Profilbearbeitung ist für die aktuelle Freigabe gesperrt."] = "Profile editing is restricted by the current access settings.",
             ["Weitere Charakterdaten"] = "Additional character details",
             ["RP-Status und Kurzprofil"] = "RP status and summary",

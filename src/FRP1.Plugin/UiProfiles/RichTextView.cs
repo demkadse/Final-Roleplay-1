@@ -11,7 +11,7 @@ internal static class RichTextView
     {
         foreach (var block in blocks)
         {
-            var factor = block.Kind == RichBlockKind.Heading ? 1.15f + (3 - block.HeadingLevel) * .08f : 1f;
+            var factor = block.Kind == RichBlockKind.Heading ? 1.08f : 1f;
             var size = ImGui.GetFontSize() * factor;
             var origin = ImGui.GetCursorScreenPos();
             var available = Math.Max(12f, ImGui.GetContentRegionAvail().X - 5f);

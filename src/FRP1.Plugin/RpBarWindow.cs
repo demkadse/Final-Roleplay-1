@@ -1,4 +1,4 @@
-using System.Numerics;
+﻿using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
@@ -109,10 +109,10 @@ internal sealed class RpBarWindow : Window, IDisposable
         ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new Vector2(6, 5) * unit); compactStylePushed = true;
         var viewport = ImGui.GetMainViewport();
         var available = Vector2.Max(Vector2.One, viewport.WorkSize - new Vector2(16));
-        var width = MathF.Min(280 * unit, available.X);
+        var width = MathF.Min((settings.Collapsed ? 32 : 210) * unit, available.X);
         ImGui.SetNextWindowSizeConstraints(new Vector2(width, 0), new Vector2(width, available.Y));
         var stored = new Vector2(settings.PositionX, settings.PositionY);
-        var size = new Vector2(width, measuredSize.Y > 0 ? measuredSize.Y : (settings.Collapsed ? 36 : 68) * unit);
+        var size = new Vector2(width, measuredSize.Y > 0 ? measuredSize.Y : 33 * unit);
         var clamped = RpBarGeometry.Clamp(stored, size, viewport.WorkSize);
         if (!positionInitialized || forcePosition || Vector2.Distance(stored, lastPreferencePosition) > .5f ||
             viewport.WorkPos != lastWorkPosition || viewport.WorkSize != lastWorkSize || settings.Scale != lastScale)
@@ -131,7 +131,6 @@ internal sealed class RpBarWindow : Window, IDisposable
             var display = CurrentDisplay();
             if (display is null) return;
             DrawHeader(display);
-            if (!session.Settings.Collapsed) DrawStrip(display);
             if (ImGui.BeginPopupContextWindow("rpbar-context", ImGuiPopupFlags.MouseButtonRight))
             {
                 try
@@ -156,7 +155,7 @@ internal sealed class RpBarWindow : Window, IDisposable
     private DisplayState? CurrentDisplay()
     {
         if (!DrawConditions()) return null;
-        var captured = scene();
+        var captured = OwnScene();
         var context = RpBarContextResolver.Resolve(captured, main.ProfileAccessReady && session.AccessReady, resolver);
         var version = context.Kind == RpBarContextKind.Own ? session.Version : resolver.Version;
         var epoch = Interlocked.Read(ref policyEpoch);
@@ -170,7 +169,7 @@ internal sealed class RpBarWindow : Window, IDisposable
                 _ => null,
             };
         }
-        if (captured != scene() || context != RpBarContextResolver.Resolve(scene(), main.ProfileAccessReady && session.AccessReady, resolver) ||
+        if (captured != OwnScene() || context != RpBarContextResolver.Resolve(OwnScene(), main.ProfileAccessReady && session.AccessReady, resolver) ||
             epoch != Interlocked.Read(ref policyEpoch)) { cachedProfile = null; ClearGlance(); return null; }
         var profile = cachedProfile;
         if (profile is not null && !main.CanDisplay(profile)) profile = null;
@@ -181,10 +180,13 @@ internal sealed class RpBarWindow : Window, IDisposable
         return new(context, profile, owner);
     }
 
+    // Target changes must not dismiss controls for the same local character.
+    private RpBarSceneSnapshot OwnScene() => scene() with { TargetPresent = false, Target = null };
+
     private bool IsCurrent(DisplayState display)
     {
-        if (!DrawConditions() || display.Owner.PolicyEpoch != Interlocked.Read(ref policyEpoch) || display.Owner.Scene != scene()) return false;
-        var live = RpBarContextResolver.Resolve(scene(), main.ProfileAccessReady && session.AccessReady, resolver);
+        if (!DrawConditions() || display.Owner.PolicyEpoch != Interlocked.Read(ref policyEpoch) || display.Owner.Scene != OwnScene()) return false;
+        var live = RpBarContextResolver.Resolve(OwnScene(), main.ProfileAccessReady && session.AccessReady, resolver);
         return live == display.Context && (display.Profile is null || main.CanDisplay(display.Profile)) &&
             (live.Kind == RpBarContextKind.Own ? cachedVersion == session.Version : cachedVersion == resolver.Version);
     }
@@ -193,36 +195,19 @@ internal sealed class RpBarWindow : Window, IDisposable
     {
         if (!IsCurrent(display)) return;
         var unit = Unit;
-        var profile = display.Profile;
-        if (IconButton("header", display.Context.Kind == RpBarContextKind.Own ? "@" : "RP", profile?.AppearanceStyle.IconId ?? 0, 26 * unit).Clicked)
-            Open(display);
-        ImGui.SameLine();
-        var name = profile?.DisplayName ?? (display.Context.Kind == RpBarContextKind.Own
-            ? T("Profil wählen", "Choose profile") : T("Kein RP-Profil", "No RP profile"));
-        var contextLabel = display.Context.Kind switch
-        {
-            RpBarContextKind.Own => T("Eigenes Profil", "Your profile"),
-            RpBarContextKind.Foreign => T("Zielprofil · nur lesen", "Target profile · read only"),
-            _ => T("Kein erlaubtes zugeordnetes Zielprofil", "No permitted assigned target profile"),
-        };
-        var prefix = display.Context.Kind switch
-        {
-            RpBarContextKind.Own => T("Ich · ", "Me · "), RpBarContextKind.Foreign => T("Ziel · ", "Target · "), _ => "",
-        };
-        ImGui.TextUnformatted(Fit(prefix + name.Replace('\r', ' ').Replace('\n', ' ').Replace('\t', ' '),
-            MathF.Max(1, ImGui.GetContentRegionAvail().X - 50 * unit)));
-        if ((ImGui.IsItemHovered() || ImGui.IsItemFocused()) && IsCurrent(display))
-        {
-            ConstrainTooltip(); ImGui.BeginTooltip(); Wrapped(name); Wrapped(contextLabel); ImGui.EndTooltip();
-        }
-        ImGui.SameLine(ImGui.GetWindowContentRegionMax().X - 44 * unit);
-        if (ImGui.Button(session.Settings.Collapsed ? ">##bar-collapse" : "v##bar-collapse", new Vector2(19 * unit, 26 * unit)))
+        var size = 23 * unit;
+        if (ImGui.Button(session.Settings.Collapsed ? ">##bar-collapse" : "<##bar-collapse", new Vector2(18 * unit, size)))
         { session.SetPreferences(session.Settings with { Collapsed = !session.Settings.Collapsed }); ClearGlance(); }
-        main.Help.AfterItem(HelpTopicId.BarCollapse);
+        if (ImGui.IsItemHovered() || ImGui.IsItemFocused()) HoverText(T("Leiste ein-/ausklappen · Rechtsklick für Aktionen", "Expand/collapse bar · right-click for actions"));
+        if (session.Settings.Collapsed) return;
         ImGui.SameLine();
-        if (ImGui.Button("...##bar-menu", new Vector2(21 * unit, 26 * unit))) { menuOwner = display.Owner; ImGui.OpenPopup("bar-menu"); }
-        if (ImGui.BeginPopup("bar-menu"))
-        { try { if (menuOwner == display.Owner) DrawContextMenu(display); else ImGui.CloseCurrentPopup(); } finally { ImGui.EndPopup(); } }
+        DrawStrip(display);
+        ImGui.SameLine();
+        var name = display.Profile?.DisplayName ?? T("Profil wählen", "Choose profile");
+        var width = MathF.Max(1, ImGui.GetContentRegionAvail().X);
+        if (ImGui.Button(Fit(name.Replace('\r', ' ').Replace('\n', ' ').Replace('\t', ' '), MathF.Max(1, width - 6 * unit)) + "##bar-open", new Vector2(width, size))) Open(display);
+        if ((ImGui.IsItemHovered() || ImGui.IsItemFocused()) && IsCurrent(display))
+            HoverText(name + "\n" + T("Eigenes Profil öffnen · Rechtsklick für Aktionen", "Open your profile · right-click for actions"));
     }
 
     private void DrawStrip(DisplayState display)
@@ -235,15 +220,16 @@ internal sealed class RpBarWindow : Window, IDisposable
         ImGui.BeginDisabled(profile is null || !own || !CanMutate());
         if (ImGui.Button(profile?.Status.ToString().ToUpperInvariant() ?? "--", new Vector2(35 * unit, size)) && IsCurrent(display))
             Run(display, () => session.UpdateStatusAsync(profile!.Status switch { RpStatus.Ic => RpStatus.Ooc, RpStatus.Ooc => RpStatus.Afk, _ => RpStatus.Ic }));
-        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
-            HoverText(own ? T("Eigener RP-Status: IC / OOC / AFK", "Your RP status: IC / OOC / AFK") : T("RP-Status des Ziels; nur lesbar", "Target RP status; read only"));
+        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled) || ImGui.IsItemFocused())
+            HoverText(T("Eigener RP-Status: IC / OOC / AFK", "Your RP status: IC / OOC / AFK"));
         ImGui.EndDisabled();
         ImGui.SameLine();
         var availability = profile?.Availability switch { RpAvailability.Open => "+", RpAvailability.Busy => "~", RpAvailability.Unavailable => "x", _ => "-" };
         ImGui.BeginDisabled(profile is null || !own || !CanMutate());
         if (ImGui.Button(availability + "##bar-availability", new Vector2(size)) && IsCurrent(display))
         { availabilityOwner = display.Owner; ImGui.OpenPopup("bar-availability"); }
-        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)) HoverText(profile is null ? T("Keine Verfügbarkeit", "No availability") : AvailabilityLabel(profile.Availability));
+        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled) || ImGui.IsItemFocused())
+            HoverText(profile is null ? T("Anspielbarkeit", "RP availability") : AvailabilityLabel(profile.Availability));
         if (ImGui.BeginPopup("bar-availability"))
         {
             try
@@ -255,27 +241,30 @@ internal sealed class RpBarWindow : Window, IDisposable
             finally { ImGui.EndPopup(); }
         }
         ImGui.EndDisabled();
-        ImGui.SameLine();
-        ImGui.BeginDisabled(profile is null);
-        if (ImGui.Button("P##bar-open", new Vector2(size))) Open(display);
-        ImGui.EndDisabled();
-        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)) HoverText(T("Profil öffnen", "Open profile"));
-        if (profile is null) return;
-        var shown = 0;
-        for (var index = 0; index < profile.Glances.Count && shown < 5; index++)
+    }
+
+    private void DrawGlanceMenu(DisplayState display)
+    {
+        if (display.Profile is not { } profile || !ImGui.BeginMenu(T("Auf den ersten Blick", "At first glance"))) return;
+        try
         {
-            var glance = profile.Glances[index];
-            if (!glance.Enabled || !IsCurrent(display)) continue;
-            ImGui.SameLine();
-            var item = IconButton("glance-" + index, (++shown).ToString(), glance.IconId, size);
-            if (item.Hovered || item.Focused || item.Clicked)
+            for (var index = 0; index < profile.Glances.Count; index++)
             {
-                if (glanceOwner != display.Owner || glanceIndex != index) { glancePinned = false; resetGlanceScroll = true; }
-                glanceOwner = display.Owner; glanceIndex = index; glanceUntil = Environment.TickCount64 + 500;
-                glanceAnchor = new Vector2(item.RectMin.X, item.RectMax.Y + 5 * unit);
-                if (item.Clicked) glancePinned = true;
+                var glance = profile.Glances[index];
+                if (!glance.Enabled || !IsCurrent(display)) continue;
+                ImGui.PushID(index);
+                var clicked = ImGui.MenuItem(glance.Label.Length == 0 ? T("Blick ", "Glance ") + (index + 1) : glance.Label);
+                if (ImGui.IsItemHovered() || ImGui.IsItemFocused() || clicked)
+                {
+                    if (glanceOwner != display.Owner || glanceIndex != index) { glancePinned = false; resetGlanceScroll = true; }
+                    glanceOwner = display.Owner; glanceIndex = index; glanceUntil = Environment.TickCount64 + 500;
+                    glanceAnchor = new Vector2(ImGui.GetItemRectMax().X + 5 * Unit, ImGui.GetItemRectMin().Y);
+                    if (clicked) glancePinned = true;
+                }
+                ImGui.PopID();
             }
         }
+        finally { ImGui.EndMenu(); }
     }
 
     private void DrawGlanceCard()
@@ -323,6 +312,7 @@ internal sealed class RpBarWindow : Window, IDisposable
         if (ImGui.MenuItem(T("Profil öffnen", "Open profile"))) Open(display);
         if (display.Context.Kind == RpBarContextKind.Foreign && ImGui.MenuItem(T("Zielkarte festhalten / Details", "Pin target card / details"))) showTargetDetails();
         if (display.Context.Kind == RpBarContextKind.Own) DrawProfileSelection();
+        DrawGlanceMenu(display);
         ImGui.Separator();
         DrawLayoutSettings();
         if (feedback is not null) Wrapped(feedback);

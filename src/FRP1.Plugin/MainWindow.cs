@@ -2,6 +2,7 @@ using System.Numerics;
 using System.Text;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Windowing;
+using Dalamud.Interface.Utility;
 using FRP1.Core.Persistence;
 using FRP1.Core.Profiles;
 using FRP1.Core.Safety;
@@ -50,7 +51,17 @@ internal sealed class MainWindow : Window, IDisposable
     public GamePresentationModule? GamePresentation { get; set; }
     public Func<Guid, string?>? OwnProfileReferenceProvider { get; set; }
     private HelpTopicId? helpTopic;
-    private ProfileArea selectedProfileArea = ProfileArea.StatusSummary;
+    private enum MainArea { Character, Contacts, Settings }
+    private enum SettingsArea { Appearance, Bar, Game, Network, Language, Tools, Safety, Help }
+    private MainArea mainArea;
+    private SettingsArea settingsArea;
+    private ProfileArea selectedProfileArea = ProfileArea.Overview;
+    private bool editing;
+    private bool preview;
+    private readonly HashSet<string> visibleFields = [];
+    private Vector2 measuredSize;
+    private Vector2 measuredPosition;
+    private bool measuredWindow;
     private bool requestJsonActions;
     private long catalogVersion = -1;
     private readonly CancellationTokenSource lifetime = new();
@@ -75,13 +86,13 @@ internal sealed class MainWindow : Window, IDisposable
     private ContentRating contentRating;
     private bool dirty;
     private bool disposed;
-    private string message = "Lokale Einstellungen werden geladen …";
+    private string message = "";
     private string jsonText = "";
 
     public MainWindow(ProfileStore store, AudienceSettings audienceSettings, UsageAcknowledgementStore usageAcknowledgements,
         ThemeSession themeSession, OwnProfileSession ownProfiles, ProfileUiModule profileUi,
         SocialUiModule socialUi, ITextureProvider textures)
-        : base("Final Roleplay 1##FRP1")
+        : base("Final Roleplay 1##FRP1CompactCharacter")
     {
         this.store = store;
         this.audienceSettings = audienceSettings;
@@ -97,7 +108,7 @@ internal sealed class MainWindow : Window, IDisposable
             if (Enum.TryParse<HelpTopicId>(topic, out var help)) Help.Heading(title, help);
             else ImGui.TextUnformatted(title);
         };
-        Size = new Vector2(1000, 700);
+        Size = new Vector2(560, 430);
         SizeCondition = ImGuiCond.FirstUseEver;
         SetDraft(new ProfileDocument());
         var token = lifetime.Token;
@@ -126,10 +137,11 @@ internal sealed class MainWindow : Window, IDisposable
 
     public void OpenOwnProfile()
     {
-        if (!ProfileAccessReady) { IsOpen = true; return; }
-        if (ownProfiles.ActiveProfile is { } active && CanDisplay(active))
-            profileUi.OpenOwn(() => ProfileAccessReady ? ownProfiles.ActiveProfile : null);
-        else { IsOpen = true; message = "Bitte zuerst ein gespeichertes Profil ausdrücklich als aktives RP-Profil auswählen."; }
+        IsOpen = true;
+        mainArea = MainArea.Character;
+        if (!ProfileAccessReady || dirty || Busy) return;
+        if (ownProfiles.ActiveProfile is { } active && CanDisplay(active)) SetDraft(active);
+        editing = preview = false;
     }
 
     // Results are applied by the plugin's Draw callback, including while the window is closed.
@@ -187,6 +199,7 @@ internal sealed class MainWindow : Window, IDisposable
                     if (index < 0) profiles.Add(saved);
                     else profiles[index] = saved;
                     SetDraft(saved);
+                    editing = preview = false;
                     message = "Profil lokal gespeichert.";
                 }
             }
@@ -214,13 +227,30 @@ internal sealed class MainWindow : Window, IDisposable
         else SetDraft(ownProfiles.ActiveProfile ?? profiles.FirstOrDefault() ?? new ProfileDocument());
     }
 
+    public override void PreDraw()
+    {
+        var viewport = ImGui.GetMainViewport();
+        var available = Vector2.Max(Vector2.One, viewport.WorkSize - new Vector2(16));
+        ImGui.SetNextWindowSizeConstraints(Vector2.Min(new Vector2(360, 280) * ImGuiHelpers.GlobalScale, available), available);
+        if (!measuredWindow) return;
+        var maximum = Vector2.Max(viewport.WorkPos + new Vector2(8), viewport.WorkPos + viewport.WorkSize - Vector2.Min(measuredSize, available) - new Vector2(8));
+        var clamped = Vector2.Clamp(measuredPosition, viewport.WorkPos + new Vector2(8), maximum);
+        if (Vector2.Distance(clamped, measuredPosition) > .5f) ImGui.SetNextWindowPos(clamped, ImGuiCond.Always);
+    }
+
     public override void Draw()
     {
+        measuredSize = ImGui.GetWindowSize();
+        measuredPosition = ImGui.GetWindowPos();
+        measuredWindow = true;
         NativeThemeRenderer.DrawInterior(themeSession.Theme, themeSession.Preferences.ReduceDecoration);
-        if (ImGui.Button("Hilfe / Erste Schritte")) OpenHelp(HelpTopicId.FirstSteps);
-        DrawHelpPanel();
-        Wrapped("Profile, Kontakte und Einstellungen bleiben lokal. Direktaustausch startet nur nach ausdrücklicher Aktivierung.");
-        Wrapped(message);
+        DrawMainNavigation();
+        if (helpTopic is not null) DrawHelpPanel();
+        if (message.Length != 0)
+        {
+            if (ImGui.SmallButton(L("OK") + "###DismissFeedback")) message = "";
+            if (message.Length != 0) { ImGui.SameLine(); Wrapped(L(message)); }
+        }
         if (!noticesLoaded)
         {
             Wrapped("Die lokale Hinweisbestätigung wird geprüft …");
@@ -246,91 +276,126 @@ internal sealed class MainWindow : Window, IDisposable
             Wrapped(profileError);
             if (ImGui.Button("Profile / Leiste erneut versuchen")) ownProfiles.Retry();
         }
+        if (ImGui.BeginChild("##MainContent", Vector2.Zero, false))
+        {
+            switch (mainArea)
+            {
+                case MainArea.Character:
+                    ImGui.BeginDisabled(Busy);
+                    DrawProfile();
+                    ImGui.EndDisabled();
+                    break;
+                case MainArea.Contacts: DrawContacts(); break;
+                case MainArea.Settings: DrawSettings(); break;
+            }
+        }
+        ImGui.EndChild();
+    }
+
+    private void DrawMainNavigation()
+    {
+        foreach (var area in Enum.GetValues<MainArea>())
+        {
+            if (area != MainArea.Character) ImGui.SameLine();
+            var label = area switch
+            {
+                MainArea.Character => T("Tab.MyProfile"),
+                MainArea.Contacts => T("Tab.Contacts"),
+                _ => T("Tab.Settings"),
+            };
+            var selected = area == mainArea;
+            if (selected) ImGui.PushStyleColor(ImGuiCol.Button, themeSession.Theme.Palette.Selected);
+            if (ImGui.Button(label + "###Main" + area)) mainArea = area;
+            if (selected) ImGui.PopStyleColor();
+        }
+        ContinueActionRow(L("Hilfe"));
+        if (ImGui.Button(L("Hilfe") + "###MainHelp")) OpenHelp(HelpTopicId.FirstSteps);
         ImGui.Separator();
-        if (!ImGui.BeginTabBar("FRP1Tabs")) return;
-        if (ImGui.BeginTabItem(T("Tab.MyProfile") + "###OwnProfileTab"))
+    }
+
+    private void DrawContacts()
+    {
+        socialUi.DrawContactsTab();
+        if (Help.Section(L("Karte"), HelpTopicId.Map)) GamePresentation?.DrawMapPanel();
+    }
+
+    private void DrawSettings()
+    {
+        var width = MathF.Min(116 * ImGuiHelpers.GlobalScale, ImGui.GetContentRegionAvail().X * .31f);
+        if (ImGui.BeginChild("##SettingsCategories", new Vector2(width, 0), false))
         {
-            ImGui.BeginDisabled(Busy);
-            DrawProfile();
-            ImGui.EndDisabled();
-            ImGui.EndTabItem();
+            foreach (var area in Enum.GetValues<SettingsArea>())
+            {
+                var label = area switch
+                {
+                    SettingsArea.Appearance => T("Theme.Title"), SettingsArea.Bar => L("RP-Leiste"),
+                    SettingsArea.Game => L("Spielanzeige"), SettingsArea.Network => L("Verbindungen"),
+                    SettingsArea.Language => L("Sprache"), SettingsArea.Tools => L("Werkzeuge"),
+                    SettingsArea.Safety => L("Alter & Inhalte"), _ => L("Hilfe"),
+                };
+                if (ImGui.Selectable(label + "###Settings" + area, settingsArea == area)) settingsArea = area;
+            }
         }
-        if (ImGui.BeginTabItem(T("Tab.Nearby") + "###NearbyTab"))
+        ImGui.EndChild();
+        ImGui.SameLine();
+        if (ImGui.BeginChild("##SettingsContent", Vector2.Zero, false))
         {
-            Help.Heading(T("Tab.Nearby"), HelpTopicId.Environment);
-            socialUi.DrawEnvironmentTab();
-            if (Help.Section("Bekannte Charaktere auf der Karte", HelpTopicId.Map)) GamePresentation?.DrawMapPanel();
-            ImGui.EndTabItem();
+            switch (settingsArea)
+            {
+                case SettingsArea.Appearance: DrawAppearanceSettings(); break;
+                case SettingsArea.Bar: RpBarWindow?.DrawSettings(); break;
+                case SettingsArea.Game: GamePresentation?.DrawSettings(); break;
+                case SettingsArea.Network: socialUi.DrawNetworkSettings(); break;
+                case SettingsArea.Language: LocalTools?.DrawLanguageSettings(); break;
+                case SettingsArea.Tools: LocalTools?.DrawToolsPanel(); break;
+                case SettingsArea.Safety:
+                    DrawAudienceChoice();
+                    if (Help.Section(T("Safety.Rules"), HelpTopicId.Rules)) DrawUsageNotices();
+                    break;
+                case SettingsArea.Help: DrawHelpSettings(); break;
+            }
         }
-        if (ImGui.BeginTabItem(T("Tab.Contacts") + "###ContactsTab"))
-        {
-            Help.Heading(T("Tab.Contacts"), HelpTopicId.Contacts);
-            socialUi.DrawContactsTab();
-            ImGui.EndTabItem();
-        }
-        if (ImGui.BeginTabItem(T("Tab.Settings") + "###SettingsTab"))
-        {
-            if (Help.Section("Sprache und lokale Automatisierung", HelpTopicId.Automation)) LocalTools?.DrawSettings();
-            ImGui.Separator();
-            DrawHelpSettings();
-            RpBarWindow?.DrawSettings();
-            DrawAppearanceSettings();
-            ImGui.Separator();
-            if (Help.Section("Lokale Spielanzeige", HelpTopicId.GamePresentation)) GamePresentation?.DrawSettings();
-            ImGui.Separator();
-            if (Help.Section(T("Network.Title"), HelpTopicId.Network)) socialUi.DrawNetworkSettings();
-            ImGui.Separator();
-            if (Help.Section(T("Safety.Rules"), HelpTopicId.Rules)) DrawUsageNotices();
-            ImGui.Separator();
-            DrawAudienceChoice();
-            ImGui.Separator();
-            Wrapped("Kein Konto, keine Registrierung, kein Hosting und keine Telemetrie. Es werden keine Relay-, Such- oder Registrierungsdienste angesprochen.");
-            Wrapped("Profile werden im Dalamud-Konfigurationsverzeichnis dieses Plugins gespeichert. JSON-Export gibt ausschließlich die öffentlichen Profilfelder aus.");
-            Wrapped("Bestätigte Charakterzuordnung, Kopplung und Freigabe sind getrennte Entscheidungen. Eine sichere Verbindung beweist keinen Spielcharakterbesitz.");
-            ImGui.EndTabItem();
-        }
-        if (LocalTools is not null && ImGui.BeginTabItem(T("Tab.Tools") + "###ToolsTab"))
-        {
-            Help.Heading(T("Tools.Title"), HelpTopicId.LocalTools);
-            LocalTools.DrawToolsPanel();
-            ImGui.EndTabItem();
-        }
-        ImGui.EndTabBar();
+        ImGui.EndChild();
     }
 
     private void DrawHelpPanel()
     {
         if (helpTopic is not { } topic) return;
-        ImGui.Separator();
-        if (ImGui.BeginCombo("Hilfethema", HelpContent.Get(topic).Title))
+        var height = MathF.Min(190 * ImGuiHelpers.GlobalScale, ImGui.GetContentRegionAvail().Y * .65f);
+        if (ImGui.BeginChild("##HelpContent", new Vector2(0, MathF.Max(1, height)), false))
         {
-            foreach (var entry in HelpContent.All)
-                if (ImGui.Selectable(entry.Value.Title, entry.Key == topic)) helpTopic = entry.Key;
-            ImGui.EndCombo();
+            if (ImGui.SmallButton(T("Common.Close") + "###CloseHelp")) helpTopic = null;
+            ImGui.SameLine();
+            ImGui.SetNextItemWidth(-1);
+            if (ImGui.BeginCombo("##HelpTopic", HelpContent.Get(topic).Title))
+            {
+                foreach (var entry in HelpContent.All)
+                    if (ImGui.Selectable(entry.Value.Title, entry.Key == topic)) helpTopic = entry.Key;
+                ImGui.EndCombo();
+            }
+            var content = HelpContent.Get(helpTopic ?? topic);
+            Wrapped(content.Summary);
+            Wrapped(content.Details);
         }
-        var content = HelpContent.Get(helpTopic.Value);
-        Wrapped(content.Summary);
-        Wrapped(content.Details);
-        if (ImGui.Button("Hilfe schließen")) helpTopic = null;
+        ImGui.EndChild();
         ImGui.Separator();
     }
 
     private void DrawHelpSettings()
     {
-        if (!Help.Section("Bedienung und Hilfe", HelpTopicId.FirstSteps)) return;
+        Help.Heading(L("Bedienung und Hilfe"), HelpTopicId.FirstSteps);
         ImGui.BeginDisabled(!ownProfiles.SettingsLoaded);
         var show = ownProfiles.Settings.ShowHints;
         if (ImGui.Checkbox("Hilfshinweise anzeigen", ref show))
             ownProfiles.SetPreferences(ownProfiles.Settings with { ShowHints = show });
         ImGui.EndDisabled();
-        Wrapped("Kurze Hinweise erscheinen beim Darüberfahren oder beim Tastaturfokus. Fragezeichen öffnen eine bleibende Erklärung.");
+        Wrapped(L("Hinweise erscheinen beim Darüberfahren. Ausführliche Hilfe öffnest du oben über Hilfe."));
         if (ImGui.Button("Erste Schritte erneut anzeigen")) OpenHelp(HelpTopicId.FirstSteps);
     }
 
     private void DrawAppearanceSettings()
     {
-        if (!Help.Section(T("Theme.Title"), HelpTopicId.ThemeAuto)) return;
-        Wrapped("Aktive Darstellung: " + themeSession.Theme.Name);
+        Help.Heading(T("Theme.Title"), HelpTopicId.ThemeManual);
         if (!themeSession.HasCharacter)
             Wrapped("Zur Auswahl und lokalen Speicherung einer Darstellung bitte mit einem Charakter anmelden. Ohne Charakter bleibt Obsidian aktiv.");
         else if (themeSession.IsLoading)
@@ -343,45 +408,58 @@ internal sealed class MainWindow : Window, IDisposable
             if (ImGui.Button("Darstellung erneut versuchen")) themeSession.Retry();
         }
         ImGui.BeginDisabled(!themeSession.HasCharacter);
-        var preferences = themeSession.Preferences;
-        var automatic = preferences.Mode == ThemeSelectionMode.Automatic;
-        if (ImGui.Checkbox(T("Theme.Automatic") + "###AutoTheme", ref automatic))
-            themeSession.SetPreferences(preferences with
-            { Mode = automatic ? ThemeSelectionMode.Automatic : ThemeSelectionMode.Manual });
-        Help.AfterItem(HelpTopicId.ThemeAuto);
-        preferences = themeSession.Preferences;
-        if (ImGui.BeginCombo(T("Theme.Manual") + "###ThemeChoice", ThemeCatalog.Get(preferences.ManualThemeId).Name))
+        var active = themeSession.Theme;
+        foreach (var id in new[] { "obsidian", "pergament", "mondlicht" })
         {
-            foreach (var theme in ThemeCatalog.All)
-                if (ImGui.Selectable(theme.Name, preferences.Mode == ThemeSelectionMode.Manual && preferences.ManualThemeId == theme.Id))
-                    themeSession.SetPreferences(themeSession.Preferences with
-                    { Mode = ThemeSelectionMode.Manual, ManualThemeId = theme.Id });
-            ImGui.EndCombo();
+            var theme = ThemeCatalog.Get(id);
+            if (ImGui.RadioButton(theme.Name, active.Id == id || id == "obsidian" && active.RaceId.HasValue))
+                themeSession.SetPreferences(themeSession.Preferences with { Mode = ThemeSelectionMode.Manual, ManualThemeId = id });
         }
         Help.AfterItem(HelpTopicId.ThemeManual);
         var reduce = themeSession.Preferences.ReduceDecoration;
         if (ImGui.Checkbox(T("Theme.Decoration") + "###ReduceDecoration", ref reduce))
             themeSession.SetPreferences(themeSession.Preferences with { ReduceDecoration = reduce });
         Help.AfterItem(HelpTopicId.Decorations);
+        if (Help.Section(L("Bisherige Auswahl"), HelpTopicId.ThemeAuto))
+        {
+            var preferences = themeSession.Preferences;
+            var automatic = preferences.Mode == ThemeSelectionMode.Automatic;
+            if (ImGui.Checkbox(T("Theme.Automatic") + "###AutoTheme", ref automatic))
+                themeSession.SetPreferences(preferences with
+                { Mode = automatic ? ThemeSelectionMode.Automatic : ThemeSelectionMode.Manual });
+            ImGui.SetNextItemWidth(-1);
+            if (ImGui.BeginCombo("##LegacyThemeChoice", ThemeCatalog.Get(preferences.ManualThemeId).Name))
+            {
+                foreach (var theme in ThemeCatalog.All)
+                    if (ImGui.Selectable(theme.Name, preferences.Mode == ThemeSelectionMode.Manual && preferences.ManualThemeId == theme.Id))
+                        themeSession.SetPreferences(themeSession.Preferences with { Mode = ThemeSelectionMode.Manual, ManualThemeId = theme.Id });
+                ImGui.EndCombo();
+            }
+        }
         ImGui.EndDisabled();
     }
 
     private void DrawProfile()
     {
         DrawProfileToolbar();
-        var name = fields["DisplayName"];
-        if (ImGui.InputText(T("Profile.Name") + "###DisplayName", ref name, 640)) { fields["DisplayName"] = name; dirty = true; }
-        var title = fields["Title"];
-        if (ImGui.InputText(T("Profile.Title") + "###Title", ref title, 1024)) { fields["Title"] = title; dirty = true; }
-        if (store.Policy.AcceptsMatureContent)
+        if (!editing || preview)
         {
-            var mature = contentRating == ContentRating.Mature18;
-            if (ImGui.Checkbox("Gesamtes Profil ist ab 18###ProfileRating", ref mature))
-            { contentRating = mature ? ContentRating.Mature18 : ContentRating.General; dirty = true; }
-            Help.AfterItem(HelpTopicId.Mature);
+            if (editing)
+                profileUi.DrawOwnOverview(() => ProfileAccessReady ? BuildDraft() : null);
+            else if (GetSavedOwnProfile(original.Id) is not null)
+            {
+                var id = original.Id;
+                profileUi.DrawOwnOverview(() => GetSavedOwnProfile(id));
+            }
+            else
+            {
+                Wrapped(L("Dein Charakter beginnt mit einem Namen."));
+                if (ImGui.Button(T("Profile.New") + "###CreateFirstProfile"))
+                { SetDraft(new ProfileDocument()); editing = true; }
+            }
+            DrawProfileJsonPopup();
+            return;
         }
-        else Wrapped("Kennzeichnung: allgemein / jugendfrei");
-
         extended.ContentRating = contentRating;
         var generation = editorGeneration;
         var policy = policyGeneration;
@@ -389,86 +467,92 @@ internal sealed class MainWindow : Window, IDisposable
         {
             if (generation == editorGeneration && policy == policyGeneration && ProfileAccessReady && !Busy) dirty = true;
         };
-        profileUi.DrawHeaderDesign(extended, changed, contentRating);
-        var additional = ExistingAdditionalContent.Read(BuildDraft());
-        if (additional.Count != 0)
-            Wrapped($"{additional.Count} vorhandene zusätzliche Inhalte: unter Weitere Charakterdaten prüfen. Sie bleiben bei Export und bewusstem Teilen enthalten, bis du sie gezielt entfernst.");
-        if (dirty) Wrapped("Ungespeicherter Entwurf: vor einem Profilwechsel speichern oder verwerfen.");
         ProfileNavigation.Draw(ref selectedProfileArea);
-        var help = selectedProfileArea switch
-        {
-            ProfileArea.StatusSummary => HelpTopicId.Status,
-            ProfileArea.OocInformation => HelpTopicId.OocInformation,
-            ProfileArea.Glances => HelpTopicId.Glances,
-            ProfileArea.FurtherCharacterData => HelpTopicId.FurtherCharacterData,
-            _ => HelpTopicId.RpExperience,
-        };
-        Help.Heading(ProfileUiText.Get(ProfileAreas.Title(selectedProfileArea)), help);
         switch (selectedProfileArea)
         {
-            case ProfileArea.StatusSummary: DrawDetails(); break;
-            case ProfileArea.OocInformation:
-                Wrapped("Diese OOC-Angaben gehören zum öffentlichen Profil; private Kontaktdaten gehören hier nicht hinein.");
-                dirty |= ImGui.InputTextMultiline("##OocInformation", ref details.OocInformation, 16384, new Vector2(-1, 180));
+            case ProfileArea.Overview:
+                DrawShortField("DisplayName", T("Profile.Name"), 640);
+                if (FieldVisible("Title")) DrawShortField("Title", T("Profile.Title"), 1024);
+                DrawDetails();
+                DrawAdditionalFieldMenu(ProfileArea.Overview);
+                profileUi.DrawHeaderDesign(extended, changed, contentRating);
+                if (store.Policy.AcceptsMatureContent)
+                {
+                    var mature = contentRating == ContentRating.Mature18;
+                    if (ImGui.Checkbox(T("Profile.Mature") + "###ProfileRating", ref mature))
+                    { contentRating = mature ? ContentRating.Mature18 : ContentRating.General; dirty = true; }
+                    Help.AfterItem(HelpTopicId.Mature);
+                }
+                if (Help.Section(T("Profile.Glances") + $" ({details.Glances.Count})", HelpTopicId.Glances)) DrawGlances();
                 break;
-            case ProfileArea.Glances: DrawGlances(); break;
-            case ProfileArea.FurtherCharacterData: DrawFurtherCharacterData(changed); break;
-            case ProfileArea.RpExperience: profileUi.DrawExperience(extended, changed, contentRating); break;
+            case ProfileArea.Character: DrawFurtherCharacterData(changed); break;
+            case ProfileArea.Ooc:
+                ImGui.TextUnformatted(T("Profile.Ooc"));
+                dirty |= ImGui.InputTextMultiline("##OocInformation", ref details.OocInformation, 16384,
+                    new Vector2(-1, ImGui.GetTextLineHeight() * 4));
+                Help.AfterItem(HelpTopicId.OocInformation);
+                profileUi.DrawExperience(extended, changed, contentRating);
+                break;
         }
         DrawProfileJsonPopup();
     }
 
     private void DrawProfileToolbar()
     {
-        ImGui.BeginDisabled(dirty);
-        ImGui.TextUnformatted(T("Profile.Select"));
-        ImGui.SetNextItemWidth(-1);
-        if (ImGui.BeginCombo("##EditorProfile", "Gespeichertes Profil öffnen"))
+        if (!editing)
         {
-            foreach (var profile in profiles)
-            {
-                ImGui.PushID(profile.Id.ToString("N"));
-                if (ProfileSelectable(profile, original.Id == profile.Id)) SetDraft(profile);
-                ImGui.PopID();
-            }
-            ImGui.EndCombo();
+            if (ImGui.Button(T("Common.Edit") + "###EditProfile")) { editing = true; preview = false; }
         }
-        Help.AfterItem(HelpTopicId.ProfileSelect);
-        ImGui.BeginDisabled(profiles.Count >= 128);
-        if (ImGui.Button(T("Profile.New") + "###NewProfile")) SetDraft(new ProfileDocument());
-        Help.AfterItem(HelpTopicId.NewProfile);
-        ImGui.EndDisabled();
-        ImGui.EndDisabled();
-        ContinueActionRow(T("Common.Save"));
-        ImGui.BeginDisabled(!dirty);
-        if (ImGui.Button(T("Common.Save") + "###SaveProfile")) SaveDraft();
-        Help.AfterItem(HelpTopicId.SaveProfile);
-        ContinueActionRow(T("Common.Discard"));
-        if (ImGui.Button(T("Common.Discard") + "###DiscardProfile")) SetDraft(original);
-        Help.AfterItem(HelpTopicId.Discard);
-        ImGui.EndDisabled();
-        if (ImGui.Button("Profilaktionen")) ImGui.OpenPopup("profile-actions");
+        else
+        {
+            ImGui.BeginDisabled(!dirty);
+            if (ImGui.Button(T("Common.Save") + "###SaveProfile")) SaveDraft();
+            Help.AfterItem(HelpTopicId.SaveProfile);
+            ImGui.EndDisabled();
+            ContinueActionRow(L("Verwerfen"));
+            if (ImGui.Button(L("Verwerfen") + "###DiscardProfile"))
+            { SetDraft(original); editing = preview = false; }
+            Help.AfterItem(HelpTopicId.Discard);
+            ContinueActionRow(T("Common.Preview"));
+            if (ImGui.Button((preview ? T("Common.Edit") : T("Common.Preview")) + "###PreviewProfile")) preview = !preview;
+        }
+        ContinueActionRow(L("Menü"));
+        if (ImGui.Button(L("Menü") + "###ProfileMenu")) ImGui.OpenPopup("profile-actions");
+        if (dirty) { ContinueActionRow(L("Entwurf")); ImGui.TextDisabled(L("Entwurf")); }
         if (ImGui.BeginPopup("profile-actions"))
         {
             try
             {
-                if (ImGui.Button("Gespeichertes Profil lesen"))
+                ImGui.BeginDisabled(dirty);
+                if (ImGui.BeginMenu(L("Profilvarianten")))
                 {
-                    var id = original.Id;
-                    if (GetSavedOwnProfile(id) is not null) profileUi.OpenOwn(() => GetSavedOwnProfile(id));
-                    else message = "Bitte den Entwurf zuerst speichern. Das Journal liest gespeicherte Profile.";
+                    foreach (var profile in profiles)
+                    {
+                        ImGui.PushID(profile.Id.ToString("N"));
+                        if (ProfileSelectable(profile, original.Id == profile.Id))
+                        { SetDraft(profile); editing = preview = false; ImGui.CloseCurrentPopup(); }
+                        ImGui.PopID();
+                    }
+                    ImGui.BeginDisabled(profiles.Count >= 128);
+                    if (ImGui.MenuItem(T("Profile.New") + "###NewProfile"))
+                    { SetDraft(new ProfileDocument()); editing = true; preview = false; }
+                    ImGui.EndDisabled();
+                    ImGui.EndMenu();
                 }
-                Help.AfterItem(HelpTopicId.Reader);
-                if (ImGui.Button("Profilverweis kopieren"))
+                ImGui.EndDisabled();
+                if (ImGui.MenuItem(L("Profilverweis kopieren")))
                 {
                     var reference = OwnProfileReferenceProvider?.Invoke(original.Id);
                     if (reference is null) message = "Ein Profilverweis benötigt ein gespeichertes Profil und eine ausdrücklich aktive Direktverbindung.";
                     else { ImGui.SetClipboardText(reference); message = T("Reference.Copied"); }
                 }
                 Help.AfterItem(HelpTopicId.ProfileLinks);
-                if (ImGui.Button("JSON importieren / exportieren"))
+                if (ImGui.MenuItem(L("JSON importieren / exportieren")))
                 { requestJsonActions = true; ImGui.CloseCurrentPopup(); }
                 Help.AfterItem(HelpTopicId.Export);
+                if (LocalTools is not null && ImGui.MenuItem(L("Werkzeuge")))
+                { mainArea = MainArea.Settings; settingsArea = SettingsArea.Tools; }
+                if (ImGui.MenuItem(L("Hilfe"))) OpenHelp(HelpTopicId.CharacterFields);
             }
             finally { ImGui.EndPopup(); }
         }
@@ -496,23 +580,22 @@ internal sealed class MainWindow : Window, IDisposable
     {
         foreach (var field in ShortFields.Where(field => field.Key is not "DisplayName" and not "Title"))
         {
-            var value = fields[field.Key];
-            if (ImGui.InputText(L(field.Label) + "###" + field.Key, ref value, field.Limit))
-            { fields[field.Key] = value; dirty = true; }
+            if (FieldVisible(field.Key)) DrawShortField(field.Key, L(field.Label), field.Limit);
         }
-        profileUi.DrawCharacterData(extended, changed, contentRating);
         foreach (var field in LongFields)
         {
+            if (!FieldVisible(field.Key)) continue;
             ImGui.TextUnformatted(L(field.Label));
             var value = fields[field.Key];
-            if (ImGui.InputTextMultiline("##" + field.Key, ref value, 32768, new Vector2(-1, 100)))
+            if (ImGui.InputTextMultiline("##" + field.Key, ref value, 32768, new Vector2(-1, ImGui.GetTextLineHeight() * 4)))
             { fields[field.Key] = value; dirty = true; }
         }
+        DrawAdditionalFieldMenu(ProfileArea.Character);
+        profileUi.DrawCharacterData(extended, changed, contentRating);
         var additional = ExistingAdditionalContent.Read(BuildDraft());
         if (additional.Count == 0) return;
         ImGui.Separator();
-        Help.Heading($"Vorhandene zusätzliche Inhalte ({additional.Count})", HelpTopicId.ExistingAdditionalContent);
-        Wrapped("Diese Inhalte bleiben gespeichert und werden bei Export oder bewusstem Teilen mitgegeben. Entfernen wirkt zunächst nur auf deinen Entwurf.");
+        if (!Help.Section(L("Vorhandene Zusatzinhalte") + $" ({additional.Count})", HelpTopicId.ExistingAdditionalContent)) return;
         foreach (var entry in additional)
         {
             ImGui.PushID(entry.Kind + "-" + entry.Index);
@@ -569,7 +652,9 @@ internal sealed class MainWindow : Window, IDisposable
 
     private void DrawDetails()
     {
-        if (ImGui.BeginCombo(T("Status.Label") + "###RpStatus", StatusLabel(details.Status)))
+        var width = MathF.Max(1, (ImGui.GetContentRegionAvail().X - ImGui.GetStyle().ItemSpacing.X) / 2);
+        ImGui.SetNextItemWidth(width);
+        if (ImGui.BeginCombo("##RpStatus", StatusLabel(details.Status)))
         {
             foreach (var status in Enum.GetValues<RpStatus>())
                 if (ImGui.Selectable(StatusLabel(status), details.Status == status))
@@ -580,7 +665,9 @@ internal sealed class MainWindow : Window, IDisposable
             ImGui.EndCombo();
         }
         Help.AfterItem(HelpTopicId.Status);
-        if (ImGui.BeginCombo(T("Availability.Label") + "###RpAvailability", AvailabilityLabel(details.Availability)))
+        ImGui.SameLine();
+        ImGui.SetNextItemWidth(width);
+        if (ImGui.BeginCombo("##RpAvailability", AvailabilityLabel(details.Availability)))
         {
             foreach (var availability in Enum.GetValues<RpAvailability>())
                 if (ImGui.Selectable(AvailabilityLabel(availability), details.Availability == availability))
@@ -591,26 +678,87 @@ internal sealed class MainWindow : Window, IDisposable
             ImGui.EndCombo();
         }
         Help.AfterItem(HelpTopicId.Availability);
-        dirty |= ImGui.InputTextMultiline(T("Profile.Summary") + "###Summary", ref details.Summary, 2048, new Vector2(-1, 75));
-        dirty |= ImGui.InputText(T("Profile.Pronouns") + "###Pronouns", ref details.Pronouns, 320);
-        dirty |= ImGui.InputText(T("Profile.Location") + "###CurrentLocation", ref details.CurrentLocation, 1024);
-        dirty |= ImGui.InputText(T("Profile.FreeCompany") + "###FreeCompany", ref details.FreeCompany, 640);
+        ImGui.TextUnformatted(T("Profile.Summary"));
+        dirty |= ImGui.InputTextMultiline("##Summary", ref details.Summary, 2048,
+            new Vector2(-1, ImGui.GetTextLineHeight() * 3));
+        if (visibleFields.Contains("Pronouns") || details.Pronouns.Length != 0)
+            dirty |= DrawTextField("Pronouns", T("Profile.Pronouns"), ref details.Pronouns, 320);
+        if (visibleFields.Contains("CurrentLocation") || details.CurrentLocation.Length != 0)
+            dirty |= DrawTextField("CurrentLocation", T("Profile.Location"), ref details.CurrentLocation, 1024);
+        if (visibleFields.Contains("FreeCompany") || details.FreeCompany.Length != 0)
+            dirty |= DrawTextField("FreeCompany", T("Profile.FreeCompany"), ref details.FreeCompany, 640);
+    }
+
+    private bool FieldVisible(string key) => visibleFields.Contains(key) || fields[key].Length != 0;
+
+    private void DrawShortField(string key, string label, int limit)
+    {
+        var value = fields[key];
+        if (!DrawTextField(key, label, ref value, limit)) return;
+        fields[key] = value;
+        dirty = true;
+    }
+
+    private static bool DrawTextField(string key, string label, ref string value, int limit)
+    {
+        var changed = false;
+        if (!ImGui.BeginTable("##Field" + key, 2, ImGuiTableFlags.SizingStretchProp)) return false;
+        try
+        {
+            ImGui.TableSetupColumn("Label", ImGuiTableColumnFlags.WidthFixed, 100 * ImGuiHelpers.GlobalScale);
+            ImGui.TableSetupColumn("Value", ImGuiTableColumnFlags.WidthStretch);
+            ImGui.TableNextColumn();
+            ImGui.AlignTextToFramePadding();
+            ImGui.TextUnformatted(label);
+            ImGui.TableNextColumn();
+            ImGui.SetNextItemWidth(-1);
+            changed = ImGui.InputText("##" + key, ref value, limit);
+        }
+        finally { ImGui.EndTable(); }
+        return changed;
+    }
+
+    private void DrawAdditionalFieldMenu(ProfileArea area)
+    {
+        ImGui.PushID("additional-" + area);
+        if (ImGui.SmallButton(L("+ Angabe"))) ImGui.OpenPopup("add-field");
+        if (ImGui.BeginPopup("add-field"))
+        {
+            foreach (var field in ShortFields)
+            {
+                if (field.Key == "DisplayName" || (field.Key == "Title") != (area == ProfileArea.Overview)) continue;
+                if (!FieldVisible(field.Key) && ImGui.MenuItem(L(field.Label))) visibleFields.Add(field.Key);
+            }
+            if (area == ProfileArea.Overview)
+            {
+                if (!visibleFields.Contains("Pronouns") && details.Pronouns.Length == 0 && ImGui.MenuItem(T("Profile.Pronouns"))) visibleFields.Add("Pronouns");
+                if (!visibleFields.Contains("CurrentLocation") && details.CurrentLocation.Length == 0 && ImGui.MenuItem(T("Profile.Location"))) visibleFields.Add("CurrentLocation");
+                if (!visibleFields.Contains("FreeCompany") && details.FreeCompany.Length == 0 && ImGui.MenuItem(T("Profile.FreeCompany"))) visibleFields.Add("FreeCompany");
+            }
+            else foreach (var field in LongFields)
+                if (!FieldVisible(field.Key) && ImGui.MenuItem(L(field.Label))) visibleFields.Add(field.Key);
+            ImGui.EndPopup();
+        }
+        ImGui.PopID();
     }
 
     private void DrawGlances()
     {
-        Wrapped("Bis zu fünf Eindrücke. Aktive Einträge erscheinen im Journal und in der eigenen RP-Leiste; deaktivierte bleiben im Profil gespeichert.");
-        DrawGlanceTemplates();
+        if (ImGui.SmallButton(L("Vorlagen"))) ImGui.OpenPopup("glance-templates");
+        if (ImGui.BeginPopup("glance-templates"))
+        { DrawGlanceTemplates(); ImGui.EndPopup(); }
         for (var index = 0; index < details.Glances.Count; index++)
         {
             ImGui.PushID("glance" + index);
             var entry = details.Glances[index];
+            if (!ImGui.CollapsingHeader((entry.Enabled ? "" : L("Inaktiv") + " · ") + entry.Label + "###GlanceEntry"))
+            { ImGui.PopID(); continue; }
             var label = entry.Label;
             var text = entry.Text;
             var enabled = entry.Enabled;
             var changed = ImGui.Checkbox(T("Common.Enabled"), ref enabled);
             changed |= ImGui.InputText("Bezeichnung", ref label, 320);
-            changed |= ImGui.InputTextMultiline("Beschreibung", ref text, 4096, new Vector2(-1, 85));
+            changed |= ImGui.InputTextMultiline("##GlanceText", ref text, 4096, new Vector2(-1, ImGui.GetTextLineHeight() * 3));
             if (changed)
             {
                 details.Glances[index] = entry = entry with { Label = label, Text = text, Enabled = enabled };
@@ -761,6 +909,7 @@ internal sealed class MainWindow : Window, IDisposable
                     throw new InvalidDataException("Profile exceeds size limit.");
                 var imported = ProfileJson.Import(Encoding.UTF8.GetBytes(jsonText), store.Policy);
                 SetDraft(imported with { Id = Guid.NewGuid(), Revision = 1 });
+                editing = true; preview = false;
                 dirty = true;
                 message = "Profil als neue Kopie importiert. Zum Übernehmen speichern.";
             }
@@ -806,6 +955,8 @@ internal sealed class MainWindow : Window, IDisposable
         profileUi.ResetEditorContext();
         editorGeneration++;
         original = profile;
+        selectedProfileArea = ProfileArea.Overview;
+        visibleFields.Clear();
         details = new ProfileDetailsDraft(profile);
         extended = ExtendedProfileDraft.From(profile);
         contentRating = profile.ContentRating;
@@ -858,6 +1009,7 @@ internal sealed class MainWindow : Window, IDisposable
         policyGeneration++;
         profiles.Clear();
         SetDraft(new ProfileDocument());
+        editing = preview = false;
         jsonText = "";
         glanceTemplate = null;
         catalogVersion = -1;

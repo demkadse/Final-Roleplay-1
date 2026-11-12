@@ -1,4 +1,5 @@
 using FRP1.Core.Profiles;
+using FRP1.Plugin;
 using FRP1.Plugin.UiProfiles;
 using Xunit;
 
@@ -7,13 +8,11 @@ namespace FRP1.Core.Tests;
 public sealed class ProfileAreaLegacyTests
 {
     [Fact]
-    public void NavigationHasExactlyTheFiveRequestedImmutableProfileAreas()
+    public void NavigationHasExactlyTheThreeRequestedImmutableProfileAreas()
     {
-        Assert.Equal(new[] { ProfileArea.StatusSummary, ProfileArea.OocInformation, ProfileArea.Glances,
-            ProfileArea.FurtherCharacterData, ProfileArea.RpExperience }, ProfileAreas.All);
-        Assert.Equal(5, Enum.GetValues<ProfileArea>().Length);
-        Assert.All(ProfileAreas.All, area => Assert.False(string.IsNullOrWhiteSpace(ProfileAreas.Title(area))));
-        Assert.Equal(5, ProfileAreas.All.Select(ProfileAreas.Title).Distinct().Count());
+        Assert.Equal(new[] { ProfileArea.Overview, ProfileArea.Character, ProfileArea.Ooc }, ProfileAreas.All);
+        Assert.Equal(3, Enum.GetValues<ProfileArea>().Length);
+        Assert.Equal(new[] { "Überblick", "Charakter", "OOC" }, ProfileAreas.All.Select(ProfileAreas.Title));
         var areas = Assert.IsAssignableFrom<ICollection<ProfileArea>>(ProfileAreas.All);
         Assert.True(areas.IsReadOnly);
         Assert.Throws<NotSupportedException>(() => areas.Clear());
@@ -105,6 +104,25 @@ public sealed class ProfileAreaLegacyTests
         var originalLanguages = source.RpLanguages.ToArray();
         source.RpLanguages.Clear();
         Assert.Equal(originalLanguages, draft.ApplyTo(source).RpLanguages);
+    }
+
+    [Fact]
+    public void EditingSummaryPreservesUneditedOptionalAndLegacyFieldsAcrossBothDrafts()
+    {
+        var source = LegacyProfile() with
+        {
+            EyeColor = "Amber", Height = "175 cm", Weight = "68 kg", Birthplace = "Gridania", Residence = "Doman village",
+            RpLanguages = [" Deutsch ", "Common\r\nDialect", "Doman"],
+            Glances = [new("Disabled but retained", "Existing optional content", Enabled: false)],
+        };
+        var before = ProfileJson.Hash(source);
+        var details = new ProfileDetailsDraft(source) { Summary = "Changed introduction" };
+        var extended = ExtendedProfileDraft.From(source);
+        var result = extended.ApplyTo(details.ApplyTo(source));
+        Assert.Equal(ProfileJson.Hash(source with { Summary = details.Summary }), ProfileJson.Hash(result));
+        Assert.Equal(before, ProfileJson.Hash(source));
+        Assert.False(Assert.Single(result.Glances).Enabled);
+        Assert.Equal(8, ExistingAdditionalContent.Read(result).Count);
     }
 
     [Fact]

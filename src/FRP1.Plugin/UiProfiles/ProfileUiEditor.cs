@@ -19,6 +19,7 @@ public sealed partial class ProfileUiModule
     private float cropZoom = 1f;
     private bool cropChanged;
     private string? portraitFeedback;
+    private readonly HashSet<string> addedEditorFields = new(StringComparer.Ordinal);
 
     public void ResetEditorContext()
     {
@@ -29,6 +30,7 @@ public sealed partial class ProfileUiModule
         dialogs.Reset();
         editorPortrait.Clear();
         portraitFeedback = null;
+        addedEditorFields.Clear();
     }
 
     public Action<string, string>? HelpHeading { get; set; }
@@ -55,54 +57,149 @@ public sealed partial class ProfileUiModule
     public void DrawCharacterData(ExtendedProfileDraft draft, Action changed, ContentRating? contentRating = null)
     {
         if (!PrepareEditor(draft, changed, contentRating)) return;
-        if (ImGui.InputText(ProfileUiText.Id("Augenfarbe"), ref draft.EyeColor, 320)) changed();
-        if (ImGui.InputText(ProfileUiText.Id("Größe"), ref draft.Height, 320)) changed();
-        if (ImGui.InputText(ProfileUiText.Id("Gewicht"), ref draft.Weight, 320)) changed();
-        if (ImGui.InputText(ProfileUiText.Id("Geburtsort"), ref draft.Birthplace, 640)) changed();
-        if (ImGui.InputText(ProfileUiText.Id("Wohnort"), ref draft.Residence, 640)) changed();
-        Wrapped(ProfileUiText.Get("RP-Sprachen: eine frei beschriebene Sprache je Zeile, höchstens zwölf."));
-        if (ImGui.InputTextMultiline("##RpLanguages", ref draft.LanguagesText, 4096, new Vector2(-1, 85))) changed();
+        ImGui.PushID("extended-character");
+        try
+        {
+            OptionalText("EyeColor", "Augenfarbe", ref draft.EyeColor, 320, changed);
+            OptionalText("Height", "Größe", ref draft.Height, 320, changed);
+            OptionalText("Weight", "Gewicht", ref draft.Weight, 320, changed);
+            OptionalText("Birthplace", "Geburtsort", ref draft.Birthplace, 640, changed);
+            OptionalText("Residence", "Wohnort", ref draft.Residence, 640, changed);
+            OptionalText("Languages", "RP-Sprachen", ref draft.LanguagesText, 4096, changed, true);
+            if (ImGui.SmallButton(ProfileUiText.Id("+ Angabe"))) ImGui.OpenPopup("add-character-detail");
+            if (ImGui.BeginPopup("add-character-detail"))
+            {
+                try
+                {
+                    AddField("EyeColor", "Augenfarbe", draft.EyeColor.Length != 0);
+                    AddField("Height", "Größe", draft.Height.Length != 0);
+                    AddField("Weight", "Gewicht", draft.Weight.Length != 0);
+                    AddField("Birthplace", "Geburtsort", draft.Birthplace.Length != 0);
+                    AddField("Residence", "Wohnort", draft.Residence.Length != 0);
+                    AddField("Languages", "RP-Sprachen", draft.LanguagesText.Length != 0);
+                }
+                finally { ImGui.EndPopup(); }
+            }
+        }
+        finally { ImGui.PopID(); }
     }
 
     public void DrawExperience(ExtendedProfileDraft draft, Action changed, ContentRating? contentRating = null)
     {
         if (!PrepareEditor(draft, changed, contentRating)) return;
-        Wrapped(ProfileUiText.Get("Diese Angaben sind Gesprächshinweise. Sie erteilen keine Einwilligung und keine Altersfreigabe."));
-        if (ImGui.BeginCombo(ProfileUiText.Id("RP-Erfahrung"), Experience(draft.Preferences.Experience)))
+        ImGui.PushID("extended-preferences");
+        try
         {
-            foreach (var experience in Enum.GetValues<RpExperience>())
-                if (ImGui.Selectable(Experience(experience), draft.Preferences.Experience == experience))
-                { draft.Preferences = draft.Preferences with { Experience = experience }; changed(); }
-            ImGui.EndCombo();
+            if (draft.Preferences.Experience != RpExperience.Unspecified || addedEditorFields.Contains("Experience"))
+            {
+                if (ImGui.BeginCombo(ProfileUiText.Id("RP-Erfahrung"), Experience(draft.Preferences.Experience)))
+                {
+                    foreach (var experience in Enum.GetValues<RpExperience>())
+                        if (ImGui.Selectable(Experience(experience), draft.Preferences.Experience == experience))
+                        {
+                            draft.Preferences = draft.Preferences with { Experience = experience };
+                            if (experience == RpExperience.Unspecified) addedEditorFields.Remove("Experience");
+                            changed();
+                        }
+                    ImGui.EndCombo();
+                }
+            }
+            var style = draft.Preferences.PreferredStyle;
+            OptionalText("PreferredStyle", "Bevorzugter RP-Stil", ref style, 2048,
+                () => { draft.Preferences = draft.Preferences with { PreferredStyle = style }; changed(); }, true);
+            OptionalPreference("Injury", "Verletzungen", draft.Preferences.Injury, value => draft.Preferences = draft.Preferences with { Injury = value }, changed);
+            OptionalPreference("CharacterDeath", "Charaktertod", draft.Preferences.CharacterDeath, value => draft.Preferences = draft.Preferences with { CharacterDeath = value }, changed);
+            OptionalPreference("Romance", "Romantik", draft.Preferences.Romance, value => draft.Preferences = draft.Preferences with { Romance = value }, changed);
+            OptionalPreference("Crime", "Kriminalität", draft.Preferences.Crime, value => draft.Preferences = draft.Preferences with { Crime = value }, changed);
+            OptionalPreference("LossOfControl", "Kontrollverlust", draft.Preferences.LossOfControl, value => draft.Preferences = draft.Preferences with { LossOfControl = value }, changed);
+            if (ImGui.SmallButton(ProfileUiText.Id("+ Angabe"))) ImGui.OpenPopup("add-preference");
+            if (ImGui.BeginPopup("add-preference"))
+            {
+                try
+                {
+                    AddField("Experience", "RP-Erfahrung", draft.Preferences.Experience != RpExperience.Unspecified);
+                    AddField("PreferredStyle", "Bevorzugter RP-Stil", draft.Preferences.PreferredStyle.Length != 0);
+                    AddField("Injury", "Verletzungen", draft.Preferences.Injury != PreferenceAnswer.Unspecified);
+                    AddField("CharacterDeath", "Charaktertod", draft.Preferences.CharacterDeath != PreferenceAnswer.Unspecified);
+                    AddField("Romance", "Romantik", draft.Preferences.Romance != PreferenceAnswer.Unspecified);
+                    AddField("Crime", "Kriminalität", draft.Preferences.Crime != PreferenceAnswer.Unspecified);
+                    AddField("LossOfControl", "Kontrollverlust", draft.Preferences.LossOfControl != PreferenceAnswer.Unspecified);
+                }
+                finally { ImGui.EndPopup(); }
+            }
         }
-        var style = draft.Preferences.PreferredStyle;
-        if (ImGui.InputTextMultiline(ProfileUiText.Id("Bevorzugter RP-Stil"), ref style, 2048, new Vector2(-1, 70)))
-        { draft.Preferences = draft.Preferences with { PreferredStyle = style }; changed(); }
-        Preference(ProfileUiText.Id("Verletzungen"), draft.Preferences.Injury, value => draft.Preferences = draft.Preferences with { Injury = value }, changed);
-        Preference(ProfileUiText.Id("Charaktertod"), draft.Preferences.CharacterDeath, value => draft.Preferences = draft.Preferences with { CharacterDeath = value }, changed);
-        Preference(ProfileUiText.Id("Romantik"), draft.Preferences.Romance, value => draft.Preferences = draft.Preferences with { Romance = value }, changed);
-        Preference(ProfileUiText.Id("Kriminalität"), draft.Preferences.Crime, value => draft.Preferences = draft.Preferences with { Crime = value }, changed);
-        Preference(ProfileUiText.Id("Kontrollverlust"), draft.Preferences.LossOfControl, value => draft.Preferences = draft.Preferences with { LossOfControl = value }, changed);
+        finally { ImGui.PopID(); }
+    }
+
+    private void AddField(string key, string label, bool filled)
+    {
+        if (!filled && !addedEditorFields.Contains(key) && ImGui.Selectable(ProfileUiText.Id(label)))
+            addedEditorFields.Add(key);
+    }
+
+    private void OptionalText(string key, string label, ref string value, int maximum, Action changed, bool multiline = false)
+    {
+        if (value.Length == 0 && !addedEditorFields.Contains(key)) return;
+        ImGui.PushID(key);
+        try
+        {
+            if (multiline)
+            {
+                ImGui.TextUnformatted(ProfileUiText.Get(label));
+                ImGui.SameLine();
+                if (ImGui.SmallButton(ProfileUiText.Id("Entfernen")))
+                { value = ""; addedEditorFields.Remove(key); changed(); return; }
+                var height = Math.Clamp(value.Count(character => character == '\n') + 1, 2, 5) * ImGui.GetTextLineHeightWithSpacing() + 8;
+                if (ImGui.InputTextMultiline("##value", ref value, maximum, new Vector2(-1, height))) changed();
+            }
+            else if (ImGui.BeginTable("optional-field", 3, ImGuiTableFlags.SizingFixedFit))
+            {
+                try
+                {
+                    ImGui.TableSetupColumn("Label", ImGuiTableColumnFlags.WidthFixed, MathF.Min(100, ImGui.GetContentRegionAvail().X * .3f));
+                    ImGui.TableSetupColumn("Value", ImGuiTableColumnFlags.WidthStretch);
+                    ImGui.TableSetupColumn("Remove", ImGuiTableColumnFlags.WidthFixed);
+                    ImGui.TableNextRow(); ImGui.TableNextColumn();
+                    Wrapped(ProfileUiText.Get(label));
+                    ImGui.TableNextColumn(); ImGui.SetNextItemWidth(-1);
+                    if (ImGui.InputText("##value", ref value, maximum)) changed();
+                    ImGui.TableNextColumn();
+                    if (ImGui.SmallButton(ProfileUiText.Id("Entfernen")))
+                    { value = ""; addedEditorFields.Remove(key); changed(); }
+                }
+                finally { ImGui.EndTable(); }
+            }
+        }
+        finally { ImGui.PopID(); }
+    }
+
+    private void OptionalPreference(string key, string label, PreferenceAnswer current, Action<PreferenceAnswer> apply, Action changed)
+    {
+        if (current == PreferenceAnswer.Unspecified && !addedEditorFields.Contains(key)) return;
+        Preference(ProfileUiText.Id(label), current, value =>
+        {
+            apply(value);
+            if (value == PreferenceAnswer.Unspecified) addedEditorFields.Remove(key);
+        }, changed);
     }
 
     public void DrawHeaderDesign(ExtendedProfileDraft draft, Action changed, ContentRating? contentRating = null)
     {
         if (!PrepareEditor(draft, changed, contentRating)) return;
         editorPortrait.Set(candidate ?? draft.Portrait);
-        if (editorPortrait.Current is { } portrait) ImGui.Image(portrait.Handle, new Vector2(64));
-        DrawIcon(draft.Appearance.IconId, new Vector2(28));
-        if (ImGui.Button(ProfileUiText.Id("Portrait und Profilgestaltung"))) ImGui.OpenPopup("profile-header-design");
+        if (editorPortrait.Current is { } portrait) ImGui.Image(portrait.Handle, new Vector2(24));
+        if (editorPortrait.Current is not null) ImGui.SameLine();
+        if (ImGui.SmallButton(ProfileUiText.Id("Portrait und Profilgestaltung"))) ImGui.OpenPopup("profile-header-design");
         var available = Vector2.Max(Vector2.One, ImGui.GetMainViewport().WorkSize - new Vector2(16));
-        var width = MathF.Min(540, available.X);
+        var width = MathF.Min(390, available.X);
         ImGui.SetNextWindowSizeConstraints(new Vector2(width, 0), new Vector2(width, available.Y));
         if (!ImGui.BeginPopup("profile-header-design")) return;
         try
         {
             if (!EditorAllowed()) { ImGui.CloseCurrentPopup(); return; }
             DrawHelpHeading("Öffentliche Profilgestaltung", "Formatting");
-            Wrapped(ProfileUiText.Get("Diese Gestaltung wird mit deinem Profil geteilt. Das persönliche FRP1-Fensterdesign bleibt davon getrennt."));
             if (ImGui.Button(ProfileUiText.Id("Profilicon auswählen")))
-                OpenIconPicker(draft.Appearance.IconId, id => { draft.Appearance = draft.Appearance with { IconId = id }; changed(); }, editorRating);
+                OpenIconPicker(draft.Appearance.IconId, id => { if (!ReferenceEquals(activeDraft, draft) || !EditorAllowed()) return; draft.Appearance = draft.Appearance with { IconId = id }; changed(); }, editorRating);
             var nameColor = draft.Appearance.NameColor;
             var accent = draft.Appearance.AccentColor;
             if (ColorEditor(ProfileUiText.Id("Namensfarbe"), ref nameColor)) { draft.Appearance = draft.Appearance with { NameColor = nameColor }; changed(); }
@@ -129,20 +226,19 @@ public sealed partial class ProfileUiModule
     private void DrawPortraitEditor(ExtendedProfileDraft draft, Action changed)
     {
         ImGui.Separator();
-        Wrapped(ProfileUiText.Get("Portrait: lokales PNG oder JPEG wählen, quadratischen Ausschnitt bestätigen. Das geteilte Vorschaubild enthält keine Bildmetadaten."));
         ImGui.BeginDisabled(importing is not null);
         if (ImGui.Button(ProfileUiText.Id("Portraitdatei auswählen")))
         {
             var generation = editorGeneration;
             dialogs.OpenFileDialog(ProfileUiText.Id("Lokales Portrait auswählen"), ProfileUiText.Get("Bilder") + "{.png,.jpg,.jpeg}", (selected, path) =>
             {
-                if (!selected || generation != editorGeneration || !EditorAllowed()) return;
+                if (!selected || generation != editorGeneration || !ReferenceEquals(activeDraft, draft) || !EditorAllowed()) return;
                 sourcePath = path; cropX = cropY = .5f; cropZoom = 1; cropChanged = false;
                 BeginPortraitImport();
             });
         }
         ImGui.EndDisabled();
-        if (ImGui.Button(ProfileUiText.Id("Portrait entfernen")))
+        if ((draft.Portrait is not null || candidate is not null) && ImGui.Button(ProfileUiText.Id("Portrait entfernen")))
         {
             importCancellation?.Cancel(); editorGeneration++;
             draft.Portrait = null; candidate = null; sourcePath = null; editorPortrait.Clear(); changed();

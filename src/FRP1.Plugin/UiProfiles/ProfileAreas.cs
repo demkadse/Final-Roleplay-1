@@ -4,23 +4,20 @@ using FRP1.Core.Profiles;
 
 namespace FRP1.Plugin.UiProfiles;
 
-public enum ProfileArea { StatusSummary, OocInformation, Glances, FurtherCharacterData, RpExperience }
+public enum ProfileArea { Overview, Character, Ooc }
 
 public static class ProfileAreas
 {
     public static IReadOnlyList<ProfileArea> All { get; } = Array.AsReadOnly(new[]
     {
-        ProfileArea.StatusSummary, ProfileArea.OocInformation, ProfileArea.Glances,
-        ProfileArea.FurtherCharacterData, ProfileArea.RpExperience,
+        ProfileArea.Overview, ProfileArea.Character, ProfileArea.Ooc,
     });
 
     public static string Title(ProfileArea area) => area switch
     {
-        ProfileArea.StatusSummary => "RP-Status und Kurzprofil",
-        ProfileArea.OocInformation => "OOC Informationen",
-        ProfileArea.Glances => "Auf den ersten Blick",
-        ProfileArea.FurtherCharacterData => "Weitere Charakterdaten",
-        ProfileArea.RpExperience => "RP-Erfahrung und Absprachen",
+        ProfileArea.Overview => "Überblick",
+        ProfileArea.Character => "Charakter",
+        ProfileArea.Ooc => "OOC",
         _ => throw new ArgumentOutOfRangeException(nameof(area)),
     };
 }

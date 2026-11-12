@@ -1,4 +1,6 @@
+﻿using System.Numerics;
 using Dalamud.Bindings.ImGui;
+using Dalamud.Interface.Utility;
 using FRP1.Core.Profiles;
 using FRP1.Plugin.Contacts;
 using FRP1.Plugin.Presentation;
@@ -8,6 +10,7 @@ namespace FRP1.Plugin.UiSocial;
 public sealed partial class SocialUiModule
 {
     private string contactSearch = "";
+    private bool environmentView;
     private bool favoritesOnly;
     private int relationshipFilter = -1;
     private uint? worldFilter;
@@ -28,68 +31,133 @@ public sealed partial class SocialUiModule
 
     public void DrawContactsTab()
     {
-        if (!AccessReady) { Text(T("Kontakte sind nach Hinweisbestätigung und Altersauswahl für deinen Spielcharakter verfügbar.", "Contacts become available for your character after guidance acknowledgement and age selection.")); return; }
+        if (!AccessReady) { Text(T("Kontakte nach Hinweis- und Altersauswahl verfügbar.", "Contacts available after guidance and age selection.")); return; }
         if (!register.IsLoaded)
         {
-            Text(register.ErrorMessage is null ? T("Lokales Register wird geladen …", "Loading local register …") :
-                T("Das lokale Register konnte nicht gelesen werden. Bitte erneut versuchen.", "The local register could not be read. Please retry."));
-            if (!register.IsBusy && ImGui.Button(T("Register erneut laden", "Reload register"))) register.Retry();
+            Text(register.ErrorMessage is null ? T("Register wird geladen …", "Loading register …") : T("Register konnte nicht geladen werden.", "Register could not load."));
+            if (!register.IsBusy && ImGui.Button(T("Erneut laden", "Reload"))) register.Retry();
             return;
         }
+        if (ImGui.Button(T("Kontakte", "Contacts"))) environmentView = false;
+        ImGui.SameLine();
+        if (ImGui.Button(T("Umgebung", "Nearby"))) environmentView = true;
         if (feedback is not null) Text(feedback);
         if (register.ErrorMessage is not null)
         {
-            Text(T("Die lokale Kontaktänderung konnte nicht gespeichert werden. Der gewünschte Zustand bleibt für die Wiederholung erhalten.",
-                "The local contact change could not be saved. The requested state is retained for retry."));
-            if (!register.IsBusy && ImGui.Button(T("Kontaktänderung erneut speichern", "Retry saving contact change"))) register.Retry();
+            Text(T("Änderung noch nicht gespeichert.", "Change not saved yet."));
+            if (!register.IsBusy && ImGui.Button(T("Erneut speichern", "Retry saving"))) register.Retry();
         }
-        ImGui.InputText(T("Suche nach RP-Name, lokalem Namen oder zugeordnetem Charakter", "Search by RP name, local name or assigned character"), ref contactSearch, 640);
+        if (environmentView) { DrawEnvironmentTab(); return; }
+        ImGui.SetNextItemWidth(MathF.Max(80, ImGui.GetContentRegionAvail().X - 90 * ImGuiHelpers.GlobalScale));
+        ImGui.InputTextWithHint("##contact-search", T("Kontakte suchen", "Search contacts"), ref contactSearch, 160);
+        if (ImGui.IsItemHovered() || ImGui.IsItemFocused())
+        { ImGui.BeginTooltip(); Text(T("RP-Name, lokaler Name oder Charakter", "RP name, local name or character")); ImGui.EndTooltip(); }
+        ImGui.SameLine();
+        if (ImGui.Button(T("Filter", "Filters"))) ImGui.OpenPopup("contact-filters");
+        if (ImGui.BeginPopup("contact-filters"))
+        {
+            try { DrawContactFilters(); }
+            finally { ImGui.EndPopup(); }
+        }
+        var wide = ImGui.GetContentRegionAvail().X >= 540 * ImGuiHelpers.GlobalScale;
+        if (wide && ImGui.BeginTable("##contact-layout", 2, ImGuiTableFlags.SizingStretchProp | ImGuiTableFlags.NoSavedSettings))
+        {
+            try
+            {
+                ImGui.TableSetupColumn("Contacts", ImGuiTableColumnFlags.WidthStretch, 1);
+                ImGui.TableSetupColumn("Details", ImGuiTableColumnFlags.WidthStretch, 1.7f);
+                ImGui.TableNextColumn();
+                ImGui.BeginChild("##contact-list", Vector2.Zero, false);
+                try { DrawContactList(); }
+                finally { ImGui.EndChild(); }
+                ImGui.TableNextColumn();
+                ImGui.BeginChild("##contact-details", Vector2.Zero, false);
+                try { DrawContactDetails(); }
+                finally { ImGui.EndChild(); }
+            }
+            finally { ImGui.EndTable(); }
+        }
+        else if (!wide)
+        {
+            ImGui.BeginChild("##contact-list", new Vector2(0, 150 * ImGuiHelpers.GlobalScale), false);
+            try { DrawContactList(); }
+            finally { ImGui.EndChild(); }
+            ImGui.Separator(); DrawContactDetails();
+        }
+    }
+
+    private void DrawContactFilters()
+    {
         ImGui.Checkbox(T("Nur Favoriten", "Favorites only"), ref favoritesOnly);
-        if (ImGui.BeginCombo(T("Beziehungsfilter", "Relationship filter"), relationshipFilter < 0 ? T("Alle", "All") : RelationshipLabel((RelationshipKind)relationshipFilter)))
+        if (ImGui.BeginCombo(T("Beziehung", "Relationship"), relationshipFilter < 0 ? T("Alle", "All") : RelationshipLabel((RelationshipKind)relationshipFilter)))
         {
             if (ImGui.Selectable(T("Alle", "All"), relationshipFilter < 0)) relationshipFilter = -1;
             foreach (var relationship in Enum.GetValues<RelationshipKind>())
                 if (ImGui.Selectable(RelationshipLabel(relationship), relationshipFilter == (int)relationship)) relationshipFilter = (int)relationship;
             ImGui.EndCombo();
         }
-        if (ImGui.BeginCombo(T("Heimatweltfilter", "Home-world filter"), worldFilter.HasValue ? WorldLabel(worldFilter.Value) : T("Alle Heimatwelten", "All home worlds")))
+        if (ImGui.BeginCombo(T("Heimatwelt", "Home world"), worldFilter.HasValue ? WorldLabel(worldFilter.Value) : T("Alle", "All")))
         {
-            if (ImGui.Selectable(T("Alle Heimatwelten", "All home worlds"), !worldFilter.HasValue)) worldFilter = null;
+            if (ImGui.Selectable(T("Alle", "All"), !worldFilter.HasValue)) worldFilter = null;
             var worlds = ActorSnapshots.Select(a => a.Actor.HomeWorldId).Concat(register.Snapshot.Contacts
-                .Where(c => c.Binding is not null).Select(c => c.Binding!.Character.HomeWorldId)).Distinct().Order().ToArray();
+                .Where(c => c.Binding is not null).Select(c => c.Binding!.Character.HomeWorldId)).Distinct().Order();
             foreach (var world in worlds)
                 if (ImGui.Selectable(WorldLabel(world), worldFilter == world)) worldFilter = world;
             ImGui.EndCombo();
         }
+    }
+
+    private void DrawContactList()
+    {
         var views = resolver.Search(contactSearch, homeWorldId: worldFilter, favoritesOnly: favoritesOnly,
             relationship: relationshipFilter < 0 ? null : (RelationshipKind)relationshipFilter);
-        if (views.Count == 0) Text(T("Keine zulässigen Profile im lokalen Cache. Kontakte bewusst koppeln und Profile empfangen.", "No permitted profiles in the local cache. Explicitly pair with peers and receive profiles."));
+        if (views.Count == 0) Text(T("Keine passenden empfangenen Profile.", "No matching received profiles."));
         for (var index = 0; index < views.Count; index++)
         {
             var view = views[index];
             if (!view.IsReadable || view.Key is not { } key) continue;
-            ImGui.PushID(index);
-            if (ImGui.Button(T("Kontakt auswählen", "Select contact"))) SelectContact(key);
-            ImGui.SameLine();
-            ImGui.TextUnformatted(view.DisplayName);
-            Text(view.Connected ? T("Direkt verbunden", "Directly connected") : T("Lokal zwischengespeichert – keine Aussage zur Spielanwesenheit", "Locally cached; does not indicate in-game presence"));
-            if (view.ReceivedAt is { } at) Text(T("Zuletzt lokal gespeichert: ", "Last saved locally: ") + at.ToLocalTime().ToString("g"));
+            ImGui.PushID(key.Fingerprint + ":" + key.ProfileId.ToString("N"));
+            var name = view.DisplayName;
+            if (!view.IsReadable || view.Key != key) { ImGui.PopID(); continue; }
+            var before = ImGui.GetCursorPos();
+            var clicked = ImGui.Selectable("##contact-row", selectedContact == key);
+            var hovered = ImGui.IsItemHovered() || ImGui.IsItemFocused();
+            var after = ImGui.GetCursorPos();
+            ImGui.SetCursorPos(before);
+            if (view.IsReadable && view.Key == key) ImGui.TextUnformatted((view.Contact?.Favorite == true ? "* " : "") + name);
+            ImGui.SetCursorPos(after);
+            if (clicked) SelectContact(key);
+            if (hovered)
+            {
+                ImGui.BeginTooltip();
+                try
+                {
+                    if (view.IsReadable && view.Key == key)
+                    {
+                        Text(view.Connected ? T("Direkt verbunden", "Directly connected") : T("Lokale Profilkopie · keine Anwesenheitsanzeige", "Local profile copy · not a presence indicator"));
+                        if (view.ReceivedAt is { } at) Text(at.ToLocalTime().ToString("g"));
+                    }
+                }
+                finally { ImGui.EndTooltip(); }
+            }
             ImGui.PopID();
         }
-        if (selectedContact is { } selected)
-        {
-            var view = resolver.GetProfile(selected);
-            if (!view.IsReadable) { selectedContact = null; ClearContactDraft(); }
-            else DrawSelectedContact(view, selected);
-        }
-        DrawMutedManagement();
-        if (ImGui.CollapsingHeader(T("Lokaler Begegnungs- und Besuchsverlauf", "Local encounter and visit history")))
+        ImGui.Separator(); DrawMutedManagement();
+        if (ImGui.CollapsingHeader(T("Verlauf", "History")))
             foreach (var entry in resolver.History().Take(100))
             {
                 if (!entry.Profile.IsReadable) continue;
                 Text(entry.At.ToLocalTime().ToString("g") + " · " + entry.Profile.DisplayName +
-                    (entry.Kind == EncounterKind.Seen ? T(" · vor Ort gesehen", " · seen locally") : T(" · Profil geöffnet", " · profile opened")));
+                    (entry.Kind == EncounterKind.Seen ? T(" · gesehen", " · seen") : T(" · geöffnet", " · opened")));
             }
+    }
+
+    private void DrawContactDetails()
+    {
+        if (selectedContact is not { } selected) { Text(T("Kontakt auswählen", "Select a contact")); return; }
+        var view = resolver.GetProfile(selected);
+        if (!view.IsReadable) { selectedContact = null; ClearContactDraft(); return; }
+        DrawSelectedContact(view, selected);
     }
 
     private void SelectContact(ProfileKey key)
@@ -128,23 +196,26 @@ public sealed partial class SocialUiModule
         if (contactDraftVersion != register.Version && !contactDirty && !characterNoteDirty) LoadContactDraft(key);
         ImGui.Separator();
         ImGui.TextUnformatted(view.DisplayName);
-        if (ImGui.Button(T("Vollständiges Profil öffnen", "Open full profile"))) Open(key);
-        Text(T("Notizen, Beziehungen und Favoriten bleiben ausschließlich auf deinem Gerät.", "Notes, relationships and favorites remain only on your device."));
+        if (ImGui.Button(T("Profil öffnen", "Open profile"))) Open(key);
+        if (view.Contact is { } details) Text(RelationshipLabel(details.Relationship) + (details.Favorite ? T(" · Favorit", " · Favorite") : ""));
+        var showNotes = ImGui.CollapsingHeader(T("Private Notizen und Beziehung", "Private notes and relationship"));
         ImGui.BeginDisabled(register.IsBusy);
-        contactDirty |= ImGui.InputText(T("Eigener Kontaktname", "Your local contact name"), ref aliasDraft, 640);
-        contactDirty |= ImGui.Checkbox(T("Favorit", "Favorite"), ref favoriteDraft);
-        if (ImGui.BeginCombo(T("Beziehung", "Relationship"), RelationshipLabel(relationshipDraft)))
+        if (showNotes)
         {
-            foreach (var relation in Enum.GetValues<RelationshipKind>())
-                if (ImGui.Selectable(RelationshipLabel(relation), relationshipDraft == relation))
-                { relationshipDraft = relation; contactDirty = true; }
-            ImGui.EndCombo();
+            contactDirty |= ImGui.InputText(T("Eigener Kontaktname", "Your local contact name"), ref aliasDraft, 640);
+            contactDirty |= ImGui.Checkbox(T("Favorit", "Favorite"), ref favoriteDraft);
+            if (ImGui.BeginCombo(T("Beziehung", "Relationship"), RelationshipLabel(relationshipDraft)))
+            {
+                foreach (var relation in Enum.GetValues<RelationshipKind>())
+                    if (ImGui.Selectable(RelationshipLabel(relation), relationshipDraft == relation))
+                    { relationshipDraft = relation; contactDirty = true; }
+                ImGui.EndCombo();
+            }
+            if (relationshipDraft == RelationshipKind.Custom)
+                contactDirty |= ImGui.InputText(T("Eigene Beziehungsbezeichnung", "Custom relationship label"), ref customRelationshipDraft, 320);
+            contactDirty |= ImGui.InputTextMultiline(T("Private Notiz zu diesem Profil", "Private note about this profile"), ref profileNoteDraft, 32768, new(-1, 110));
         }
-        if (relationshipDraft == RelationshipKind.Custom)
-            contactDirty |= ImGui.InputText(T("Eigene Beziehungsbezeichnung", "Custom relationship label"), ref customRelationshipDraft, 320);
-        contactDirty |= ImGui.InputTextMultiline(T("Private Notiz zu diesem Profil", "Private note about this profile"), ref profileNoteDraft, 32768, new(-1, 110));
-        ImGui.BeginDisabled(!contactDirty);
-        if (ImGui.Button(T("Profilnotiz und Beziehung lokal speichern", "Save profile note and relationship locally")))
+        if (contactDirty && ImGui.Button(T("Änderungen lokal speichern", "Save changes locally")))
         {
             var contact = view.Contact ?? new LocalContact { Profile = key };
             var snapshot = contact with { Alias = aliasDraft, ProfileNote = profileNoteDraft, Favorite = favoriteDraft,
@@ -155,8 +226,7 @@ public sealed partial class SocialUiModule
                 { contactDirty = false; contactDraftVersion = register.Version; }
             });
         }
-        ImGui.EndDisabled();
-        if (characterNoteKey is { } character)
+        if (showNotes && characterNoteKey is { } character)
         {
             Text(T("Von dir zugeordnet: ", "Assigned by you: ") + character.Name + T(" · Heimatwelt ", " · home world ") + character.HomeWorldId);
             characterNoteDirty |= ImGui.InputTextMultiline(T("Private Notiz zum Spielcharakter", "Private note about the game character"), ref characterNoteDraft, 32768, new(-1, 95));
@@ -173,15 +243,18 @@ public sealed partial class SocialUiModule
         if ((contactDirty || characterNoteDirty) && ImGui.Button(T("Offenen Entwurf verwerfen", "Discard open draft"))) LoadContactDraft(key);
         ImGui.EndDisabled();
         ImGui.BeginDisabled(contactDirty || characterNoteDirty);
-        if (ImGui.Button(T("Profil stummschalten (nur Anzeige)", "Mute profile (presentation only)")))
+        if (ImGui.CollapsingHeader(T("Stummschalten und Sperren", "Mute and block")))
         {
-            var contact = view.Contact ?? new LocalContact { Profile = key };
-            Queue(() => register.SetContactAsync(contact with { Muted = true }));
+            if (ImGui.Button(T("Profil stummschalten (nur Anzeige)", "Mute profile (presentation only)")))
+            {
+                var contact = view.Contact ?? new LocalContact { Profile = key };
+                Queue(() => register.SetContactAsync(contact with { Muted = true }));
+            }
+            ImGui.SameLine();
+            if (ImGui.Button(T("Peer sperren und Austausch unterbinden", "Block peer and prevent exchange")))
+                Queue(() => register.SetPeerBlockedAsync(key.Fingerprint, true));
         }
-        ImGui.SameLine();
-        if (ImGui.Button(T("Peer sperren und Austausch unterbinden", "Block peer and prevent exchange")))
-            Queue(() => register.SetPeerBlockedAsync(key.Fingerprint, true));
-        DrawBindingUi(view, key);
+        if (ImGui.CollapsingHeader(T("Charakter zuordnen", "Assign character"))) DrawBindingUi(view, key);
         ImGui.EndDisabled();
         ImGui.EndDisabled();
     }
@@ -212,7 +285,7 @@ public sealed partial class SocialUiModule
 
     private void DrawMutedManagement()
     {
-        if (!ImGui.CollapsingHeader(T("Stummschaltungen verwalten", "Manage muted profiles"))) return;
+        if (!ImGui.CollapsingHeader(T("Stummgeschaltet", "Muted"))) return;
         Text(T("Stummschalten versteckt ein Profil. Es beendet keine Verbindung. Gesperrte Peers verwaltest du in den Direktaustausch-Einstellungen.", "Muting hides a profile. It does not disconnect a peer. Manage blocked peers in the direct-networking settings."));
         var index = 0;
         foreach (var contact in register.Snapshot.Contacts.Where(c => c.Muted))
@@ -228,51 +301,61 @@ public sealed partial class SocialUiModule
 
     public void DrawEnvironmentTab()
     {
-        if (!AccessReady) { Text(T("Die Umgebung ist nach Hinweis- und Altersauswahl verfügbar.", "The local environment is available after guidance acknowledgement and age selection.")); return; }
-        var known = options.OnlyKnownEnvironment;
-        if (ImGui.Checkbox(T("Nur bekannte zulässige RP-Profile", "Only known permitted RP profiles"), ref known)) SetOptions(options with { OnlyKnownEnvironment = known });
-        if (ImGui.BeginCombo(T("RP-Statusfilter", "RP status filter"), options.EnvironmentStatus is { } status ? StatusLabel(status) : T("Alle", "All")))
+        if (!AccessReady) { Text(T("Umgebung nach Hinweis- und Altersauswahl verfügbar.", "Nearby actors available after guidance and age selection.")); return; }
+        if (ImGui.Button(T("Filter##nearby", "Filters##nearby"))) ImGui.OpenPopup("environment-filters");
+        ImGui.SameLine(); Text(T("Nur lokal sichtbare Charaktere", "Currently visible characters only"));
+        if (ImGui.BeginPopup("environment-filters"))
         {
-            if (ImGui.Selectable(T("Alle", "All"), options.EnvironmentStatus is null)) SetOptions(options with { EnvironmentStatus = null });
-            foreach (var value in Enum.GetValues<RpStatus>())
-                if (ImGui.Selectable(StatusLabel(value), options.EnvironmentStatus == value)) SetOptions(options with { EnvironmentStatus = value });
-            ImGui.EndCombo();
+            try
+            {
+                var known = options.OnlyKnownEnvironment;
+                if (ImGui.Checkbox(T("Nur bekannte RP-Profile", "Known RP profiles only"), ref known)) SetOptions(options with { OnlyKnownEnvironment = known });
+                if (ImGui.BeginCombo(T("RP-Status", "RP status"), options.EnvironmentStatus is { } status ? StatusLabel(status) : T("Alle", "All")))
+                {
+                    if (ImGui.Selectable(T("Alle", "All"), options.EnvironmentStatus is null)) SetOptions(options with { EnvironmentStatus = null });
+                    foreach (var value in Enum.GetValues<RpStatus>())
+                        if (ImGui.Selectable(StatusLabel(value), options.EnvironmentStatus == value)) SetOptions(options with { EnvironmentStatus = value });
+                    ImGui.EndCombo();
+                }
+                if (ImGui.BeginCombo(T("Anspielbarkeit", "Availability"), options.EnvironmentAvailability is { } availability ? AvailabilityLabel(availability) : T("Alle", "All")))
+                {
+                    if (ImGui.Selectable(T("Alle", "All"), options.EnvironmentAvailability is null)) SetOptions(options with { EnvironmentAvailability = null });
+                    foreach (var value in Enum.GetValues<RpAvailability>())
+                        if (ImGui.Selectable(AvailabilityLabel(value), options.EnvironmentAvailability == value)) SetOptions(options with { EnvironmentAvailability = value });
+                    ImGui.EndCombo();
+                }
+                var hideEmpty = options.HideEmptyEnvironment;
+                if (ImGui.Checkbox(T("Leere Profile ausblenden", "Hide empty profiles"), ref hideEmpty))
+                    SetOptions(options with { HideEmptyEnvironment = hideEmpty });
+            }
+            finally { ImGui.EndPopup(); }
         }
-        if (ImGui.BeginCombo(T("Verfügbarkeitsfilter", "Availability filter"), options.EnvironmentAvailability is { } availability ? AvailabilityLabel(availability) : T("Alle", "All")))
-        {
-            if (ImGui.Selectable(T("Alle", "All"), options.EnvironmentAvailability is null)) SetOptions(options with { EnvironmentAvailability = null });
-            foreach (var value in Enum.GetValues<RpAvailability>())
-                if (ImGui.Selectable(AvailabilityLabel(value), options.EnvironmentAvailability == value)) SetOptions(options with { EnvironmentAvailability = value });
-            ImGui.EndCombo();
-        }
-        var hideEmpty = options.HideEmptyEnvironment;
-        if (ImGui.Checkbox(T("Profile ohne ausgefüllte RP-Informationen ausblenden", "Hide profiles without written RP information"), ref hideEmpty))
-            SetOptions(options with { HideEmptyEnvironment = hideEmpty });
         var filter = new EnvironmentFilter(options.EnvironmentStatus, options.EnvironmentAvailability, options.HideEmptyEnvironment);
-        Text(T("Sichtbare Spielcharaktere sind keine automatisch entdeckten FRP1-Clients. Unbekannte Personen werden nicht kontaktiert.", "Visible game characters are not automatically discovered FRP1 clients. Unknown players are never contacted."));
         var index = 0;
         foreach (var actor in ActorSnapshots.OrderBy(a => a.Distance).Take(128))
         {
             var view = resolver.Resolve(actor.Actor);
             if (view.State is ProfilePresentationState.Restricted or ProfilePresentationState.Blocked or ProfilePresentationState.Muted or ProfilePresentationState.Ambiguous ||
-                (known && !view.IsReadable) || !MatchesEnvironmentFilter(view, filter)) continue;
+                (options.OnlyKnownEnvironment && !view.IsReadable) || !MatchesEnvironmentFilter(view, filter)) continue;
             ImGui.PushID(index++);
-            ImGui.TextUnformatted(view.IsReadable ? view.DisplayName : actor.Actor.Name);
-            if (float.IsFinite(actor.Distance)) { ImGui.SameLine(); ImGui.TextUnformatted(actor.Distance.ToString("0.0") + " m"); }
-            if (view.IsReadable && view.Key is { } key)
-            {
-                if (ImGui.Button(T("Profil öffnen", "Open profile"))) Open(key);
-                ImGui.SameLine();
-            }
-            else Text(T("Kein bekanntes RP-Profil", "No known RP profile"));
-            if (ImGui.Button(T("Spielcharakter anvisieren", "Target game character")))
+            var key = view.Key;
+            var name = view.IsReadable ? view.DisplayName : actor.Actor.Name;
+            ImGui.BeginDisabled(key is null);
+            if (ImGui.SmallButton(T("Profil", "Profile")) && key is { } currentKey) Open(currentKey);
+            ImGui.EndDisabled();
+            ImGui.SameLine();
+            if (ImGui.SmallButton(T("Ziel", "Target")))
             {
                 var current = objects.OfType<Dalamud.Game.ClientState.Objects.SubKinds.IPlayerCharacter>().FirstOrDefault(p =>
                     p.EntityId == actor.Actor.LocalEntityId && p.HomeWorld.RowId == actor.Actor.HomeWorldId && p.Name.TextValue == actor.Actor.Name);
                 if (current is not null) targets.Target = current;
             }
+            ImGui.SameLine();
+            if (key is null || (view.IsReadable && view.Key == key))
+                Text(name + (float.IsFinite(actor.Distance) ? " · " + actor.Distance.ToString("0.0") + " m" : ""));
             ImGui.PopID();
         }
+        if (index == 0) Text(T("Keine passenden Charaktere in der Nähe.", "No matching characters nearby."));
     }
 
     private bool MatchesEnvironmentFilter(ResolvedProfile view, EnvironmentFilter filter)

@@ -1,4 +1,4 @@
-using System.Numerics;
+﻿using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Windowing;
 using FRP1.Core.Profiles;
@@ -148,46 +148,76 @@ public sealed class LocalToolsModule : IDisposable
 
     public void DrawSettings()
     {
+        DrawLanguageSettings();
+        if (ImGui.CollapsingHeader(T("Automation.Title"))) DrawAutomationSettings();
+        if (ImGui.Button(T("Tools.Title"))) ShowTools();
+        DrawFeedback();
+    }
+
+    public void DrawLanguageSettings()
+    {
         ImGui.TextUnformatted(T("Language.Title"));
+        ItemHelp(T("Language.Help"));
         if (ImGui.RadioButton("Deutsch##LocalLanguage", Language == UiLanguage.German)) SetLanguage(UiLanguage.German);
         ImGui.SameLine();
         if (ImGui.RadioButton("English##LocalLanguage", Language == UiLanguage.English)) SetLanguage(UiLanguage.English);
-        ImGui.TextWrapped(T("Language.Help"));
         if (language.ErrorMessage is { } languageError)
         {
             ImGui.TextWrapped(languageError);
             if (ImGui.Button(T("Common.Retry") + "##Language")) language.Retry();
         }
-        ImGui.Separator();
-        ImGui.TextUnformatted(T("Automation.Title"));
-        ImGui.TextWrapped(T("Automation.Help"));
+    }
+
+    private void DrawAutomationSettings()
+    {
         if (!HasAccess) { ImGui.TextWrapped(T("Safety.Required")); return; }
         var current = preferences.Value;
         var enabled = current.Enabled;
         if (ImGui.Checkbox(T("Automation.Enable"), ref enabled)) SetPreferences(current with { Enabled = enabled });
+        ItemHelp(T("Automation.Help"));
         var combat = preferences.Value.HideOverlaysInCombat;
         if (ImGui.Checkbox(T("Automation.HideCombat"), ref combat)) SetPreferences(preferences.Value with { HideOverlaysInCombat = combat });
         var duty = preferences.Value.HideOverlaysInDuty;
         if (ImGui.Checkbox(T("Automation.HideDuty"), ref duty)) SetPreferences(preferences.Value with { HideOverlaysInDuty = duty });
-        ImGui.TextWrapped(T("Automation.HideHelp"));
+        ItemHelp(T("Automation.HideHelp"));
         if (preferences.ErrorKey is { } key)
         {
             ImGui.TextWrapped(T(key));
             if (ImGui.Button(T("Common.Retry") + "##Automation")) preferences.Retry();
         }
         DrawRules();
-        if (ImGui.Button(T("Tools.Title"))) ShowTools();
-        DrawFeedback();
     }
 
     public void DrawToolsPanel()
     {
         if (!HasAccess) { ImGui.TextWrapped(T("Safety.Required")); return; }
-        ImGui.TextWrapped(T("Tools.Help"));
-        ImGui.Separator();
-        ImGui.TextUnformatted(T("Reference.Title"));
-        ImGui.TextWrapped(T("Reference.Help"));
+        if (!ImGui.BeginTabBar("##local-tool-areas")) return;
+        try
+        {
+            if (ImGui.BeginTabItem(Language == UiLanguage.English ? "Draft" : "Entwurf"))
+            {
+                try { DrawTextDraft(); }
+                finally { ImGui.EndTabItem(); }
+            }
+            if (ImGui.BeginTabItem(Language == UiLanguage.English ? "Profile link" : "Profilverweis"))
+            {
+                try { DrawProfileReference(); }
+                finally { ImGui.EndTabItem(); }
+            }
+            if (ImGui.BeginTabItem(Language == UiLanguage.English ? "Automation" : "Automationen"))
+            {
+                try { DrawAutomationSettings(); }
+                finally { ImGui.EndTabItem(); }
+            }
+        }
+        finally { ImGui.EndTabBar(); }
+        DrawFeedback();
+    }
+
+    private void DrawProfileReference()
+    {
         ImGui.InputText(T("Reference.Input"), ref referenceText, 2048);
+        ItemHelp(T("Reference.Help"));
         if (ImGui.Button(T("Common.Open") + "##Reference"))
         {
             if (!ProfileReference.TryParse(referenceText, out var reference)) feedbackKey = "Reference.Invalid";
@@ -204,38 +234,39 @@ public sealed class LocalToolsModule : IDisposable
             { ImGui.SetClipboardText(reference!.Format()); feedbackKey = "Reference.Copied"; }
             else feedbackKey = "Reference.Invalid";
         }
-        ImGui.Separator();
-        ImGui.TextUnformatted(T("Draft.Title"));
-        ImGui.TextWrapped(T("Draft.Help"));
+    }
+
+    private void DrawTextDraft()
+    {
         ImGui.InputText(T("Common.Name") + "##Draft", ref draftName, 321);
         ImGui.InputTextMultiline(T("Draft.Text"), ref draftText, 8193, new Vector2(-1, 140));
+        ItemHelp(T("Draft.Help"));
         if (ImGui.RadioButton(T("Draft.Speech"), draftTemplate == RpTextTemplate.Speech)) draftTemplate = RpTextTemplate.Speech;
         ImGui.SameLine();
         if (ImGui.RadioButton(T("Draft.Emote"), draftTemplate == RpTextTemplate.Emote)) draftTemplate = RpTextTemplate.Emote;
         try
         {
             var preview = new RpTextDraft(draftName, draftText, draftTemplate).Preview();
-            ImGui.TextUnformatted(T("Common.Preview"));
-            ImGui.TextWrapped(preview);
+            if (ImGui.CollapsingHeader(T("Common.Preview"))) ImGui.TextWrapped(preview);
             if (ImGui.Button(T("Common.Copy") + "##Draft")) { ImGui.SetClipboardText(preview); feedbackKey = "Draft.Copied"; }
         }
         catch (InvalidDataException) { ImGui.TextWrapped(T("Draft.Invalid")); }
-        DrawFeedback();
     }
 
     private void DrawRules()
     {
         ImGui.TextUnformatted(T("Automation.RuleLimit"));
+        ItemHelp(T("Automation.Help"));
         foreach (var rule in preferences.Value.Rules.ToArray())
         {
             ImGui.PushID(rule.Id.ToString("N"));
             try
             {
-                ImGui.TextUnformatted(rule.Name + " · " + T("Trigger." + rule.Trigger));
-                if (ImGui.Button(T("Common.Edit"))) { ruleDraft = rule; editingRule = true; }
+                if (ImGui.SmallButton(T("Common.Edit"))) { ruleDraft = rule; editingRule = true; }
                 ImGui.SameLine();
-                if (ImGui.Button(T("Common.Remove")))
+                if (ImGui.SmallButton(T("Common.Remove")))
                     SetPreferences(preferences.Value with { Rules = Array.AsReadOnly(preferences.Value.Rules.Where(item => item.Id != rule.Id).ToArray()) });
+                ImGui.SameLine(); ImGui.TextUnformatted(rule.Name + " · " + T("Trigger." + rule.Trigger));
             }
             finally { ImGui.PopID(); }
         }
@@ -314,6 +345,14 @@ public sealed class LocalToolsModule : IDisposable
         (profile.ContentRating == ContentRating.General || audience?.AcceptsMatureContent == true);
     private string T(string key) => UiText.Get(key, Language);
     private void DrawFeedback() { if (Feedback is { } message) ImGui.TextWrapped(message); }
+    private static void ItemHelp(string text)
+    {
+        if (!ImGui.IsItemHovered() && !ImGui.IsItemFocused()) return;
+        ImGui.BeginTooltip();
+        try { ImGui.PushTextWrapPos(ImGui.GetFontSize() * 26); ImGui.TextUnformatted(text); ImGui.PopTextWrapPos(); }
+        finally { ImGui.EndTooltip(); }
+    }
+
 
     public void Dispose()
     {

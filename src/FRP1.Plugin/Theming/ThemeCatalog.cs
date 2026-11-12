@@ -25,23 +25,19 @@ public readonly record struct ThemeDefinition(
 
 public static class ThemeCatalog
 {
-    // Original FRP1 palettes. Race IDs are local game-sheet row IDs, not profile text.
+    // Legacy IDs stay readable; their automatic variants share the quiet default palette.
     private static readonly ReadOnlyCollection<ThemeDefinition> Themes = Array.AsReadOnly(new[]
     {
-        Dark("hyur", "Hyur · Schiefer und Bronze", 1, 0x141C27, 0x1E2938, 0xF4F1E9, 0xC2C9D2, 0xD5AF79, 0x6C829A),
-        Dark("elezen", "Elezen · Blaugrau und Silber", 2, 0x151D28, 0x233043, 0xF0F3F8, 0xC5D0DF, 0xC9D7EE, 0x6D86A7, 4f),
-        Dark("lalafell", "Lalafell · Honig und Creme", 3, 0x251B15, 0x35281E, 0xFFF4DD, 0xD9CAB4, 0xEFCA79, 0xA5875F, 10f),
-        Dark("miqote", "Miqo’te · Pflaume und Roségold", 4, 0x231725, 0x352338, 0xFBEDF4, 0xD7BFD0, 0xE4B2AA, 0x9B738E, 9f),
-        Dark("roegadyn", "Roegadyn · Petrol und Kupfer", 5, 0x101E23, 0x193239, 0xEEF6F2, 0xBDD2D0, 0xE0AE8B, 0x688E91, 3f),
-        Dark("aura", "Au Ra · Tinte und Jade", 6, 0x101B2B, 0x1C2B40, 0xF8F1DD, 0xC7D1CF, 0x9CD9C1, 0x688C9A, 5f),
-        Dark("hrothgar", "Hrothgar · Anthrazit und Bernstein", 7, 0x1A1A1D, 0x2B2A2D, 0xF8F1E5, 0xCFC6B9, 0xF1C16B, 0x96846B, 3f),
-        Dark("viera", "Viera · Moos und Violett", 8, 0x172018, 0x263329, 0xF4F2DF, 0xC9D4C0, 0xD1BFEA, 0x789879, 9f),
-        Dark("obsidian", "Obsidian", null, 0x17191E, 0x252931, 0xF1F3F7, 0xC5CBD5, 0xCCD4E2, 0x7C879B, 6f),
+        Legacy("hyur", "Hyur", 1), Legacy("elezen", "Elezen", 2),
+        Legacy("lalafell", "Lalafell", 3), Legacy("miqote", "Miqo’te", 4),
+        Legacy("roegadyn", "Roegadyn", 5), Legacy("aura", "Au Ra", 6),
+        Legacy("hrothgar", "Hrothgar", 7), Legacy("viera", "Viera", 8),
+        Dark("obsidian", "Obsidian", null, 0x15171B, 0x1D2026, 0xEDF0F4, 0xB7BEC9, 0xA5B8D3, 0x3C424C, 4f),
         new ThemeDefinition("pergament", "Pergament", null, new ThemePalette(
             Color(0xF2E7D1), Color(0xFFF5E2), Color(0x302A24), Color(0x534536),
-            Color(0x704427), Color(0x9B8266), Color(0x744D2B), Color(0xFBF1DC),
-            Color(0xE4D3B5), Color(0xD7C39F), Color(0xCCB58D)), 5f),
-        Dark("mondlicht", "Mondlicht", null, 0x111A2D, 0x1C2A44, 0xEDF3FF, 0xBCCBE5, 0xB6D0FC, 0x748CB7, 8f),
+            Color(0x704427), Color(0xC8B79C), Color(0x744D2B), Color(0xFBF1DC),
+            Color(0xE4D3B5), Color(0xE2D4BB), Color(0xD5C3A5)), 4f),
+        Dark("mondlicht", "Nachtblau", null, 0x101823, 0x172332, 0xEDF3FF, 0xB8C9E0, 0x91B7D8, 0x34465A, 4f),
     });
 
     public static IReadOnlyList<ThemeDefinition> All => Themes;
@@ -77,6 +73,9 @@ public static class ThemeCatalog
         _ = Get(preferences.ManualThemeId);
     }
 
+    private static ThemeDefinition Legacy(string id, string name, uint raceId) =>
+        Dark(id, name, raceId, 0x15171B, 0x1D2026, 0xEDF0F4, 0xB7BEC9, 0xA5B8D3, 0x3C424C, 4f);
+
     private static ThemeDefinition Dark(string id, string name, uint? raceId, uint background, uint panel,
         uint text, uint muted, uint accent, uint border, float rounding = 7f)
     {
@@ -84,7 +83,7 @@ public static class ThemeCatalog
         return new ThemeDefinition(id, name, raceId, new ThemePalette(
             Color(background), panelColor, Color(text), Color(muted), Color(accent), Color(border),
             Color(accent), Color(background), panelColor,
-            Blend(panelColor, Color(accent), 0.12f), Blend(panelColor, Color(accent), 0.20f)), rounding);
+            Blend(panelColor, Color(accent), 0.10f), Blend(panelColor, Color(accent), 0.18f)), rounding);
     }
 
     private static Vector4 Color(uint rgb) => new(((rgb >> 16) & 255) / 255f, ((rgb >> 8) & 255) / 255f, (rgb & 255) / 255f, 1f);

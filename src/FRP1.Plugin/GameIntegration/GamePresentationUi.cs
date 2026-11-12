@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using Dalamud.Bindings.ImGui;
 using FRP1.Plugin.Localization;
 using Lumina.Excel.Sheets;
@@ -11,11 +11,7 @@ public sealed partial class GamePresentationModule
     public void DrawSettings()
     {
         if (Volatile.Read(ref disposed) != 0) return;
-        ImGui.TextWrapped(T("Lokale Spielanzeige", "Local game presentation"));
-        ImGui.TextWrapped(T("Standardmäßig aus. Nur bekannte, von dir zugeordnete und aktuell erlaubte Profile ersetzen Namen. " +
-            "Die Zuordnung ist keine Verifikation eines Spielkontos.",
-            "Off by default. Only known, explicitly assigned and currently permitted profiles replace names. " +
-            "Your assignment does not verify a game account."));
+        ImGui.TextUnformatted(T("Nur lokal · standardmäßig aus", "Local only · off by default"));
         var names = options.Nameplates;
         if (ImGui.Checkbox(T("RP-Namen über Charakteren##gameNames", "RP names on nameplates##gameNames"), ref names))
             SetOptions(options with { Nameplates = names });
@@ -33,11 +29,21 @@ public sealed partial class GamePresentationModule
         var chatNames = options.ChatNames;
         if (ImGui.Checkbox(T("RP-Namen im lokalen Chat anzeigen##gameChat", "Show RP names in local chat##gameChat"), ref chatNames))
             SetOptions(options with { ChatNames = chatNames });
-        ImGui.TextWrapped(T("Im Chat werden ausschließlich Namen jugendfreier Profile ersetzt. Namen aus Ab-18-Profilen bleiben unverändert, " +
-            "weil gedruckte Chatgeschichte bei Widerruf oder Sperren nicht rückwirkend zuverlässig bereinigt werden kann. " +
-            "Chattext, echtes Klickziel und Spielschriften bleiben erhalten.",
-            "Chat names are replaced only for general-audience profiles. Names from mature profiles remain unchanged because printed chat history " +
-            "cannot reliably be cleaned up after withdrawal or blocking. Message text, real player links and game fonts stay intact."));
+        if (ImGui.IsItemHovered() || ImGui.IsItemFocused())
+        {
+            ImGui.BeginTooltip(); ImGui.PushTextWrapPos(ImGui.GetFontSize() * 26);
+            ImGui.TextWrapped(T("Im Chat werden ausschließlich Namen jugendfreier Profile ersetzt. Namen aus Ab-18-Profilen bleiben unverändert, " +
+                "weil gedruckte Chatgeschichte bei Widerruf oder Sperren nicht rückwirkend zuverlässig bereinigt werden kann. " +
+                "Chattext, echtes Klickziel und Spielschriften bleiben erhalten.",
+                "Chat names are replaced only for general-audience profiles. Names from mature profiles remain unchanged because printed chat history " +
+                "cannot reliably be cleaned up after withdrawal or blocking. Message text, real player links and game fonts stay intact."));
+            ImGui.PopTextWrapPos(); ImGui.EndTooltip();
+        }
+        if (ImGui.CollapsingHeader(T("Hinweise zur Spielanzeige", "Game presentation notes")))
+        {
+            ImGui.TextWrapped(T("Nur bekannte, von dir zugeordnete und aktuell erlaubte Profile ersetzen Namen. Eine Zuordnung verifiziert kein Spielkonto. Chatnamen werden nur für jugendfreie Profile ersetzt.",
+                "Only known, explicitly assigned and currently permitted profiles replace names. An assignment does not verify a game account. Chat names use general-audience profiles only."));
+        }
         if (load is not null) ImGui.TextUnformatted(T("Einstellungen werden geladen …", "Loading settings …"));
         if (loadFailed || saveFailed)
         {
@@ -52,11 +58,13 @@ public sealed partial class GamePresentationModule
     public void DrawMapPanel()
     {
         if (Volatile.Read(ref disposed) != 0) return;
-        ImGui.TextWrapped(T("Bekannte Charaktere in deiner Nähe", "Known characters nearby"));
-        ImGui.TextWrapped(T("Nur aktuell lokal sichtbare, zugeordnete Profile. Eine Kartenmarkierung wird ausschließlich durch deinen Klick geöffnet. " +
-            "Positionen werden nicht übertragen. Dies ist keine globale Spielerliste.",
-            "Only currently visible, assigned profiles. A map marker opens only when you click. " +
-            "Positions are never transmitted. This is not a global player list."));
+        ImGui.TextUnformatted(T("Bekannte Charaktere in der Nähe", "Known characters nearby"));
+        if (ImGui.IsItemHovered() || ImGui.IsItemFocused())
+        {
+            ImGui.BeginTooltip(); ImGui.PushTextWrapPos(ImGui.GetFontSize() * 26);
+            ImGui.TextUnformatted(T("Nur lokal sichtbare, zugeordnete Profile. Positionen bleiben lokal; die Karte öffnet sich erst beim Anklicken.", "Only locally visible, assigned profiles. Positions stay local; the map opens when clicked."));
+            ImGui.PopTextWrapPos(); ImGui.EndTooltip();
+        }
         var snapshot = Volatile.Read(ref published);
         if (snapshot is null || !CanUse(snapshot) || snapshot.Entries.Count == 0)
         {
@@ -81,14 +89,9 @@ public sealed partial class GamePresentationModule
         {
             if (!CanUse(snapshot)) break;
             ImGui.PushID(index++);
-            ImGui.TextUnformatted(entry.RpName);
-            ImGui.SameLine();
-            ImGui.TextUnformatted(entry.Distance.ToString("0.0", CultureInfo.CurrentCulture) + " m");
             if (GameDisplayRules.TryMapCoordinates(entry.Position, map.Value.SizeFactor, map.Value.OffsetX, map.Value.OffsetY, out var position))
             {
-                ImGui.SameLine();
-                ImGui.TextUnformatted(string.Format(CultureInfo.CurrentCulture, "({0:0.0}, {1:0.0})", position.X, position.Y));
-                if (ImGui.Button(T("Auf Karte zeigen", "Show on map")) && CanUse(snapshot))
+                if (ImGui.SmallButton(T("Karte", "Map")) && CanUse(snapshot))
                 {
                     try
                     {
@@ -99,7 +102,16 @@ public sealed partial class GamePresentationModule
                     }
                     catch (Exception ex) when (Expected(ex)) { mapFailed = true; }
                 }
+                if ((ImGui.IsItemHovered() || ImGui.IsItemFocused()) && CanUse(snapshot))
+                {
+                    ImGui.BeginTooltip();
+                    ImGui.TextUnformatted(string.Format(CultureInfo.CurrentCulture, "({0:0.0}, {1:0.0})", position.X, position.Y));
+                    ImGui.EndTooltip();
+                }
             }
+            else ImGui.TextUnformatted("—");
+            ImGui.SameLine();
+            if (CanUse(snapshot)) ImGui.TextUnformatted(entry.RpName + " · " + entry.Distance.ToString("0.0", CultureInfo.CurrentCulture) + " m");
             ImGui.Separator(); ImGui.PopID();
         }
         ImGui.EndChild();

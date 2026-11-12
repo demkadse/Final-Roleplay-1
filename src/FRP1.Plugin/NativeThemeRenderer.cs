@@ -55,13 +55,15 @@ internal static class NativeThemeRenderer
             scope.Color(ImGuiCol.TextSelectedBg, palette.Selected);
             scope.Variable(ImGuiStyleVar.WindowRounding, theme.Rounding);
             scope.Variable(ImGuiStyleVar.WindowBorderSize, 1f);
-            scope.Variable(ImGuiStyleVar.FrameRounding, MathF.Max(2f, theme.Rounding - 2f));
-            scope.Variable(ImGuiStyleVar.FrameBorderSize, 1f);
+            scope.Variable(ImGuiStyleVar.FrameRounding, 3f);
+            scope.Variable(ImGuiStyleVar.FrameBorderSize, 0f);
             scope.Variable(ImGuiStyleVar.TabRounding, theme.Rounding);
             scope.Variable(ImGuiStyleVar.PopupRounding, theme.Rounding);
-            scope.Variable(ImGuiStyleVar.WindowPadding, new Vector2(reduceDecoration ? 16 : 23, 18));
-            scope.Variable(ImGuiStyleVar.FramePadding, new Vector2(10, 6));
-            scope.Variable(ImGuiStyleVar.ItemSpacing, new Vector2(10, 10));
+            scope.Variable(ImGuiStyleVar.WindowPadding, new Vector2(9, 8));
+            scope.Variable(ImGuiStyleVar.FramePadding, new Vector2(7, 3));
+            scope.Variable(ImGuiStyleVar.ItemSpacing, new Vector2(6, 5));
+            scope.Variable(ImGuiStyleVar.CellPadding, new Vector2(0, 2));
+            scope.Variable(ImGuiStyleVar.ScrollbarSize, 10f);
             return scope;
         }
         catch { scope.Dispose(); throw; }
@@ -69,26 +71,14 @@ internal static class NativeThemeRenderer
 
     public static void DrawInterior(ThemeDefinition theme, bool reduceDecoration)
     {
+        if (reduceDecoration) return;
         var draw = ImGui.GetWindowDrawList();
         var position = ImGui.GetWindowPos();
         var size = ImGui.GetWindowSize();
-        var minimum = position + new Vector2(8, 30);
-        var maximum = position + size - new Vector2(8, 8);
-        if (maximum.X <= minimum.X || maximum.Y <= minimum.Y) return;
-        draw.PushClipRect(minimum, maximum, true);
-        try
-        {
-            var border = ImGui.ColorConvertFloat4ToU32(theme.Palette.Border);
-            var accent = ImGui.ColorConvertFloat4ToU32(theme.Palette.Accent);
-            draw.AddRect(minimum, maximum, border, MathF.Max(0, theme.Rounding - 2));
-            if (reduceDecoration) return;
-            var length = MathF.Min(16f, MathF.Min(size.X, size.Y) / 12f);
-            draw.AddLine(minimum, minimum + new Vector2(length, 0), accent);
-            draw.AddLine(minimum, minimum + new Vector2(0, length), accent);
-            draw.AddLine(maximum, maximum - new Vector2(length, 0), accent);
-            draw.AddLine(maximum, maximum - new Vector2(0, length), accent);
-        }
-        finally { draw.PopClipRect(); }
+        if (size.X < 20) return;
+        var start = position + new Vector2(9, size.Y - 1);
+        draw.AddLine(start, start + new Vector2(MathF.Min(36, size.X - 18), 0),
+            ImGui.ColorConvertFloat4ToU32(theme.Palette.Accent));
     }
 
     private sealed class StyleScope : IDisposable
