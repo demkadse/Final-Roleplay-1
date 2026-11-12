@@ -3,6 +3,8 @@
 param(
     [string] $InputZip = (Join-Path $PSScriptRoot '..\..\src\FRP1.Plugin\bin\Release\FRP1.Plugin\latest.zip'),
     [string] $NuGetPackageRoot = (Join-Path $env:USERPROFILE '.nuget\packages'),
+    [string] $Version,
+    [string] $Tag,
     [long] $LastUpdateUnix = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds(),
     [switch] $KeepArtifacts
 )
@@ -13,13 +15,23 @@ $projectRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))
 $prepareScript = Join-Path $projectRoot 'tools\Publish\New-ReleasePackage.ps1'
 $validateScript = Join-Path $projectRoot 'tools\Publish\Test-ReleasePackage.ps1'
 $inputPath = (Resolve-Path -LiteralPath $InputZip).Path
+if ([string]::IsNullOrWhiteSpace($Version)) {
+    $sourceArchive = [IO.Compression.ZipFile]::OpenRead($inputPath)
+    try {
+        $sourceManifest = $sourceArchive.GetEntry('FRP1.Plugin.json')
+        if ($null -eq $sourceManifest) { throw 'The input archive has no plugin manifest for version inference.' }
+        $reader = [IO.StreamReader]::new($sourceManifest.Open())
+        try { $Version = ($reader.ReadToEnd() | ConvertFrom-Json).AssemblyVersion }
+        finally { $reader.Dispose() }
+    }
+    finally { $sourceArchive.Dispose() }
+}
+if ([string]::IsNullOrWhiteSpace($Tag)) { $Tag = 'v' + $Version }
 $runId = [Guid]::NewGuid().ToString('N')
 $fixtureRoot = Join-Path $PSScriptRoot ('bin\package-tests-' + $runId)
 $stageRoot = Join-Path $projectRoot ('.release-staging\package-tests-' + $runId)
-$version = '0.1.0.0'
-$tag = 'v0.1.0.0'
 $repository = 'demkadse/Final-Roleplay-1'
-$assetName = 'FRP1-0.1.0.0.zip'
+$assetName = 'FRP1-' + $Version + '.zip'
 $script:passed = 0
 $script:failed = 0
 $script:stageNumber = 0

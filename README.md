@@ -4,9 +4,9 @@
 
 FRP1 ist ein Dalamud-Plugin für Charakterbeschreibungen, erste Eindrücke, RP-Status und Kontakte. Es orientiert sich beim Bedienkonzept an Total RP 3 und übernimmt die lokal beziehungsweise direkt zwischen Clients umsetzbaren Funktionen von Glance in einer eigenen FFXIV-Oberfläche.
 
-**Stand: 2026-11-11 – veröffentlicht als früher öffentlicher Teststand 0.1.0.0 (Prerelease).** Repository, MIT-Lizenz, Installerindex und Releasepaket sind öffentlich verfügbar. Der geprüfte Code besteht 467 Tests, Release-Build und unabhängiges Review; zusätzlich bestehen 33 Offline-Paketprüfungen. Eine tatsächliche Spielabnahme und reale LAN-/Internet-/NAT-Abnahme sind noch nicht erfolgt.
+**Stand: 2026-11-12 – veröffentlicht als früher öffentlicher Teststand 0.1.0.0 (Prerelease).** Repository, MIT-Lizenz, Installerindex und Releasepaket sind öffentlich verfügbar. Der geprüfte Code besteht 467 Tests, Release-Build und unabhängiges Review; zusätzlich bestehen 33 Offline-Paketprüfungen. Eine tatsächliche Spielabnahme und reale LAN-/Internet-/NAT-Abnahme sind noch nicht erfolgt.
 
-**Zusätzlicher lokaler UX-Stand:** Die nachfolgend beschriebene neue Fünf-Bereiche-Oberfläche und das MiniHUD sind ausschließlich im Arbeitsverzeichnis überarbeitet, **nicht committed und nicht gepusht**. Sie bestehen den Release-Build ohne Warnungen/Fehler, 500/500 Funktionstests und unabhängiges Review. Das öffentliche ZIP 0.1.0.0 und der öffentliche Installerindex sind unverändert; die Installation über die untenstehende JSON-Adresse enthält diese UX-Änderungen noch nicht. Commit und Push übernimmt der Nutzer.
+**Neuerer UX-Quellstand:** Fünf-Bereiche-Oberfläche und MiniHUD sind inzwischen im Nutzercommit `62a91a7` („rework“) enthalten. Der geprüfte UX-Stand besteht 500/500 Funktionstests, Release-Build und unabhängiges Review, ist aber noch nicht als Installerupdate ausgeliefert. Öffentliches ZIP/Index 0.1.0.0 bleiben bis zu einer erfolgreichen neuen Veröffentlichung unverändert. Die neue Releaseautomatik wird zunächst nur lokal vorbereitet; Commit und Push ihrer Einrichtung übernimmt der Nutzer.
 
 ## Kein zentraler Server für deine Profile
 
@@ -89,7 +89,7 @@ Portraits werden lokal zu metadatenfreien PNG-Miniaturen bis 256 × 256 und 12 K
 
 Die RP-Präferenzen beschreiben Gesprächs- und Spielwünsche. Sie sind keine Zustimmung zu Handlungen und kein Altersnachweis.
 
-## Neue lokale Bedienung – noch nicht im Installer
+## Neuerer UX-Quellstand – noch nicht im Installer
 
 Editor und Leser verwenden jetzt genau fünf gleichrangige Bereiche: **RP-Status und Kurzprofil**, **OOC Informationen**, **Auf den ersten Blick**, **Weitere Charakterdaten**, **RP-Erfahrung und Absprachen**. Ein kleiner Kopf enthält Name, Titel, Portrait, Icon und Inhaltskennzeichnung; darunter steht ein Inhaltsbereich statt einer zweispaltigen Vorschau. Gestaltung öffnet sich am Kopf, JSON-Funktionen unter Profilaktionen.
 
@@ -99,7 +99,7 @@ Vorhandene Hooks, freie Zusatzfelder, Traits und Begleiter bleiben unter **Weite
 
 Glance-Inhalte öffnen sich beim Darüberfahren oder Tastaturfokus vollständig in einer scrollbaren Karte – auch bei ausgeschalteten Hilfen. Ein kurzer Mausübergang zur Karte ist möglich; Klick kann sie anheften. Kontext-/Freigabewechsel verwirft sie. Profilwahl, Einstellungen und Hilfe liegen im Kontextmenü; Einklappen speichert einen kleinen Wiederöffner. Beschriftete **? Hilfe: Titel** beziehungsweise **? Hilfe** stehen direkt bei ihrem Feld. Die große Zusatz-Zielkarte bleibt bei neuen Einstellungen zunächst aus und wird bei Bedarf bewusst geöffnet; bestehende gespeicherte Sichtbarkeit bleibt erhalten.
 
-Die ausführliche lokale Kurzanleitung steht in [Handbuch, Abschnitt 17](docs/benutzerhandbuch.md). Für ein späteres Installerupdate sind neue Versionsnummer, Releasepaket und Index nötig; das veröffentlichte 0.1.0.0 wird nicht überschrieben.
+Die Kurzanleitung steht in [Handbuch, Abschnitt 17](docs/benutzerhandbuch.md). Der vorhandene Sourcecommit allein ersetzt noch kein Installerpaket. Die unten beschriebene Automatik wird erst nach Nutzercommit/-push ihrer Einrichtung wirksam und erzeugt danach neue Version/Paket/Index; das veröffentlichte 0.1.0.0 wird nicht überschrieben.
 
 ## Wie zwei Spieler Profile austauschen
 
@@ -135,6 +135,14 @@ Bei Widerruf werden Verbindungen geschlossen und gesperrte Ansichten entfernt. B
 Chatnamensersetzung verwendet ausschließlich allgemein gekennzeichnete Profile, weil bereits ausgegebener Chat nicht zuverlässig zurückgenommen werden kann. Mature-Namen bleiben auch bei Erwachsenenfreigabe aus diesem bleibenden Chat ausgeschlossen.
 
 ## Updates, Prüfung und Entwicklungsstand
+
+### Vorbereitete Releaseautomatik für eigene Master-Pushes
+
+Die neue GitHub-Actions-Einrichtung liegt zunächst nur lokal. **Vor dem Nutzercommit/-push gibt es dadurch noch keinen neuen gehosteten Lauf und kein automatisches Installerupdate.** Danach sollen relevante Quellcode-, Build-, Test-, Workflow- oder Lizenzänderungen auf `master` Build, Tests, Paketprüfung und Veröffentlichung starten. Reine Dokumentations-/Indexänderungen erzeugen keine Releaseschleife; ein bewusster manueller Start ist auf `master` möglich.
+
+Die CI-Version entsteht aus Basis `0.1.1` und Laufnummer minus eins als vierter Komponente: Lauf 1 verwendet `0.1.1.0`, Lauf 2 `0.1.1.1`. Erst nach erfolgreicher Veröffentlichung und anonymer Paket-/Hashprüfung schreibt ein Bot ausschließlich den erzeugten `repo.json`-Index zurück. Die Installeradresse bleibt unverändert. Es wird nur das integrierte `GITHUB_TOKEN` benötigt, kein zusätzliches PAT, Profilserver oder Nutzerkonto.
+
+Die Einrichtung besteht lokal den Build gegen das frisch verifizierte API-15-SDK, 500/500 Funktionstests, 33/33 Paketprüfungen und 101/101 zusätzliche CI-Prüfungen. Die statische Workflowprüfung mit actionlint ist ohne Befund; das unabhängige Review ist ohne kritische oder wichtige Restbefunde freigegeben. Ein echter gehosteter Lauf ist erst nach dem Nutzerpush prüfbar. Für Ablauf, Schutz vor alten Läufen/Wiederholungen, Actions-Fehlersuche und Branchabgleich nach einem Botcommit siehe [Releaseautomatik](docs/auto-release.md).
 
 Softwareupdates laufen über den normalen Dalamud-Installer und die Repositoryadresse; FRP1 betreibt keinen eigenen automatischen Updater und keinen Profilserver. Profiländerungen zwischen bereits verbundenen freigegebenen Peers sind davon unabhängig.
 

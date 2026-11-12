@@ -1,6 +1,9 @@
 <Project Sdk="Dalamud.NET.Sdk/15.0.0">
   <PropertyGroup>
-    <Version>0.1.0</Version>
+    <Frp1Version Condition="'$(Frp1Version)' == ''">0.1.1.0</Frp1Version>
+    <Version>$(Frp1Version)</Version>
+    <AssemblyVersion>$(Frp1Version)</AssemblyVersion>
+    <FileVersion>$(Frp1Version)</FileVersion>
     <Author>FRP1 Contributors</Author>
     <Name>Final Roleplay 1</Name>
     <Punchline>Lokale Rollenspielprofile für FFXIV.</Punchline>

@@ -2,7 +2,7 @@
 
 Stand: 2026-11-11. Die bisher beschriebenen Folgepakete sind im nativen Plugin integriert. Abschließender Release-Build, 467 Tests und unabhängiges Review sind bestanden; die Spielabnahme bleibt offen.
 
-Diese Matrix beschreibt das **veröffentlichte 0.1.0.0**. Eine weitere lokale UX mit fünf Bereichen, reduziertem MiniHUD und feldnahen Hilfen besteht inzwischen 500 Tests, ist aber uncommitted/unpushed und nicht im Installer. Dort werden vorhandene Hooks/Extras/Traits/Begleiter erhalten und gezielt entfernt, ohne neue Baukästen anzubieten. Aktueller Unterschied: [UX](ux-and-vanity.md) und [Status](../STATUS.md).
+Diese Matrix beschreibt das **veröffentlichte 0.1.0.0**. Die neuere UX mit fünf Bereichen, MiniHUD und feldnahen Hilfen besteht 500 Tests und ist im Nutzercommit 62a91a7 enthalten, aber noch nicht im Installer. Die Releaseautomatik ist zunächst lokal vorbereitet und wird erst durch den Nutzer eingeführt. Zusatzinhalte bleiben erhalten/gezielt entfernbar, ohne neue Baukästen. Unterschiede: [UX](ux-and-vanity.md), [Status](../STATUS.md).
 
 Referenzen: [Glance](https://rphub.co/glance), [offizielles Repository](https://github.com/rphubco/glance), [Profilmodelle](https://raw.githubusercontent.com/rphubco/glance/master/Models/ProfileModels.cs), [Editor](https://raw.githubusercontent.com/rphubco/glance/master/UI/Components/ProfileEditor.cs), [Einstellungen](https://raw.githubusercontent.com/rphubco/glance/master/UI/Windows/Tabs/SettingsTab.cs), [Profiltab](https://raw.githubusercontent.com/rphubco/glance/master/UI/Windows/Tabs/ProfileTab.cs), [Toolbox](https://raw.githubusercontent.com/rphubco/glance/master/UI/Windows/ToolboxWindow.cs). Eigene Implementierung; keine Übernahme des AGPL-3.0-Quellcodes.
 

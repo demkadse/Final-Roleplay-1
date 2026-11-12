@@ -87,7 +87,8 @@ function ConvertTo-Frp1CanonicalText([byte[]]$Bytes) {
 }
 
 function Assert-Frp1Parameters([string]$Version, [string]$Tag, [string]$Repository, [long]$LastUpdateUnix) {
-    if ($Version -notmatch '^\d+\.\d+\.\d+\.\d+$' -or -not [version]::TryParse($Version, [ref]([version]$null))) { throw 'Invalid four-component plugin version.' }
+    if ($Version -notmatch '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$' -or
+        @($Version.Split('.') | Where-Object { [long]$_ -gt 65534 }).Count -ne 0) { throw 'Invalid four-component plugin version.' }
     if ($Tag -cne "v$Version") { throw 'Release tag does not match the plugin version.' }
     if ($Repository -notmatch '^[A-Za-z0-9][A-Za-z0-9_.-]{0,99}/[A-Za-z0-9][A-Za-z0-9_.-]{0,99}$') { throw 'Invalid GitHub repository name.' }
     if ($LastUpdateUnix -lt 1577836800 -or $LastUpdateUnix -gt 4102444800) { throw 'LastUpdateUnix must be a UTC Unix timestamp between 2020 and 2100.' }
@@ -242,11 +243,13 @@ function Write-Frp1Atomic([string]$Path, [byte[]]$Bytes) {
 function Test-Frp1ReleasePackage {
     [CmdletBinding()]
     param([Parameter(Mandatory)][string]$PackagePath, [Parameter(Mandatory)][string]$RepoJsonPath,
-        [Parameter(Mandatory)][long]$LastUpdateUnix, [string]$Version = '0.1.0.0', [string]$Tag = 'v0.1.0.0',
+        [Parameter(Mandatory)][long]$LastUpdateUnix, [string]$Version, [string]$Tag,
         [string]$Repository = 'demkadse/Final-Roleplay-1', [string]$NuGetPackageRoot = (Join-Path ([Environment]::GetFolderPath('UserProfile')) '.nuget/packages'))
+    $files = Read-Frp1Archive $PackagePath
+    if (-not $Version) { $Version = (Read-Frp1Json $files['FRP1.Plugin.json']).AssemblyVersion }
+    if (-not $Tag) { $Tag = "v$Version" }
     Assert-Frp1Parameters $Version $Tag $Repository $LastUpdateUnix
     $official = Get-Frp1LegalFiles $NuGetPackageRoot
-    $files = Read-Frp1Archive $PackagePath
     $validated = Assert-Frp1Payload $files $Version $Repository $official $true
     $entry = Read-Frp1Json ([IO.File]::ReadAllBytes($RepoJsonPath)) $true
     foreach ($key in @('InternalName','AssemblyVersion','DalamudApiLevel','RepoUrl','DownloadLinkInstall','DownloadLinkUpdate',
@@ -276,10 +279,14 @@ function New-Frp1ReleasePackage {
     [CmdletBinding()]
     param([Parameter(Mandatory)][long]$LastUpdateUnix,
         [string]$InputZip = (Join-Path $script:ProjectRoot 'src/FRP1.Plugin/bin/Release/FRP1.Plugin/latest.zip'),
-        [string]$OutputDirectory = (Join-Path $script:ProjectRoot '.release-staging/v0.1.0.0'),
+        [string]$OutputDirectory,
         [string]$NuGetPackageRoot = (Join-Path ([Environment]::GetFolderPath('UserProfile')) '.nuget/packages'),
-        [string]$Version = '0.1.0.0', [string]$Tag = 'v0.1.0.0', [string]$Repository = 'demkadse/Final-Roleplay-1')
+        [string]$Version, [string]$Tag, [string]$Repository = 'demkadse/Final-Roleplay-1')
+    $files = Read-Frp1Archive $InputZip
+    if (-not $Version) { $Version = (Read-Frp1Json $files['FRP1.Plugin.json']).AssemblyVersion }
+    if (-not $Tag) { $Tag = "v$Version" }
     Assert-Frp1Parameters $Version $Tag $Repository $LastUpdateUnix
+    if (-not $OutputDirectory) { $OutputDirectory = Join-Path $script:ProjectRoot ".release-staging/$Tag" }
     $output = [IO.Path]::GetFullPath($OutputDirectory)
     $stage = [IO.Path]::GetFullPath((Join-Path $script:ProjectRoot '.release-staging'))
     if ($output -ne $stage -and -not $output.StartsWith($stage + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) { throw 'OutputDirectory must stay inside the ignored .release-staging directory.' }
@@ -289,7 +296,6 @@ function New-Frp1ReleasePackage {
         $parent = [IO.Path]::GetDirectoryName($ancestor); if (-not $parent -or $parent -eq $ancestor) { break }; $ancestor = $parent
     }
     $official = Get-Frp1LegalFiles $NuGetPackageRoot
-    $files = Read-Frp1Archive $InputZip
     $validated = Assert-Frp1Payload $files $Version $Repository $official
     $manifest = $validated.Manifest
     $manifest.RepoUrl = "https://github.com/$Repository"

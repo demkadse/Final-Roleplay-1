@@ -1,10 +1,22 @@
 # Status
 
-Stand: 2026-11-11
+Stand: 2026-11-12
 
-## Aktueller lokaler UX-Stand – nicht veröffentlicht
+## Aktuell: Releaseautomatik lokal eingerichtet und geprüft
 
-Alle neuen UX-Änderungen liegen nur im Arbeitsverzeichnis, **uncommitted und unpushed**. Commit und Push übernimmt ausdrücklich der Nutzer. Versionsnummer und öffentliches Release-ZIP 0.1.0.0 sowie Root-`repo.json` sind unverändert; die Veröffentlichungshistorie weiter unten beschreibt nicht diesen neuen Code.
+Der UX-Quellstand ist im Nutzercommit `62a91a7` („rework“) enthalten. Das bedeutet noch keine neue Installerveröffentlichung: öffentlich bleibt 0.1.0.0, bis ein neuer Lauf erfolgreich veröffentlicht.
+
+Workflow und CI-Hilfen werden zunächst nur lokal eingerichtet. Der Nutzer übernimmt Sourcecommit und Push. Erst nach Einführung auf `master` können relevante Pushes beziehungsweise ein manueller Master-Start die Automatik auslösen; ein gehosteter Lauf wurde nicht gestartet.
+
+Vorbereitet sind gepinnte Windows-/SDK-/API-15-Buildgrundlage, Funktionstests, Paket-/Lizenz-/Hashprüfung, neue unveränderliche Releases und erst danach ein verifizierter Botcommit ausschließlich für `repo.json`. Versionbasis `0.1.1`, vierte Komponente Laufnummer minus eins. Ein Hosted-Lauf ist nicht erfolgt. Details: [Releaseautomatik](docs/auto-release.md).
+
+Nachgewiesen, ausschließlich lokal: frisch geladenes offizielles Dalamud 15.0.4/API 15 mit SHA-/Metadatenprüfung, .NET-SDK 10.0.401, Locked-Restore und ganzer Release-Build gegen dieses `DALAMUD_HOME` mit 0 Warnungen/Fehlern; 500/500 Funktionstests bestanden (26 Sekunden). FRP1.Core bleibt 1.0.0.0. Zusätzlich bestehen 33/33 Paketprüfungen und 101/101 Offline-CI-Prüfungen: 33 Versions-/Releasepolicyfälle, 24 Veröffentlichungsabläufe und 44 SDK-/Pfad-/Metadatenfälle. Die unabhängige statische Workflowprüfung mit actionlint 1.7.12 besteht ohne Meldungen. Das abschließende unabhängige Review ist ohne kritische oder wichtige Restbefunde freigegeben; daraus wird kein gehosteter Erfolg abgeleitet.
+
+Kandidat 0.1.1.0 ist vollständig paketvalidiert. Sein ZIP umfasst 1.072.715 Bytes mit SHA-256 `3D8631338B00A89B065EF3BB305D5EA3DB3D9FA5F9289640B331F9DCE940216D`. Zwei lokale Erstellungen ergeben byteidentische ZIP-, Index- und Prüfsummendateien. Die Prüfung belegt die lokale Erstellung und Wiederholbarkeit; der öffentliche 0.1.0.0-Index wurde nicht verändert.
+
+## UX-Quellstand 62a91a7 – noch nicht als Installerupdate ausgeliefert
+
+Die UX-Änderungen sind im Nutzercommit enthalten. Öffentliches Release-ZIP 0.1.0.0 und Root-`repo.json` bleiben bis zur erfolgreichen neuen Veröffentlichung unverändert; die Veröffentlichungshistorie weiter unten beschreibt nicht automatisch den neueren Sourcecommit.
 
 - Editor und Leser teilen genau fünf gleichrangige Bereiche: RP-Status und Kurzprofil; OOC Informationen; Auf den ersten Blick; Weitere Charakterdaten; RP-Erfahrung und Absprachen.
 - Kleiner Profilkopf, ein Inhaltsbereich, Gestaltung im Kopf-Popup und JSON unter Profilaktionen. Keine zweispaltige Vorschau oder Neuanlagebaukästen für Hooks/Extras/Traits/Begleiter.
@@ -19,7 +31,7 @@ Release-Build: **0 Warnungen, 0 Fehler** (1,08 Sekunden). Abschließender Gesamt
 
 Testhistorie: Der erste Gesamtlauf bestand 499/500; im bereits vorhandenen unveränderten Test `ThemeTests.ConcurrentChangesPublishOneCompleteChoiceWithoutLeavingTemporaryFiles` trat einmalig eine `UnauthorizedAccessException` bei `File.Move` mit Überschreiben (`ThemeSettingsStore`, Zeile 71) auf. Der Einzeltest mit identischen Artefakten bestand anschließend 1/1 (55 ms), danach der vollständige Wiederholungslauf 500/500. Die Ursache ist nicht belegt; es wurden weder ein Produktiv-I/O-Fix noch automatische Test-Retries oder übersprungene Tests eingeführt.
 
-Die früheren 33 Offline-Paketprüfungen und öffentlichen Download-/Hashnachweise gelten für das unveränderte Release 0.1.0.0, nicht als Paketabnahme dieser lokalen UX-Version. Vor späterem Installerupdate neue Version, Paket und Index erstellen; 0.1.0.0 nicht ersetzen.
+Die früheren 33 Offline-Paketprüfungen und öffentlichen Download-/Hashnachweise gelten für das unveränderte Release 0.1.0.0, nicht als Abnahme der neuen Automatik oder eines neueren Installerpakets. Nach Einführung soll die Automatik neue Version/Paket/Index erzeugen; 0.1.0.0 nicht ersetzen.
 
 ## Öffentliche Veröffentlichung 0.1.0.0
 
@@ -73,5 +85,5 @@ Der wichtige Chatbefund ist korrigiert und unabhängig regressionsgeprüft: nur 
 
 Native Bedienung, Skalierung, Fokus, Entladen, reale Volkzuordnung, Nameplate-/Chatdarstellung und Portrait-/Iconwiedergabe müssen im laufenden Spiel geprüft werden. Reale LAN-/IPv6-/Internet-/NAT-/CGNAT-Erreichbarkeit und Belastungsprüfung bleiben offen. Die End-to-End-Definition of Done mit zwei Spielern ist dadurch noch nicht abgenommen.
 
-Eine Installation beziehungsweise reale Spiel-/Netzabnahme wurde nicht durchgeführt. Quellcode, MIT-Lizenz und Installerverteilung des bisherigen 0.1.0.0 sind veröffentlicht und auf Erreichbarkeit geprüft; die neue lokale UX ist weder committed noch gepusht oder als Release ausgeliefert. Vollständige Zuordnung der vorhandenen und angepassten Funktionen: [TRP3-Matrix](docs/trp3-feature-map.md), [Glance-Matrix](docs/glance-feature-map.md).
+Eine Installation beziehungsweise reale Spiel-/Netzabnahme wurde nicht durchgeführt. Quellcode, MIT-Lizenz und Installerverteilung des bisherigen 0.1.0.0 sind veröffentlicht und auf Erreichbarkeit geprüft; die neuere UX ist im Nutzercommit enthalten, aber noch nicht als neues Release ausgeliefert. Die neue Automatik bleibt bis zum Nutzercommit/-push ihrer Einrichtung lokal. Vollständige Zuordnung: [TRP3-Matrix](docs/trp3-feature-map.md), [Glance-Matrix](docs/glance-feature-map.md).
 

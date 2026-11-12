@@ -1,0 +1,136 @@
+name: Build and release FRP1
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'tools/**'
+      - 'LICENSE'
+      - 'LICENSES/**'
+      - 'THIRD-PARTY-NOTICES.txt'
+      - 'Directory.Build.props'
+      - 'global.json'
+      - 'FRP1.slnx'
+      - '.github/workflows/release.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    if: github.ref == 'refs/heads/master' && github.repository == 'demkadse/Final-Roleplay-1'
+    runs-on: windows-2025
+    timeout-minutes: 25
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.prepare.outputs.version }}
+      artifact_name: ${{ steps.prepare.outputs.artifact_name }}
+      build_attempt: ${{ steps.identity.outputs.build_attempt }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          dotnet-version: '10.0.401'
+      - name: Derive assembly version
+        id: identity
+        shell: pwsh
+        env:
+          RELEASE_RUN_NUMBER: ${{ github.run_number }}
+          RELEASE_RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          Import-Module ./tools/CI/ReleasePolicy.psm1
+          [xml]$project = Get-Content ./src/FRP1.Plugin/FRP1.Plugin.csproj -Raw
+          $version = Get-Frp1CiVersion -BaseVersion $project.Project.PropertyGroup.Frp1Version.InnerText -RunNumber ([long]$env:RELEASE_RUN_NUMBER)
+          "FRP1_CI_VERSION=$version" >> $env:GITHUB_ENV
+          "build_attempt=$env:RELEASE_RUN_ATTEMPT" >> $env:GITHUB_OUTPUT
+      - name: Install the verified API 15 SDK
+        shell: pwsh
+        run: ./tools/CI/Install-PinnedDalamud.ps1 -Destination (Join-Path $env:RUNNER_TEMP 'frp1-dalamud-api15')
+      - name: Restore pinned packages
+        shell: pwsh
+        run: |
+          dotnet restore FRP1.slnx --locked-mode
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Release build and functional tests
+        shell: pwsh
+        run: |
+          dotnet build FRP1.slnx -c Release --no-restore "-p:Frp1Version=$env:FRP1_CI_VERSION" -v minimal
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test tests/FRP1.Core.Tests/FRP1.Core.Tests.csproj -c Release --no-build --no-restore -v minimal
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Offline package and release-policy checks
+        shell: pwsh
+        run: |
+          ./tests/Publish/Test-ReleasePackaging.ps1 -Version $env:FRP1_CI_VERSION -Tag "v$env:FRP1_CI_VERSION"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./tests/CI/Test-ReleasePolicy.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./tests/CI/Test-PublishFlow.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./tests/CI/Test-PinnedDalamud.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Prepare and verify exact release candidate
+        id: prepare
+        shell: pwsh
+        env:
+          RELEASE_SOURCE_SHA: ${{ github.sha }}
+          RELEASE_RUN_NUMBER: ${{ github.run_number }}
+          RELEASE_RUN_ID: ${{ github.run_id }}
+          RELEASE_RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          ./tools/CI/Prepare-CiRelease.ps1 -SourceSha $env:RELEASE_SOURCE_SHA -RunNumber ([long]$env:RELEASE_RUN_NUMBER) -RunId $env:RELEASE_RUN_ID -RunAttempt ([int]$env:RELEASE_RUN_ATTEMPT) -OutputDirectory .release-staging/ci-candidate
+          ./tools/CI/Test-CiCandidate.ps1 -CandidateDirectory .release-staging/ci-candidate -SourceSha $env:RELEASE_SOURCE_SHA -Version $env:FRP1_CI_VERSION -RunId $env:RELEASE_RUN_ID -RunAttempt ([int]$env:RELEASE_RUN_ATTEMPT)
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ${{ steps.prepare.outputs.artifact_name }}
+          path: |
+            .release-staging/ci-candidate/FRP1-${{ steps.prepare.outputs.version }}.zip
+            .release-staging/ci-candidate/repo.json
+            .release-staging/ci-candidate/SHA256SUMS
+            .release-staging/ci-candidate/build-metadata.json
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    needs: build
+    if: github.ref == 'refs/heads/master' && github.repository == 'demkadse/Final-Roleplay-1'
+    runs-on: windows-2025
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    concurrency:
+      group: frp1-installer-publication-master
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          dotnet-version: '10.0.401'
+      - name: Restore official package licenses for independent validation
+        shell: pwsh
+        run: |
+          dotnet restore src/FRP1.Plugin/FRP1.Plugin.csproj --locked-mode
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: ${{ needs.build.outputs.artifact_name }}
+          path: .release-staging/downloaded-candidate
+      - name: Publish verified assets, then advance installer without overwriting user commits
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          RELEASE_SOURCE_SHA: ${{ github.sha }}
+          RELEASE_VERSION: ${{ needs.build.outputs.version }}
+          RELEASE_RUN_ID: ${{ github.run_id }}
+          RELEASE_BUILD_ATTEMPT: ${{ needs.build.outputs.build_attempt }}
+        run: |
+          ./tools/CI/Publish-CiRelease.ps1 -CandidateDirectory .release-staging/downloaded-candidate -SourceSha $env:RELEASE_SOURCE_SHA -Version $env:RELEASE_VERSION -RunId $env:RELEASE_RUN_ID -RunAttempt ([int]$env:RELEASE_BUILD_ATTEMPT)

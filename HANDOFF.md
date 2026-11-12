@@ -1,14 +1,14 @@
 # Übergabe
 
-Stand: 2026-11-11
+Stand: 2026-11-12
 
 ## Aktueller Arbeitsfokus
 
-**Neue UX ausschließlich lokal:** Alle Editor-/Reader-/MiniHUD-/Hilfeänderungen sind uncommitted und unpushed. Der Nutzer übernimmt Commit und Push; der Agent führt beides nicht aus. Öffentlicher Installerindex und Release-ZIP 0.1.0.0 bleiben unverändert. Die darunterstehende Veröffentlichungshistorie ist kein Nachweis, dass die neue UX bereits ausgeliefert wird.
+**Releaseautomatik lokal eingerichtet und geprüft.** UX ist bereits im Nutzercommit `62a91a7` („rework“) enthalten. Der Nutzer übernimmt den Commit/Push der neuen Automatik; ein gehosteter Lauf wurde nicht gestartet. Öffentliches ZIP/Index 0.1.0.0 bleiben bis zum erfolgreichen neuen Workflowlauf unverändert.
 
-HEAD bleibt `1ce77e3`. Neue Code-/Testdateien sind zum Teil noch untracked und müssen bei einem späteren Nutzercommit ausdrücklich mit berücksichtigt werden; es wurde nichts dafür gestaged, committed oder gepusht.
+Ausgangs-HEAD ist `62a91a7`; der Arbeitsbaum war vor dieser Einrichtung sauber. Neue Workflow-/CI-/Testdateien und geänderte Build-/Pakethilfen beim späteren Nutzercommit vollständig berücksichtigen. Nicht aus einem Sourcecommit auf eine neue Installerverfügbarkeit schließen.
 
-Lokale Abschlussprüfung: Release-Build 0 Warnungen/Fehler, Gesamtlauf 500/500 bestanden ohne Fehler/Skips, unabhängige Reviewfreigabe. Ein erster Gesamtlauf hatte den einmaligen bestehenden Theme-I/O-Testfehler; Einzeltest und komplette Wiederholung bestanden. Ursache unbelegt, kein Produktiv-I/O-Fix/Retrymechanismus; Details in [STATUS.md](STATUS.md).
+Abschlussprüfung des UX-Quellstands: Release-Build 0 Warnungen/Fehler, Gesamtlauf 500/500 bestanden ohne Fehler/Skips, unabhängige Reviewfreigabe. Ein erster Gesamtlauf hatte den einmaligen bestehenden Theme-I/O-Testfehler; Einzeltest und komplette Wiederholung bestanden. Ursache unbelegt, kein Produktiv-I/O-Fix/Retrymechanismus; Details in [STATUS.md](STATUS.md). Die gesonderte Prüfung der Releaseautomatik folgt weiter unten.
 
 Der lokale Editor und Leser haben dieselben fünf Bereiche aus `ProfileAreas`. Keine sechste Gestaltungs-/JSON-Hauptebene hinzufügen: Gestaltung bleibt Kopf-Popup, JSON in Profilaktionen. Vorhandene Zusatzinhalte sind unter Weitere Charakterdaten über `ExistingAdditionalContent` gezielt entfernbar; Snapshot-/CAS-Schutz bewahren. Ausgeblendete oder deaktivierte Inhalte bleiben öffentliches Schema, keine privaten Notizen. Unbearbeitete `RpLanguages` nicht versehentlich leeren.
 
@@ -16,7 +16,13 @@ MiniHUD-Kontext kommt über `RpBarContextResolver` aus dem tatsächlichen Raw-Ta
 
 `Collapsed` ist ein eigener lokaler Leistenwert im rückwärtslesbaren Schema 1. Wiederöffner, Lock/Move/Scale und Viewportgrenzen erhalten. Große Zusatz-Zielkarte nur bei neuen Einstellungen standardmäßig aus; vorhandene gespeicherte Wahl bewahren. Hilfen direkt am Feld/Titel beschriften, keine losen Fragezeichengruppen.
 
-Für einen späteren Installerstand zuerst neue Versionsnummer, Paket und Index vorbereiten. **Das veröffentlichte v0.1.0.0 nicht überschreiben.** Reale Spielabnahme bleibt offen. Kurzanleitung: [Benutzerhandbuch, Abschnitt 17](docs/benutzerhandbuch.md).
+Für den nächsten Installerstand erzeugt die vorbereitete Automatik nach ihrer Einführung neue Version, Paket und Index. **Das veröffentlichte v0.1.0.0 nicht überschreiben und repo.json nicht von Hand versionieren.** Reale Spielabnahme bleibt offen. UX: [Benutzerhandbuch, Abschnitt 17](docs/benutzerhandbuch.md); Pipeline: [Releaseautomatik](docs/auto-release.md).
+
+Die Pipelineversion verwendet Basis `0.1.1` und `GITHUB_RUN_NUMBER - 1` als vierte Komponente; `Frp1Version` überschreibt nur die Pluginversion, FRP1.Core bleibt bei 1.0.0.0. Windows/.NET-SDK 10.0.401 und offizielles API-15.0.4-`DALAMUD_HOME` sind festzuhalten, kein stiller Wechsel auf „latest“/API 17. Zwei Jobs: Build nur lesend ohne persistierte Checkout-Credentials; Publish erst nach Erfolg mit `contents: write` über eingebautes `GITHUB_TOKEN`, kein PAT.
+
+Release-Assets nicht überschreiben: identische Wiederholung wiederverwenden/no-op, abweichender Hash stoppen. Source-Head-/CAS-Prüfung muss veraltete Läufe vom Index fernhalten. `repo.json` erst nach öffentlichem ZIP-Download und Hashprüfung aktualisieren; Fehler dürfen den bisherigen Installerindex nicht unbrauchbar machen. Botcommit darf ausschließlich `repo.json` ändern. Dokumentations-/Indexpushes dürfen keine Releaseschleife auslösen.
+
+Nach einem Botcommit den lokalen Branch vor dem nächsten Push abgleichen, etwa `git pull --ff-only`; bei Abweichungen prüfen statt Force-Push. Lokal bestehen der frische API-15-Build ohne Warnungen/Fehler, 500/500 Funktionstests, 33/33 Paketprüfungen und 101/101 CI-Prüfungen (Policy 33, Publishabläufe 24, SDK 44). Kandidatenprüfung und actionlint sind erfolgreich, zwei Erstellungen erzeugen identische ZIP-/Index-/Prüfsummendateien. Das unabhängige Automatikreview ist ohne kritische oder wichtige Restbefunde freigegeben. Lokale Simulations-/Pakettests sind kein Hosted-Nachweis; der erste gehostete Lauf bleibt bis zum Nutzercommit/-push offen.
 
 ## Historisch: veröffentlichter Stand 0.1.0.0
 
