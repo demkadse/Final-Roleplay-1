@@ -2,6 +2,31 @@
 
 Stand: 2026-11-13
 
+## Aktueller Checkpoint: WP5 Moodles als 0.2.0.7 veröffentlicht
+
+**Quellstand `1d5f7749cabfad47ad4636398ef524a71605d331`, veröffentlicht am 2026-11-13:** Moodles ist unter **Einstellungen → Integrationen** standardmäßig ausgeschaltet. Der Adapter liest ausschließlich eigene aktive Zustände (API 4, Quellformat 2). Höchstens fünf lokale Bindungen halten Status-ID, Inhalts-Hash und ein ausdrücklich bestätigtes General-/Mature-Rating. Titel, Text und Icon sind an den Hash gebunden; geänderte Inhalte gelten wieder als ungeprüft. Ungeprüfte und Mature-Vorschauen erfordern aktuelle Adult-Auswahl samt Mature-Opt-in; ein passendes geprüftes General-Rating erlaubt die Vorschau nach erfolgter Alterswahl. Bewertung selbst verlangt Adult samt Mature-Opt-in. Kein automatisches General-Rating.
+
+Die ausdrückliche Aktion **Als Eindruck übernehmen** hängt einen Glance an den unveränderten gespeicherten eigenen Entwurf an; insgesamt höchstens fünf Glances. Mature-Import ist nur in einen Mature-Entwurf mit aktueller Adult-/Mature-Freigabe erlaubt. Titel höchstens 80, Beschreibung höchstens 1024 Zeichen; zu große Inhalte werden abgewiesen, nicht gekürzt. Anschließend regulär prüfen und speichern. Bestehende Profilfreigaben gelten für gespeicherte Inhalte weiter; der Import erteilt keine neue Netzwerkfreigabe. Keine Moodles-Apply-/Set-Aufrufe, Fremdreads oder neuen Profil-/Wirefelder.
+
+Lokale Einstellungen bleiben in `integrations.json`, Schema 1 mit optionalen Moodles-Feldern, **8 KiB** Gesamtgrenze und Lesbarkeit älterer Dateien ohne diese Felder. Hintergrundaktualisierungen sind auf höchstens **1 Hz** begrenzt. Bewusste Bewertung und Import lesen zusätzlich frisch; beide Aktionen teilen sich einen **500-ms-Abstand**. Actor-/Profil-/Policy-/Entwurfswechsel, Busy, Quelländerung und Unload verwerfen veraltete Arbeit.
+
+Lokaler WP5-Nachweis laut abgeschlossener Teamprüfung: voller Release-Solutionbuild **0 Warnungen/Fehler**, **248 gezielte Tests**, **1019/1019 vollständige Funktionstests** in 28 Sekunden ohne Fehler/Skips, **33/33 Paketprüfungen**, unabhängige Reviewfreigabe ohne wichtige Restbefunde. Die synthetische SDK-/Newtonsoft-Probe für das 16-Felder-Tuple einschließlich Enum-Konvertierung besteht; dies ist ausschließlich ein synthetischer Nachweis. Native Moodles-/IPC-/Spiel-/UI-QA bleibt offen, keine Aktivierung durch den Agenten.
+
+[Hosted-Lauf 43419504299](https://github.com/demkadse/Final-Roleplay-1/actions/runs/43419504299) besteht Build und Publish: **0 Warnungen/Fehler**, **1019/1019 Funktionstests** in 32 Sekunden, **33/33 Paketprüfungen**, **105/105 CI-Prüfungen** (Policy33, Publish24, SDK44, Quellpfade4); alle Ergebnisse ausdrücklich in den Logs bestätigt. [Release v0.2.0.7](https://github.com/demkadse/Final-Roleplay-1/releases/tag/v0.2.0.7) und kanonischer Raw-Index sind öffentlich; Index anonym HTTP 200 mit Version 0.2.0.7, ZIP und `SHA256SUMS` anonym geladen, Hashvergleich und vollständige erneute Paketvalidierung bestanden. Botcommit `de8a29d` ändert ausschließlich `repo.json`; lokaler Branch per Fast-forward abgeglichen. Das ist ein Distributionsnachweis, keine native Spielabnahme.
+
+| Datei / Feld | Nachweis für 0.2.0.7 |
+|---|---|
+| ZIP-Größe | 1.123.824 Bytes |
+| ZIP SHA-256 | `E6AE80825161D6C3DC0CC61874A042EF473F664BAD933E26B0C9D2403ACF504D` |
+| JSON SHA-256 | `ED2E67B29314896F55509FCA77A4AAFBD2864E623234CE3083C95D6F74D3E123` |
+| LastUpdate | `1794570287` |
+
+Verifiziertes Quellbackup vor WP5: `.release-staging/before-moodles-20261113T112856Z`, Quelle `7666329`, SHA-256 `32CABC658791D3436FC4F8546EB88AD44D8052CEB81786BF8ACFD7072F3A2006`. WP3-Ausbau und WP6–8 bleiben separate Pakete. Bedienung: [Handbuch, Abschnitt 22](docs/benutzerhandbuch.md#22-moodles-lokal-auswählen-wp5).
+
+**WP7 Lifestream ist am 2026-11-13 nach dem begrenzten Adress-/Abbruchabgleich in Umsetzung (`lifestream_impl`); noch kein abgeschlossener Funktions-/Prüf-/Releaseumfang.** Verifiziertes lokales Quellbackup vor WP7: `.release-staging/before-lifestream-20261113T114933Z`, Quelle `de8a29d`, SHA-256 `B1EEBDB6E65E8941DD3D8732EF111AF6124796F76C2CF06B4B16DC52FAA23A82`. WP6-Glamourer-Schreiben ist nach begrenztem API-1.8-/Quellabgleich blockiert: `ApplyDesign(Once | Equipment, key: 0)` kann über verknüpfte AssociatedMods Penumbra ändern; ActorIndex-/Identitäts-/Kopienscope ist ebenfalls ungeklärt. Kein WP6-Produktcode, keine Dummyoberfläche oder native Abnahme. Belegte Quellkette und Grenzen: [Integrationsplan, WP6](docs/integrationen-plan.md#wp6--eigener-glamourer-equipment-look).
+
+## Vorheriger Stand: WP4 als 0.2.0.6 veröffentlicht
+
 **WP4 als 0.2.0.6 veröffentlicht am 2026-11-13:** `6b97c1bd556f98d7d6295954d4a371e5e7c32f41` implementiert [FRP1-IPC v1](docs/frp1-ipc-v1.md) mit API 1.0, Capabilities/Readiness, General-only-Status/Verfügbarkeit und separat freizugebenden eigenen Aktionen samt Ticketabfrage. Alle fünf Freigaben standardmäßig aus. Aktives eigenes Profil unabhängig von der Editorauswahl; keine privaten Datenexporte. Mature-Steuerung nur mit aktueller Adult-Auswahl und zusätzlichem Mature-Opt-in, lesbarer Export bleibt General-only. Native-freie IPC-Callbacks, begrenzte Frame-Queue, synchroner Policy-Epochenwechsel und generationengebundene Ergebnisse sichern Kontext und Widerruf. `Persisted` erst nach erfolgreichem eigenen Schreibauftrag und Übernahme genau dieses gespeicherten Profilstands; das Poll-Zeitfenster bleibt `Running`, echte Konflikte werden `Stale`.
 
 Lokaler WP4-Nachweis: **812/812 Funktionstests** (27 Sekunden; 150 zusätzlich zum 662er-MVP), **287 gezielte Tests**, voller Release-Solutionbuild mit **0 Warnungen/Fehlern** (2,54 Sekunden) und **33/33 Paketprüfungen**. Unabhängiges abschließendes Review ohne kritische/wichtige Restbefunde freigegeben. Registrierung und Pluginverdrahtung sind statisch geprüft und kompiliert; native IPC-/Spielprobe steht aus.
@@ -17,7 +42,7 @@ Der [Hosted-Lauf 43416697284](https://github.com/demkadse/Final-Roleplay-1/actio
 
 **Lokale I/O-Korrektur im selben Quellstand:** Das MVP-Instanzgate verhinderte den sporadischen Windows-Fehler bei `File.Move` mit Überschreiben nicht vollständig; die Ursache der zeitweise offenen Handles ist unbelegt. `LocalJsonFile` ersetzt bestehende Zieldateien jetzt mit `File.Replace` und eindeutig benannter `.previous`-Sicherung. Erst nach erfolgreichem Replace wird die Sicherung entfernt; nach einem teilweisen Replacefehler bleibt sie zur Wiederherstellung erhalten. Erstanlage verwendet `File.Move` ohne Überschreiben. Instanzgate erhalten, keine instanzübergreifende Garantie oder Retries. Synthetische Diagnose mit 23.000 Vorgängen und Sicherung erfolgreich; Regressionen mit offenem bzw. blockierendem Leser und fünf Own-Poll-/Refresh-/Scope-Fälle sind im Prüfstand enthalten. Keine belegte Aussage zu Virenscannerursachen.
 
-Nächster Schritt: WP5 wird nach dem begrenzten Moodles-Quell-/API-/Ratingabgleich umgesetzt; noch kein abgeschlossener Funktions-/Prüf-/Releaseumfang. Moodles-Manifest 1.1.3.5/API 15 schreibfrei erfasst, keine native Aktivierung oder IPC-Probe. Verifiziertes Quellbackup vor WP5: `.release-staging/before-moodles-20261113T112856Z`, Quelle `7666329`, SHA-256 `32CABC658791D3436FC4F8546EB88AD44D8052CEB81786BF8ACFD7072F3A2006`. WP3-Ausbau und WP5–8 bleiben getrennte Pakete; native Spiel-/Netzabnahme bleibt offen.
+Historischer Folgeauftrag von WP4 war WP5 nach begrenztem Moodles-Quell-/API-/Ratingabgleich; das Moodles-Manifest 1.1.3.5/API 15 wurde schreibfrei erfasst. Der abgeschlossene lokale WP5-Nachweis und die erfolgreiche Veröffentlichung stehen im obersten Checkpoint. Native Spiel-/Netzabnahme bleibt offen.
 
 ## Vorheriger Stand: Honorific-MVP als 0.2.0.5 veröffentlicht
 

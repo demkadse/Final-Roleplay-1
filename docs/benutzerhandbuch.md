@@ -1,10 +1,12 @@
 # FRP1 – Benutzerhandbuch
 
-Stand: 2026-11-13 · veröffentlichter früher öffentlicher Teststand 0.2.0.6 (Prerelease).
+Stand: 2026-11-13 · veröffentlichter früher öffentlicher Teststand 0.2.0.7 (Prerelease).
 
-**Veröffentlicht:** Repository, MIT-Lizenz, Installerindex und Releasepaket 0.2.0.6 sind öffentlich und ohne Anmeldung erreichbar. Der erfolgreiche GitHub-Lauf besteht Build ohne Warnungen/Fehler, 812/812 Funktionstests, 33/33 Paketprüfungen und 105/105 CI-Prüfungen. Eine native IPC-/Spiel-/LAN-/Internetabnahme steht noch aus.
+**Veröffentlicht:** Repository, MIT-Lizenz, Installerindex und Releasepaket 0.2.0.7 sind öffentlich und ohne Anmeldung erreichbar. Der erfolgreiche GitHub-Lauf besteht Build ohne Warnungen/Fehler, 1019/1019 Funktionstests (32 Sekunden), 33/33 Paketprüfungen und 105/105 CI-Prüfungen; anonyme JSON-/ZIP-/Hashprüfung und vollständige erneute Paketvalidierung sind erfolgreich. Eine native IPC-/Spiel-/LAN-/Internetabnahme steht noch aus.
 
 **Aktuelle Bedienung:** [Abschnitt 19](#19-kompakte-bedienung-seit-0204) beschreibt die seit 0.2.0.4 geltende Oberfläche: drei Hauptwege und Profilbereiche, eigene Lesekarte, einzeilige zielunabhängige eigene Leiste und drei primäre Themes. [Abschnitt 20](#20-honorific-titel-lokal-übernehmen-seit-0205) ergänzt die optionale Honorific-Titelübernahme seit 0.2.0.5, [Abschnitt 21](#21-lokale-frp1-schnittstelle-seit-0206) die lokale FRP1-Schnittstelle seit 0.2.0.6. Kapitel 1–18 halten ältere Bedienung und die Entwicklungshistorie fest. Daten und Freigaben bleiben erhalten.
+
+**Neu seit 0.2.0.7 (Quelle `1d5f774`):** [Abschnitt 22](#22-moodles-lokal-auswählen-wp5) erklärt die optionale lokale Moodles-Auswahl und bewusste Übernahme als Eindruck. Die Veröffentlichung ist durch [Hosted-Lauf 43419504299](https://github.com/demkadse/Final-Roleplay-1/actions/runs/43419504299) sowie anonyme Index-/Download-/Hash-/Paketprüfung belegt. Aktualisiere über die bestehende JSON-Adresse im Dalamud-Installer und lade bei Bedarf neu; lokale Daten und Freigaben bleiben erhalten, Moodles wird nicht automatisch aktiviert. Native Moodles-/Spielabnahme steht aus.
 
 ## 1. Was FRP1 ist
 
@@ -273,7 +275,7 @@ Technische Details: [Architektur](architecture.md), [Machbarkeit](feasibility.md
 
 ## 17. Historische Bedienung von 0.1.1.1 bis 0.1.1.3
 
-Dieser Abschnitt hält die historische Bedienung von 0.1.1.1 bis 0.1.1.3 fest. Für das aktuelle 0.2.0.6 gelten die Anleitungen in Abschnitt 19–21; fünf Profilbereiche, zielabhängige eigene Leiste und Hilfebadges sind dort abgelöst. Die Installeradresse bleibt gleich.
+Dieser Abschnitt hält die historische Bedienung von 0.1.1.1 bis 0.1.1.3 fest. Für das aktuelle 0.2.0.7 gelten die Anleitungen in Abschnitt 19–22; fünf Profilbereiche, zielabhängige eigene Leiste und Hilfebadges sind dort abgelöst. Die Installeradresse bleibt gleich.
 
 ### Profil bearbeiten und lesen
 
@@ -328,7 +330,7 @@ Nach einem solchen Botcommit muss der Maintainer seinen lokalen Branch vor dem n
 
 ## 19. Kompakte Bedienung seit 0.2.0.4
 
-Dieser Abschnitt beschreibt die seit 0.2.0.4 geltende Oberfläche; das aktuelle Release ist 0.2.0.6. Aktualisiere über die bestehende JSON-Adresse im Dalamud-Installer und lade das Plugin bei Bedarf neu. Konfigurationslöschung oder Datenmigration sind nicht erforderlich. Die frühere Vorgabe für fünf Bereiche und eine zielabhängige eigene Leiste wurde ausdrücklich aufgehoben.
+Dieser Abschnitt beschreibt die seit 0.2.0.4 geltende Oberfläche; das aktuelle Release ist 0.2.0.7. Aktualisiere über die bestehende JSON-Adresse im Dalamud-Installer und lade das Plugin bei Bedarf neu. Konfigurationslöschung oder Datenmigration sind nicht erforderlich. Die frühere Vorgabe für fünf Bereiche und eine zielabhängige eigene Leiste wurde ausdrücklich aufgehoben.
 
 ### Drei Wege und eine lesbare eigene Karte
 
@@ -379,3 +381,18 @@ Lesen liefert ausschließlich RP-Status und Verfügbarkeit deines aktiven allgem
 Maßgeblich ist dein ausdrücklich aktives eigenes Profil, unabhängig davon, welchen Entwurf du gerade im Hauptfenster ausgewählt hast. Offene Entwurfsänderungen oder laufende Vorgänge können Aktionen sperren. Der angezeigte Zustand unterscheidet ausgeschaltet, Profil/Zugriff nicht bereit, offener Entwurf/Vorgang und bereit. Ein angenommener Auftrag bestätigt zunächst nur die Warteschlange; das aufrufende Plugin kann den tatsächlichen Abschluss abfragen.
 
 Status- und Verfügbarkeitsänderungen werden über den normalen eigenen Profilschreiber gespeichert. Bestehende Freigaben können diese gespeicherten Änderungen anschließend mit verbundenen Kontakten synchronisieren. Eine IPC-Freigabe erstellt keine zusätzliche Netzwerkfreigabe. Du kannst Lese-/Aktionsfreigaben jederzeit zurücknehmen; veraltete Aufträge und Ergebnisse werden dadurch ungültig. Bereits abgeschlossene Speicherungen werden dabei nicht rückgängig gemacht.
+
+## 22. Moodles lokal auswählen (WP5)
+
+Stand **2026-11-13**, im Quellstand `1d5f774` umgesetzt, automatisiert geprüft und unabhängig reviewfreigegeben. Als [Release v0.2.0.7](https://github.com/demkadse/Final-Roleplay-1/releases/tag/v0.2.0.7) veröffentlicht und über die unveränderte Installeradresse verfügbar; native Moodles-/IPC-/Spiel-/UI-QA ist offen. Die Integration ist standardmäßig ausgeschaltet und setzt eine verfügbare kompatible Moodles-Installation voraus (API 4, Quellformat 2). FRP1 installiert oder aktiviert Moodles nicht selbst.
+
+1. Öffne **Einstellungen → Integrationen → Moodles – eigene aktive Eindrücke** und aktiviere **Eigene aktive Moodles lokal lesen**. Die Statuszeile zeigt, ob die Quelle ausgeschaltet, nicht verfügbar, inkompatibel oder bereit ist.
+2. Zum erstmaligen Prüfen unbekannter Inhalte benötigst du die aktuelle Alterswahl **mindestens 18** und die zusätzliche Freigabe für Inhalte ab 18. Ungeprüfte Titel, Texte und Icons werden anderen Altersgruppen nicht als Vorschau angezeigt. **Aktualisieren** fordert neue Quelldaten an.
+3. Wähle über **Aktiven Status auswählen** höchstens fünf eigene aktive Status. Prüfe jeden Inhalt einschließlich Icon und bestätige bewusst **Als Allgemein geprüft bestätigen** oder **Als Ab 18 geprüft bestätigen**. Auswahl allein kennzeichnet einen Inhalt nicht als jugendfrei; auch die Bewertung verlangt Adult-Auswahl und Mature-Freigabe.
+4. Öffne den gespeicherten eigenen Entwurf, in den du einen Eindruck übernehmen möchtest. Er muss unverändert und ohne laufenden Vorgang sein und noch Platz unter den insgesamt fünf Glances haben. Ein als Ab 18 geprüfter Inhalt lässt sich nur in ein als Ab 18 gekennzeichnetes Profil mit aktueller Adult-/Mature-Freigabe übernehmen. Geprüfte Allgemein-Inhalte bleiben nach erfolgter Alterswahl auch ohne Mature-Freigabe als Vorschau zugänglich.
+5. Wähle **Als Eindruck übernehmen**. FRP1 ergänzt Titel, Beschreibung und Spielicon als neuen Glance; vorhandene Glances bleiben erhalten. Höchstens 80 Zeichen Titel und 1024 Zeichen Beschreibung sind zulässig; zu große Inhalte werden abgewiesen und nicht gekürzt.
+6. Prüfe den entstandenen Entwurf und **speichere regulär** oder verwirf die Änderung. Übernahme und Speichern erteilen keine neue Kontaktfreigabe. Bereits bestehende Profilfreigaben können gespeicherte Änderungen anschließend an verbundene Kontakte weitergeben.
+
+Die Prüfung gilt nur für den unveränderten Inhalt. Ändern sich Titel, Text oder Icon in Moodles, gilt der Eintrag wieder als ungeprüft und benötigt eine erneute Bestätigung; es gibt keine automatische Aktualisierung des bereits übernommenen Glance. Auswahl und Bewertung bleiben lokal. **Auswahl entfernen** löst die lokale Bindung, die ausgeschaltete Integration beendet ihre Lese-/Übernahmefunktion. FRP1 setzt, entfernt oder verändert keine Moodles-Zustände und liest keine fremden Statuslisten.
+
+Bei Charakter-, Profil-, Quellen- oder Freigabewechsel verwirft FRP1 veraltete Vorschauen und ausstehende Aktionen. Hintergrundaktualisierungen erfolgen höchstens einmal pro Sekunde; Bewertung und Import prüfen die Quelle zusätzlich frisch und teilen einen Mindestabstand von 500 ms. Bei einer Sperre kurz warten, aktuellen Zustand prüfen und die gewünschte Aktion bewusst erneut auslösen.
