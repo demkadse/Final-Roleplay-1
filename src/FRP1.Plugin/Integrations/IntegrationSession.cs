@@ -51,6 +51,18 @@ public sealed class IntegrationSession : IDisposable
     public IntegrationIpcOptions IpcOptions => new(Settings.IpcReadEnabled, Settings.IpcControlEnabled,
         Settings.IpcSetStatusEnabled, Settings.IpcSetAvailabilityEnabled, Settings.IpcOpenOwnProfileEnabled);
     public event Action<IntegrationIpcOptions>? IpcOptionsChanged;
+    public MoodlesOptions MoodlesOptions => new(Settings.MoodlesEnabled, Settings.MoodlesBindings);
+    public event Action<MoodlesOptions>? MoodlesOptionsChanged;
+
+    public void SetMoodlesOptions(MoodlesOptions options)
+    {
+        if (disposed || !SettingsLoaded) return;
+        options = MoodlesRules.ValidateOptions(options);
+        if (Settings.MoodlesEnabled == options.Enabled && Settings.MoodlesBindings.SequenceEqual(options.Bindings!)) return;
+        Settings = Settings with { MoodlesEnabled = options.Enabled, MoodlesBindings = options.Bindings! };
+        savePending = true;
+        MoodlesOptionsChanged?.Invoke(MoodlesOptions);
+    }
 
     public void SetIpcOptions(IntegrationIpcOptions options)
     {
@@ -188,6 +200,7 @@ public sealed class IntegrationSession : IDisposable
             SettingsLoaded = true;
             readPending = Settings.HonorificEnabled;
             IpcOptionsChanged?.Invoke(IpcOptions);
+            MoodlesOptionsChanged?.Invoke(MoodlesOptions);
         }
         if (save is { IsCompleted: true } written)
         {

@@ -12,6 +12,8 @@ public sealed record IntegrationSettings
     public bool IpcSetStatusEnabled { get; init; }
     public bool IpcSetAvailabilityEnabled { get; init; }
     public bool IpcOpenOwnProfileEnabled { get; init; }
+    public bool MoodlesEnabled { get; init; }
+    public IReadOnlyList<MoodlesBinding> MoodlesBindings { get; init; } = Array.Empty<MoodlesBinding>();
 }
 
 public sealed record IntegrationIpcOptions(bool ReadEnabled = false, bool ControlEnabled = false,

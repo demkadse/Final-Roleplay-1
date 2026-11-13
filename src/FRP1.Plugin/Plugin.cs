@@ -55,6 +55,8 @@ public sealed class Plugin : IDalamudPlugin
     private readonly LocalToolsModule localTools;
     private readonly GamePresentationModule gamePresentation;
     private readonly IntegrationSession integrations;
+    private readonly MoodlesAdapter moodlesAdapter;
+    private readonly MoodlesSession moodles;
     private readonly AudiencePolicy policy;
     private readonly FrpIpcSession ipcSession;
     private readonly FrpIpcProvider? ipcProvider;
@@ -90,6 +92,11 @@ public sealed class Plugin : IDalamudPlugin
         integrations = new IntegrationSession(new IntegrationSettingsStore(directory), HonorificAdapter.Create(PluginInterface),
             () => mainWindow.CaptureIntegrationContext(CaptureIntegrationActor()), mainWindow.TryApplyHonorificTitle);
         mainWindow.Integrations = integrations;
+        moodlesAdapter = new MoodlesAdapter(PluginInterface);
+        moodles = new MoodlesSession(moodlesAdapter, CaptureMoodlesContext, mainWindow.TryApplyMoodlesGlance,
+            () => integrations.MoodlesOptions, integrations.SetMoodlesOptions);
+        integrations.MoodlesOptionsChanged += moodles.OptionsChanged;
+        mainWindow.Moodles = moodles;
         ipcSession = new FrpIpcSession(CaptureIpcContext, WriteIpcActionAsync, mainWindow.TryOpenIpcOwnProfile);
         integrations.IpcOptionsChanged += ipcSession.SetOptions;
         ipcProvider = FrpIpcProvider.Create(PluginInterface, ipcSession);
@@ -163,6 +170,13 @@ public sealed class Plugin : IDalamudPlugin
         catch (Exception) { return default; }
     }
 
+    private MoodlesContext CaptureMoodlesContext()
+    {
+        var actor = CaptureIntegrationActor();
+        moodlesAdapter.ObserveActor(actor);
+        return mainWindow.CaptureMoodlesContext(actor);
+    }
+
     private FrpIpcContext CaptureIpcContext()
     {
         if (ipcCatalogVersion != ownProfiles.Version)
@@ -214,6 +228,7 @@ public sealed class Plugin : IDalamudPlugin
         var integrationGeneration = integrations.Generation;
         var integrationStatus = integrations.Status;
         integrations.Tick();
+        if (Framework.IsInFrameworkUpdateThread) moodles.Tick();
         if (integrations.Generation != integrationGeneration || integrations.Status != integrationStatus) gamePresentation.Invalidate();
         ownProfiles.SetEditorBlocked(mainWindow.EditorBlocked);
         ipcSession.Tick();
@@ -257,8 +272,10 @@ public sealed class Plugin : IDalamudPlugin
         policy.Changed -= OnIpcPolicyChanged;
         Framework.Update -= ObserveIpcScene;
         integrations.IpcOptionsChanged -= ipcSession.SetOptions;
+        integrations.MoodlesOptionsChanged -= moodles.OptionsChanged;
         ipcProvider?.Dispose();
         ipcSession.Dispose();
+        moodles.Dispose();
         integrations.Dispose();
         gamePresentation.Dispose();
         socialUi.Dispose();

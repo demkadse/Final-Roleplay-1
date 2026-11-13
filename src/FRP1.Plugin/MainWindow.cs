@@ -52,6 +52,7 @@ internal sealed class MainWindow : Window, IDisposable
     public LocalToolsModule? LocalTools { get; set; }
     public GamePresentationModule? GamePresentation { get; set; }
     public IntegrationSession? Integrations { get; set; }
+    public MoodlesSession? Moodles { get; set; }
     public FrpIpcSession? IpcSession { get; set; }
     public bool IpcAvailable { get; set; }
     public Func<Guid, string?>? OwnProfileReferenceProvider { get; set; }
@@ -150,6 +151,28 @@ internal sealed class MainWindow : Window, IDisposable
     {
         return new(actor, !disposed && ProfileAccessReady, store.Policy.Snapshot, IntegrationPolicyGeneration,
             CaptureIntegrationDraft(), dirty, Busy);
+    }
+
+    public MoodlesContext CaptureMoodlesContext(IntegrationActor actor) =>
+        new(CaptureIntegrationContext(actor), contentRating, details.Glances.Count);
+
+    public bool TryApplyMoodlesGlance(IntegrationDraftToken expected, GlanceEntry glance, ContentRating sourceRating)
+    {
+        if (disposed || !ProfileAccessReady || dirty || Busy || CaptureIntegrationDraft(recheck: true) != expected ||
+            details.Glances.Count >= 5 || glance.IconId > 1_000_000 ||
+            !MoodlesRules.TryCreateStatus(MoodlesRules.SourceSchemaVersion, Guid.NewGuid(),
+                (int)glance.IconId, glance.Label, glance.Text, out var source) ||
+            !MoodlesRules.CanCopy(source!, sourceRating, contentRating, store.Policy.Snapshot)) return false;
+        var draft = BuildDraft();
+        var next = draft with { Glances = draft.Glances.Append(glance).ToList() };
+        store.Policy.EnsureAllowed(next);
+        ProfileJson.Validate(next);
+        details.Glances.Add(glance);
+        profileUi.ResetEditorContext(); editorGeneration++;
+        dirty = true; editing = true; preview = false;
+        mainArea = MainArea.Character; selectedProfileArea = ProfileArea.Overview;
+        message = T("Moodles.Imported");
+        return true;
     }
 
     private IntegrationDraftToken? CaptureIntegrationDraft(bool recheck = false)
@@ -421,7 +444,75 @@ internal sealed class MainWindow : Window, IDisposable
         else if (Busy) Wrapped(T("Integration.EditorBusy"));
         if (session.LastAction is IntegrationActionResult.Stale or IntegrationActionResult.Blocked or IntegrationActionResult.RateLimited)
             Wrapped(T("Integration.Rejected"));
+        DrawMoodlesSettings(session);
         DrawIpcSettings(session);
+    }
+
+    private void DrawMoodlesSettings(IntegrationSession integrations)
+    {
+        ImGui.Separator();
+        ImGui.TextUnformatted(T("Moodles.Title"));
+        if (Moodles is not { } session) return;
+        var enabled = integrations.Settings.MoodlesEnabled;
+        ImGui.BeginDisabled(!integrations.SettingsLoaded);
+        if (ImGui.Checkbox(T("Moodles.Enable"), ref enabled))
+            integrations.SetMoodlesOptions(integrations.MoodlesOptions with { Enabled = enabled });
+        ImGui.EndDisabled();
+        Wrapped(T("Moodles." + session.Status));
+        Wrapped(T("Moodles.Explanation"));
+        if (!enabled) return;
+        if (ImGui.Button(T("Moodles.Refresh"))) session.RequestRead();
+        var visible = session.VisibleStatuses;
+        var bindings = integrations.Settings.MoodlesBindings;
+        ImGui.SameLine();
+        ImGui.BeginDisabled(bindings.Count >= MoodlesRules.MaximumBindings);
+        if (ImGui.Button(T("Moodles.Add") + $" ({bindings.Count}/5)")) ImGui.OpenPopup("##MoodlesAdd");
+        ImGui.EndDisabled();
+        if (ImGui.BeginPopup("##MoodlesAdd"))
+        {
+            if (visible.Count == 0) Wrapped(T("Moodles.Hidden"));
+            foreach (var source in visible)
+            {
+                if (bindings.Any(binding => binding.StatusId == source.StatusId)) continue;
+                if (ImGui.Selectable(source.Label + "###MoodleAdd" + source.StatusId))
+                { session.SetSelected(source.StatusId, true); break; }
+            }
+            ImGui.EndPopup();
+        }
+        var draft = CaptureIntegrationDraft();
+        Wrapped(T("Integration.SelectedProfile") + (draft is null ? T("Common.Unavailable") : original.DisplayName));
+        foreach (var binding in bindings)
+        {
+            ImGui.PushID(binding.StatusId.ToString());
+            var source = visible.FirstOrDefault(status => status.StatusId == binding.StatusId);
+            if (source is null) Wrapped(T("Moodles.Hidden"));
+            else
+            {
+                DrawLocalIcon(source.IconId, new Vector2(28));
+                ImGui.SameLine(); Wrapped(source.Label);
+                Wrapped(source.Description);
+                var rating = MoodlesRules.ReviewedRating(source, integrations.MoodlesOptions);
+                Wrapped(T(rating == ContentRating.General ? "Moodles.General" : rating == ContentRating.Mature18 ? "Moodles.Mature" : "Moodles.Unknown"));
+                ImGui.BeginDisabled(!MoodlesRules.AdultOptIn(store.Policy.Snapshot) || session.HasPendingImport);
+                if (ImGui.Button(T("Moodles.ReviewGeneral"))) session.RequestRating(source.StatusId, ContentRating.General);
+                ImGui.SameLine();
+                if (ImGui.Button(T("Moodles.ReviewMature"))) session.RequestRating(source.StatusId, ContentRating.Mature18);
+                ImGui.EndDisabled();
+                ImGui.BeginDisabled(draft is null || dirty || Busy || session.HasPendingImport || details.Glances.Count >= 5 ||
+                    !MoodlesRules.CanCopy(source, rating, contentRating, store.Policy.Snapshot));
+                if (ImGui.Button(T("Moodles.Import"))) session.RequestImport(source.StatusId);
+                ImGui.EndDisabled();
+                if (source.Label.Length > 80 || source.Description.Length > 1024 || source.IconId > 1_000_000)
+                    Wrapped(T("Moodles.TooLarge"));
+            }
+            if (ImGui.SmallButton(T("Moodles.Remove"))) session.SetSelected(binding.StatusId, false);
+            ImGui.PopID();
+            ImGui.Separator();
+        }
+        if (dirty) Wrapped(T("Integration.Dirty"));
+        else if (Busy) Wrapped(T("Integration.EditorBusy"));
+        if (session.LastAction is IntegrationActionResult.Stale or IntegrationActionResult.Blocked or IntegrationActionResult.RateLimited)
+            Wrapped(T("Integration.Rejected"));
     }
 
     private void DrawIpcSettings(IntegrationSession session)

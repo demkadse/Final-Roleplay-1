@@ -39,6 +39,9 @@
     <Compile Include="../../src/FRP1.Plugin/Integrations/IntegrationSettingsStore.cs" Link="Plugin/Integrations/IntegrationSettingsStore.cs" />
     <Compile Include="../../src/FRP1.Plugin/Integrations/IntegrationSession.cs" Link="Plugin/Integrations/IntegrationSession.cs" />
     <Compile Include="../../src/FRP1.Plugin/Integrations/HonorificRules.cs" Link="Plugin/Integrations/HonorificRules.cs" />
+    <Compile Include="../../src/FRP1.Plugin/Integrations/MoodlesModels.cs" Link="Plugin/Integrations/MoodlesModels.cs" />
+    <Compile Include="../../src/FRP1.Plugin/Integrations/MoodlesRules.cs" Link="Plugin/Integrations/MoodlesRules.cs" />
+    <Compile Include="../../src/FRP1.Plugin/Integrations/MoodlesSession.cs" Link="Plugin/Integrations/MoodlesSession.cs" />
     <Compile Include="../../src/FRP1.Plugin/Ipc/FrpIpcContracts.cs" Link="Plugin/Ipc/FrpIpcContracts.cs" />
     <Compile Include="../../src/FRP1.Plugin/Ipc/FrpIpcRules.cs" Link="Plugin/Ipc/FrpIpcRules.cs" />
     <Compile Include="../../src/FRP1.Plugin/Ipc/FrpIpcSession.cs" Link="Plugin/Ipc/FrpIpcSession.cs" />
