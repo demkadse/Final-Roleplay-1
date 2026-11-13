@@ -45,6 +45,7 @@ public sealed class IntegrationSession : IDisposable
     public IntegrationActionResult LastAction { get; private set; }
     public string Title { get; private set; } = "";
     public long Generation => generation;
+    public long SettingsGeneration { get; private set; }
     public bool HasPendingImport => pendingImport is not null;
     public bool HasConfirmedReadiness => Volatile.Read(ref titleConfirmation) is { } snapshot && snapshot.ReaderVersion == reader.Version;
     public Task DisposalCompletion { get; private set; } = Task.CompletedTask;
@@ -53,6 +54,18 @@ public sealed class IntegrationSession : IDisposable
     public event Action<IntegrationIpcOptions>? IpcOptionsChanged;
     public MoodlesOptions MoodlesOptions => new(Settings.MoodlesEnabled, Settings.MoodlesBindings);
     public event Action<MoodlesOptions>? MoodlesOptionsChanged;
+    public LifestreamOptions LifestreamOptions => new(Settings.LifestreamEnabled, Settings.LifestreamAddress);
+    public event Action<LifestreamOptions>? LifestreamOptionsChanged;
+
+    public void SetLifestreamOptions(LifestreamOptions options)
+    {
+        if (disposed || !SettingsLoaded) return;
+        options = LifestreamRules.ValidateOptions(options);
+        if (LifestreamOptions == options) return;
+        Settings = Settings with { LifestreamEnabled = options.Enabled, LifestreamAddress = options.Address };
+        SettingsGeneration++; savePending = true;
+        LifestreamOptionsChanged?.Invoke(LifestreamOptions);
+    }
 
     public void SetMoodlesOptions(MoodlesOptions options)
     {
@@ -60,6 +73,7 @@ public sealed class IntegrationSession : IDisposable
         options = MoodlesRules.ValidateOptions(options);
         if (Settings.MoodlesEnabled == options.Enabled && Settings.MoodlesBindings.SequenceEqual(options.Bindings!)) return;
         Settings = Settings with { MoodlesEnabled = options.Enabled, MoodlesBindings = options.Bindings! };
+        SettingsGeneration++;
         savePending = true;
         MoodlesOptionsChanged?.Invoke(MoodlesOptions);
     }
@@ -74,6 +88,7 @@ public sealed class IntegrationSession : IDisposable
             IpcOpenOwnProfileEnabled = options.OpenOwnProfileEnabled,
         };
         savePending = true;
+        SettingsGeneration++;
         IpcOptionsChanged?.Invoke(options);
     }
 
@@ -81,6 +96,7 @@ public sealed class IntegrationSession : IDisposable
     {
         if (disposed || !SettingsLoaded || Settings.HonorificEnabled == enabled) return;
         Settings = Settings with { HonorificEnabled = enabled };
+        SettingsGeneration++;
         savePending = true;
         Invalidate();
         Status = enabled ? IntegrationStatus.Blocked : IntegrationStatus.Disabled;
@@ -198,9 +214,11 @@ public sealed class IntegrationSession : IDisposable
             try { Settings = completed.GetAwaiter().GetResult(); }
             catch (Exception) { LoadFailed = true; Settings = new(); }
             SettingsLoaded = true;
+            SettingsGeneration++;
             readPending = Settings.HonorificEnabled;
             IpcOptionsChanged?.Invoke(IpcOptions);
             MoodlesOptionsChanged?.Invoke(MoodlesOptions);
+            LifestreamOptionsChanged?.Invoke(LifestreamOptions);
         }
         if (save is { IsCompleted: true } written)
         {

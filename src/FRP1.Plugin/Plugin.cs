@@ -57,6 +57,7 @@ public sealed class Plugin : IDalamudPlugin
     private readonly IntegrationSession integrations;
     private readonly MoodlesAdapter moodlesAdapter;
     private readonly MoodlesSession moodles;
+    private readonly LifestreamSession lifestream;
     private readonly AudiencePolicy policy;
     private readonly FrpIpcSession ipcSession;
     private readonly FrpIpcProvider? ipcProvider;
@@ -97,6 +98,12 @@ public sealed class Plugin : IDalamudPlugin
             () => integrations.MoodlesOptions, integrations.SetMoodlesOptions);
         integrations.MoodlesOptionsChanged += moodles.OptionsChanged;
         mainWindow.Moodles = moodles;
+        lifestream = new LifestreamSession(new LifestreamAdapter(PluginInterface), CaptureLifestreamContext,
+            CaptureHousingWorlds, () => integrations.LifestreamOptions, integrations.SetLifestreamOptions,
+            onFrameworkThread: () => Framework.IsInFrameworkUpdateThread);
+        integrations.LifestreamOptionsChanged += lifestream.OptionsChanged;
+        mainWindow.Lifestream = lifestream;
+        mainWindow.HousingWorldProvider = CaptureHousingWorlds;
         ipcSession = new FrpIpcSession(CaptureIpcContext, WriteIpcActionAsync, mainWindow.TryOpenIpcOwnProfile);
         integrations.IpcOptionsChanged += ipcSession.SetOptions;
         ipcProvider = FrpIpcProvider.Create(PluginInterface, ipcSession);
@@ -177,6 +184,27 @@ public sealed class Plugin : IDalamudPlugin
         return mainWindow.CaptureMoodlesContext(actor);
     }
 
+    private LifestreamContext CaptureLifestreamContext()
+    {
+        var actor = CaptureIntegrationActor();
+        uint currentWorld = 0;
+        try { if (actor.IsValid) currentWorld = ObjectTable.LocalPlayer?.CurrentWorld.RowId ?? 0; }
+        catch (Exception) { }
+        return new(mainWindow.CaptureIntegrationContext(actor), currentWorld, 0, integrations.SettingsGeneration);
+    }
+
+    private static IReadOnlyList<HousingWorld> CaptureHousingWorlds()
+    {
+        try
+        {
+            return DataManager.GetExcelSheet<Lumina.Excel.Sheets.World>()
+                .Where(world => world.RowId is > 0 and <= int.MaxValue && world.IsPublic && world.DataCenter.RowId is > 0 and <= int.MaxValue)
+                .Select(world => new HousingWorld((int)world.RowId, world.Name.ToString(), (int)world.DataCenter.RowId, world.IsPublic))
+                .Where(LifestreamRules.IsPublicWorld).OrderBy(world => world.Name, StringComparer.Ordinal).ToArray();
+        }
+        catch (Exception) { return Array.Empty<HousingWorld>(); }
+    }
+
     private FrpIpcContext CaptureIpcContext()
     {
         if (ipcCatalogVersion != ownProfiles.Version)
@@ -203,10 +231,16 @@ public sealed class Plugin : IDalamudPlugin
         return FrpIpcProfile.From(await operation.ConfigureAwait(false));
     }
 
-    private void OnIpcPolicyChanged(object? sender, EventArgs args) => ipcSession.InvalidatePolicy();
+    private void OnIpcPolicyChanged(object? sender, EventArgs args)
+    {
+        ipcSession.InvalidatePolicy();
+        lifestream.InvalidatePolicy();
+    }
 
     private void ObserveIpcScene(IFramework _)
     {
+        lifestream.ObserveScene();
+        lifestream.Tick();
         if (!ipcSession.HasCapabilities) { ipcSceneActor = default; return; }
         var current = CaptureIntegrationActor();
         if (current == ipcSceneActor) return;
@@ -273,9 +307,11 @@ public sealed class Plugin : IDalamudPlugin
         Framework.Update -= ObserveIpcScene;
         integrations.IpcOptionsChanged -= ipcSession.SetOptions;
         integrations.MoodlesOptionsChanged -= moodles.OptionsChanged;
+        integrations.LifestreamOptionsChanged -= lifestream.OptionsChanged;
         ipcProvider?.Dispose();
         ipcSession.Dispose();
         moodles.Dispose();
+        lifestream.Dispose();
         integrations.Dispose();
         gamePresentation.Dispose();
         socialUi.Dispose();

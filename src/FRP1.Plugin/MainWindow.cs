@@ -53,6 +53,11 @@ internal sealed class MainWindow : Window, IDisposable
     public GamePresentationModule? GamePresentation { get; set; }
     public IntegrationSession? Integrations { get; set; }
     public MoodlesSession? Moodles { get; set; }
+    public LifestreamSession? Lifestream { get; set; }
+    public Func<IReadOnlyList<HousingWorld>> HousingWorldProvider { get; set; } = () => Array.Empty<HousingWorld>();
+    private HousingAddress housingDraft = new(0, HousingDistrict.Mist, 1, HousingPropertyType.House);
+    private HousingAddress? housingSaved;
+    private bool housingInitialized;
     public FrpIpcSession? IpcSession { get; set; }
     public bool IpcAvailable { get; set; }
     public Func<Guid, string?>? OwnProfileReferenceProvider { get; set; }
@@ -445,7 +450,88 @@ internal sealed class MainWindow : Window, IDisposable
         if (session.LastAction is IntegrationActionResult.Stale or IntegrationActionResult.Blocked or IntegrationActionResult.RateLimited)
             Wrapped(T("Integration.Rejected"));
         DrawMoodlesSettings(session);
+        DrawLifestreamSettings(session);
         DrawIpcSettings(session);
+    }
+
+    private void DrawLifestreamSettings(IntegrationSession integrations)
+    {
+        ImGui.Separator();
+        ImGui.TextUnformatted(T("Lifestream.Title"));
+        if (Lifestream is not { } session) return;
+        var enabled = integrations.Settings.LifestreamEnabled;
+        ImGui.BeginDisabled(!integrations.SettingsLoaded);
+        if (ImGui.Checkbox(T("Lifestream.Enable"), ref enabled))
+            integrations.SetLifestreamOptions(integrations.LifestreamOptions with { Enabled = enabled });
+        ImGui.EndDisabled();
+        Wrapped(T("Lifestream." + session.Status));
+        Wrapped(T("Lifestream.Explanation"));
+        if (!enabled || !integrations.SettingsLoaded) return;
+        var saved = integrations.Settings.LifestreamAddress;
+        if (!housingInitialized || saved != housingSaved)
+        {
+            housingInitialized = true; housingSaved = saved;
+            housingDraft = saved ?? new(0, HousingDistrict.Mist, 1, HousingPropertyType.House);
+            session.AddressSelectionChanged();
+        }
+        var changed = false;
+        var worlds = HousingWorldProvider();
+        var worldName = worlds.FirstOrDefault(world => world.WorldId == housingDraft.WorldId)?.Name ?? T("Lifestream.ChooseWorld");
+        ImGui.SetNextItemWidth(220);
+        if (ImGui.BeginCombo(T("Lifestream.World"), worldName))
+        {
+            foreach (var world in worlds)
+                if (ImGui.Selectable(world.Name, world.WorldId == housingDraft.WorldId))
+                { housingDraft = housingDraft with { WorldId = world.WorldId }; changed = true; }
+            ImGui.EndCombo();
+        }
+        ImGui.SetNextItemWidth(220);
+        if (ImGui.BeginCombo(T("Lifestream.District"), T("Lifestream.District." + housingDraft.District)))
+        {
+            foreach (var district in Enum.GetValues<HousingDistrict>())
+                if (ImGui.Selectable(T("Lifestream.District." + district), housingDraft.District == district))
+                { housingDraft = housingDraft with { District = district }; changed = true; }
+            ImGui.EndCombo();
+        }
+        var ward = housingDraft.Ward;
+        ImGui.SetNextItemWidth(130);
+        if (ImGui.InputInt(T("Lifestream.Ward"), ref ward))
+        { housingDraft = housingDraft with { Ward = ward }; changed = true; }
+        var apartment = housingDraft.PropertyType == HousingPropertyType.Apartment;
+        if (ImGui.Checkbox(T("Lifestream.Apartment"), ref apartment))
+        {
+            housingDraft = LifestreamRules.Canonicalize(housingDraft with
+            { PropertyType = apartment ? HousingPropertyType.Apartment : HousingPropertyType.House });
+            changed = true;
+        }
+        var number = apartment ? housingDraft.Apartment : housingDraft.Plot;
+        ImGui.SetNextItemWidth(130);
+        if (ImGui.InputInt(T(apartment ? "Lifestream.ApartmentNumber" : "Lifestream.Plot"), ref number))
+        {
+            housingDraft = apartment ? housingDraft with { Apartment = number } : housingDraft with { Plot = number };
+            changed = true;
+        }
+        if (apartment)
+        {
+            var subdivision = housingDraft.ApartmentSubdivision;
+            if (ImGui.Checkbox(T("Lifestream.Subdivision"), ref subdivision))
+            { housingDraft = housingDraft with { ApartmentSubdivision = subdivision }; changed = true; }
+        }
+        if (changed) session.AddressSelectionChanged();
+        var valid = LifestreamRules.IsValidAddress(housingDraft) && LifestreamRules.WorldExists(housingDraft, worlds);
+        if (!valid) Wrapped(T("Lifestream.InvalidAddress"));
+        ImGui.BeginDisabled(!valid);
+        if (ImGui.Button(T("Lifestream.Save"))) session.SaveAddress(housingDraft);
+        ImGui.EndDisabled();
+        ImGui.SameLine();
+        ImGui.BeginDisabled(!valid || housingDraft != integrations.Settings.LifestreamAddress || dirty || Busy ||
+            session.Status != IntegrationStatus.Ready || session.HasPendingVisit);
+        if (ImGui.Button(T("Lifestream.Visit"))) session.RequestVisit();
+        ImGui.EndDisabled();
+        if (housingDraft != integrations.Settings.LifestreamAddress) Wrapped(T("Lifestream.Unsaved"));
+        if (session.LastAction == LifestreamActionResult.HandedOff) Wrapped(T("Lifestream.HandedOff"));
+        else if (session.LastAction == LifestreamActionResult.Queued) Wrapped(T("Lifestream.Queued"));
+        else if (session.LastAction != LifestreamActionResult.None) Wrapped(T("Lifestream.Rejected"));
     }
 
     private void DrawMoodlesSettings(IntegrationSession integrations)

@@ -4,7 +4,7 @@ namespace FRP1.Plugin.Integrations;
 
 public sealed class IntegrationSettingsStore(string configurationDirectory)
 {
-    // Five ID/hash/rating bindings plus the existing optional integrations.
+    // Five ID/hash/rating bindings and one typed housing destination, all local.
     public const int MaximumBytes = 8192;
     private readonly LocalJsonFile<IntegrationSettings> file = new(configurationDirectory, "integrations.json", MaximumBytes,
         () => new(), Validate);
@@ -14,7 +14,8 @@ public sealed class IntegrationSettingsStore(string configurationDirectory)
         if (value is null || value.SchemaVersion != 1 || value.MoodlesBindings is null)
             throw new InvalidDataException("Invalid local integration settings.");
         var options = MoodlesRules.ValidateOptions(new(value.MoodlesEnabled, value.MoodlesBindings));
-        return value with { MoodlesBindings = options.Bindings! };
+        var lifestream = LifestreamRules.ValidateOptions(new(value.LifestreamEnabled, value.LifestreamAddress));
+        return value with { MoodlesBindings = options.Bindings!, LifestreamAddress = lifestream.Address };
     }
 
     public Task<IntegrationSettings> LoadAsync(CancellationToken cancellationToken = default) => file.LoadAsync(cancellationToken);

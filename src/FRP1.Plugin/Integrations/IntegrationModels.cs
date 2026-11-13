@@ -14,6 +14,8 @@ public sealed record IntegrationSettings
     public bool IpcOpenOwnProfileEnabled { get; init; }
     public bool MoodlesEnabled { get; init; }
     public IReadOnlyList<MoodlesBinding> MoodlesBindings { get; init; } = Array.Empty<MoodlesBinding>();
+    public bool LifestreamEnabled { get; init; }
+    public HousingAddress? LifestreamAddress { get; init; }
 }
 
 public sealed record IntegrationIpcOptions(bool ReadEnabled = false, bool ControlEnabled = false,
