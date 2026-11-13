@@ -1,10 +1,10 @@
 # FRP1 – Benutzerhandbuch
 
-Stand: 2026-11-13 · veröffentlichter früher öffentlicher Teststand 0.2.0.8 (Prerelease).
+Stand: 2026-11-13 · veröffentlichter früher öffentlicher Teststand 0.2.0.9 (Prerelease).
 
-**Veröffentlicht:** Repository, MIT-Lizenz, Installerindex und Releasepaket 0.2.0.8 sind öffentlich und ohne Anmeldung erreichbar. Der erfolgreiche GitHub-Lauf besteht Build ohne Warnungen/Fehler, 1201/1201 Funktionstests (36 Sekunden), 33/33 Paketprüfungen und 105/105 CI-Prüfungen; anonyme JSON-/ZIP-/Hashprüfung und vollständige erneute Paketvalidierung sind erfolgreich. Eine native IPC-/Spiel-/LAN-/Internetabnahme steht noch aus.
+**Veröffentlicht:** Repository, MIT-Lizenz, Installerindex und Releasepaket 0.2.0.9 sind öffentlich und ohne Anmeldung erreichbar. Der erfolgreiche GitHub-Lauf besteht Build ohne Warnungen/Fehler, 1201/1201 Funktionstests (37 Sekunden), 33/33 Paketprüfungen und 105/105 CI-Prüfungen; anonyme JSON-/ZIP-/Hashprüfung und vollständige erneute Paketvalidierung sind erfolgreich. Eine native IPC-/Spiel-/LAN-/Internetabnahme steht noch aus.
 
-**Aktuelle Bedienung:** [Abschnitt 19](#19-kompakte-bedienung-seit-0204) beschreibt die seit 0.2.0.4 geltende Oberfläche: drei Hauptwege und Profilbereiche, eigene Lesekarte, einzeilige zielunabhängige eigene Leiste und drei primäre Themes. [Abschnitt 20](#20-honorific-titel-lokal-übernehmen-seit-0205) ergänzt die optionale Honorific-Titelübernahme seit 0.2.0.5, [Abschnitt 21](#21-lokale-frp1-schnittstelle-seit-0206) die lokale FRP1-Schnittstelle seit 0.2.0.6. Kapitel 1–18 halten ältere Bedienung und die Entwicklungshistorie fest. Daten und Freigaben bleiben erhalten.
+**Aktuelle Bedienung:** [Abschnitt 19](#19-kompakte-bedienung-seit-0204) beschreibt die seit 0.2.0.4 geltende Oberfläche: drei Hauptwege und Profilbereiche, eigene Lesekarte, einzeilige zielunabhängige eigene Leiste und drei primäre Themes. [Abschnitt 20](#20-honorific-titel-lokal-übernehmen-seit-0205) ergänzt die optionale Honorific-Titelübernahme seit 0.2.0.5, [Abschnitt 21](#21-lokale-frp1-schnittstelle-seit-0206) die lokale FRP1-Schnittstelle seit 0.2.0.6. [Abschnitt 24](#24-kompakte-integrationen-wp3) beschreibt die seit 0.2.0.9 kompakte Integrationsoberfläche. Kapitel 1–18 halten ältere Bedienung und die Entwicklungshistorie fest. Daten und Freigaben bleiben erhalten.
 
 **Neu seit 0.2.0.7 (Quelle `1d5f774`):** [Abschnitt 22](#22-moodles-lokal-auswählen-wp5) erklärt die optionale lokale Moodles-Auswahl und bewusste Übernahme als Eindruck. Die Veröffentlichung ist durch [Hosted-Lauf 43419504299](https://github.com/demkadse/Final-Roleplay-1/actions/runs/43419504299) sowie anonyme Index-/Download-/Hash-/Paketprüfung belegt. Aktualisiere über die bestehende JSON-Adresse im Dalamud-Installer und lade bei Bedarf neu; lokale Daten und Freigaben bleiben erhalten, Moodles wird nicht automatisch aktiviert. Native Moodles-/Spielabnahme steht aus.
 
@@ -275,7 +275,7 @@ Technische Details: [Architektur](architecture.md), [Machbarkeit](feasibility.md
 
 ## 17. Historische Bedienung von 0.1.1.1 bis 0.1.1.3
 
-Dieser Abschnitt hält die historische Bedienung von 0.1.1.1 bis 0.1.1.3 fest. Für das aktuelle 0.2.0.8 gelten die Anleitungen in Abschnitt 19–23; fünf Profilbereiche, zielabhängige eigene Leiste und Hilfebadges sind dort abgelöst. Die Installeradresse bleibt gleich.
+Dieser Abschnitt hält die historische Bedienung von 0.1.1.1 bis 0.1.1.3 fest. Für das aktuelle 0.2.0.9 gelten die Anleitungen in Abschnitt 19–24; fünf Profilbereiche, zielabhängige eigene Leiste und Hilfebadges sind dort abgelöst. Die Installeradresse bleibt gleich.
 
 ### Profil bearbeiten und lesen
 
@@ -330,7 +330,7 @@ Nach einem solchen Botcommit muss der Maintainer seinen lokalen Branch vor dem n
 
 ## 19. Kompakte Bedienung seit 0.2.0.4
 
-Dieser Abschnitt beschreibt die seit 0.2.0.4 geltende Oberfläche; das aktuelle Release ist 0.2.0.8. Aktualisiere über die bestehende JSON-Adresse im Dalamud-Installer und lade das Plugin bei Bedarf neu. Konfigurationslöschung oder Datenmigration sind nicht erforderlich. Die frühere Vorgabe für fünf Bereiche und eine zielabhängige eigene Leiste wurde ausdrücklich aufgehoben.
+Dieser Abschnitt beschreibt die seit 0.2.0.4 geltende Oberfläche; das aktuelle Release ist 0.2.0.9. Aktualisiere über die bestehende JSON-Adresse im Dalamud-Installer und lade das Plugin bei Bedarf neu. Konfigurationslöschung oder Datenmigration sind nicht erforderlich. Die frühere Vorgabe für fünf Bereiche und eine zielabhängige eigene Leiste wurde ausdrücklich aufgehoben.
 
 ### Drei Wege und eine lesbare eigene Karte
 
@@ -409,3 +409,16 @@ Stand **2026-11-13**, als [Release v0.2.0.8](https://github.com/demkadse/Final-R
 6. **Auftrag vorgemerkt** bedeutet, dass FRP1 vor der Übergabe erneut prüft. **Auftrag übergeben. Keine Ankunftsbestätigung.** bestätigt ausschließlich die Übergabe an Lifestream. Erreichbarkeit, Ankunft und erfolgreicher Zutritt werden nicht bestätigt.
 
 Bei Charakter-, Welt-, Szenen-, Ziel-/Einstellungs-, Freigabe- oder Providerwechsel sowie offenen Änderungen/laufenden Vorgängen verwirft FRP1 ausstehende Aufträge. Hintergrundprüfungen erfolgen höchstens einmal pro Sekunde, Besuchsaktionen mit mindestens 500 ms Abstand. Ein bereits an Lifestream übergebener Auftrag wird dadurch nicht zurückgenommen: **Ausschalten in FRP1 stoppt eine gestartete Reise nicht.** FRP1 hat keinen Abbruchknopf, keinen Reiseticket-/Erfolgsnachweis und beansprucht keine Kontrolle über die gestartete Reise. Bediene laufende Reisen in Lifestream selbst.
+
+## 24. Kompakte Integrationen (WP3)
+
+Stand **2026-11-13**, Quelle `5e809b85dd83eadaf25f46a6b726c3a39b693df7`, umgesetzt, automatisiert geprüft und unabhängig reviewfreigegeben. Als [Release v0.2.0.9](https://github.com/demkadse/Final-Roleplay-1/releases/tag/v0.2.0.9) veröffentlicht und durch [Hosted-Lauf 43464404004](https://github.com/demkadse/Final-Roleplay-1/actions/runs/43464404004) sowie anonyme Index-/ZIP-/Hash-/Paketprüfung bestätigt. Über die bestehende JSON-Adresse aktualisieren und bei Bedarf neu laden; Daten und Freigaben bleiben erhalten, Integrationen werden nicht automatisch aktiviert. Native Bedienung, Fokus und Skalierung sind noch nicht abgenommen.
+
+Unter **Einstellungen → Integrationen** starten **Honorific**, **Moodles**, **Lifestream** und **FRP1-IPC** als vier geschlossene Teile. Status und aktuelle Freigaben bleiben sichtbar. Öffne gezielt den gewünschten Teil; Auf- und Zuklappen ändern keine Freigabe. Alle bisherigen Inhalts-, Alters-, Speicher- und Reisegrenzen aus Abschnitt 20–23 gelten weiter.
+
+- **Honorific:** Öffne den Teil für lokale Freigabe, Titelvorschau und bewusste Übernahme in den eigenen Entwurf. Anschließend regulär speichern.
+- **Moodles:** Gewählte Einträge zeigen Titel und Prüfstatus kompakt. **Inhalt prüfen** öffnet Beschreibung und ausdrückliche Allgemein-/Ab-18-Bewertung gemeinsam. Verborgene Quellen zeigen weder Titel noch Beschreibung. Übernahme und reguläres Speichern bleiben getrennt.
+- **Lifestream:** Das gespeicherte Ziel erscheint als kurze Zusammenfassung. Öffne **Ziel bearbeiten** für die Adressfelder und **Ziel speichern**. **Besuchen**, Reisehinweis und Ergebnis bleiben auch bei geschlossenem Adresseditor zugänglich. Speichern startet keine Reise; FRP1 bestätigt nur die Übergabe und bietet keinen Abbruch.
+- **FRP1-IPC:** Alle fünf Freigaben bleiben erhalten. Bei ausgeschaltetem **Lokale Aktionen erlauben** sind die drei einzelnen Aktionsfreigaben weiterhin sichtbar, aber nicht bedienbar. Aufklappen aktiviert sie nicht.
+
+Vier thematische Hilfen sind über die bestehende Hilfe, Hover beziehungsweise Tastaturfokus und das Hilfemenü erreichbar. Die globale Hinweissteuerung gilt weiter. Diese Änderung betrifft nur Oberfläche und Hilfe; Daten, Einstellungen und Integrationsverhalten werden nicht migriert.

@@ -2,7 +2,26 @@
 
 Stand: 2026-11-13
 
-## Aktueller Checkpoint: WP7 als 0.2.0.8 veröffentlicht
+## Aktueller Checkpoint: WP3 als 0.2.0.9 veröffentlicht, Integrationsplan abgeschlossen
+
+**WP3 kompakte Integrationsoberfläche am 2026-11-13 umgesetzt und unabhängig ohne kritische/wichtige Restbefunde reviewfreigegeben**, Quelle `5e809b85dd83eadaf25f46a6b726c3a39b693df7`. Als **0.2.0.9 veröffentlicht**; öffentlicher Software-/Index-/Downloadnachweis erfolgreich. Bestehende vollständige Suite einmal 1201/1201 bestanden (28 Sekunden, keine Fehler/Skips), API-15-Solutionbuild 0 Warnungen/Fehler (1,11 Sekunden), Paket33/33. Die bestehenden Tests prüfen auch die vier neuen Hilfethemen und DE-/EN-Texte; keine neuen Tests angelegt. Native Bedien-/Fokus-/Skalierungsabnahme bleibt offen.
+
+Vier standardmäßig geschlossene Teile **Honorific**, **Moodles**, **Lifestream** und **FRP1-IPC** halten Status und Freigaben auch geschlossen sichtbar; Auf-/Zuklappen verändert keine Freigabe oder Integrationseinstellung. Moodles zeigt Titel und Prüfstatus kompakt, Beschreibung und Rating gemeinsam unter **Inhalt prüfen**; verborgene Quellen bleiben neutral und liefern keine Titel/Beschreibungen. Lifestream zeigt das gespeicherte Ziel als Zusammenfassung, Adressfelder unter **Ziel bearbeiten**, mit getrennten Aktionen Speichern/Besuchen. Reisehinweis bei Besuchen und Übergabeergebnis bleiben bei geschlossenem Adresseditor sichtbar. IPC behält alle fünf Freigaben; die drei Aktionsflags bleiben bei ausgeschalteter globaler Aktionsfreigabe sichtbar, sind jedoch nicht bedienbar. Vier angehängte Hilfethemen verwenden die bestehende Hinweissteuerung, Hover/Fokus und das Hilfemenü; kein neuer Tutorialdialog. Ausschließlich UI/Hilfe in `MainWindow.cs`, `Localization/UiText.cs` (25 DE-/EN-Schlüssel) und `HelpContent.cs` (vier Themen); keine Adapter-, Schema-, Daten-, Session- oder Backendänderung.
+
+Mit bestätigter Veröffentlichung 0.2.0.9 sind die beauftragten umsetzbaren Integrationspakete **WP1/WP2/WP3/WP4/WP5/WP7 abgeschlossen, reviewfreigegeben und veröffentlicht**. WP6-Glamourer-Schreiben und das WP8-Customize+-Produktmodul bleiben wegen der dokumentierten Fremd-API-Grenzen zurückgestellt. Offen bleiben native Abnahmen und diese belegten Grenzen; kein weiterer Implementierungsauftrag ohne nachgewiesene Notwendigkeit.
+
+Verifiziertes Quellbackup vor WP3: `.release-staging/before-integration-ux-20261113T163049Z`, Quelle `5c01d54`, SHA-256 `C3FC93FB27B5C3145EFED97E52FF77E7BB89C87395935A4F2E50E6D487D738D6`.
+
+[Hosted-Lauf 43464404004](https://github.com/demkadse/Final-Roleplay-1/actions/runs/43464404004) besteht Build/Publish mit **0 Warnungen/Fehlern**, **1201/1201 Funktionstests** (37 Sekunden), **33/33 Paketprüfungen** und **105/105 CI-Prüfungen** (Policy33, Publication24, SDK44, Quellpfade4). [Release v0.2.0.9](https://github.com/demkadse/Final-Roleplay-1/releases/tag/v0.2.0.9) ist ein öffentlicher früher Teststand/Prerelease, kein Entwurf; Assets genau `FRP1-0.2.0.9.zip` und `SHA256SUMS`. Der kanonische Raw-Index ist öffentlich; Index anonym HTTP 200 mit Version 0.2.0.9, ZIP und `SHA256SUMS` anonym geladen, Hashvergleich und vollständige Paketvalidierung bestanden. Botcommit `a16b3af6152b8184b8d6d5ff157db8eeadebaa46` ändert nur `repo.json`; per Fast-forward abgeglichen.
+
+| Datei / Feld | Nachweis für 0.2.0.9 |
+|---|---|
+| ZIP-Größe | 1.140.551 Bytes |
+| ZIP SHA-256 | `A8AF7603698FB0FCB0011D64526F30E576BBBF4DB38DC548E42EC3EFE857CA6F` |
+| JSON SHA-256 | `6EF47A40E696C4EBCB2756DD064790FC6DB690713FE70EA1EF46D89E93472EA2` |
+| LastUpdate | `1794587782` |
+
+## Vorheriger Stand: WP7 als 0.2.0.8 veröffentlicht
 
 **WP7 Lifestream ist am 2026-11-13 im Produktcode implementiert; Tests bestanden, unabhängig ohne kritische/wichtige Restbefunde reviewfreigegeben; als 0.2.0.8 veröffentlicht, Quelle `5c01d545de0330ac6231175c617f8801453def33`.** Lokal 182/182 gezielte und 1201/1201 vollständige Funktionstests (28 Sekunden, keine Fehler/Skips), Testbuild ohne Warnungen/Fehler, voller API-15-Release-Solutionbuild 0 Warnungen/Fehler (1,25 Sekunden), Paket33/33. Release 0.2.0.8 ist öffentlich bestätigt. Native QA offen, Lifestream wurde durch den Agenten weder installiert noch aktiviert. Verifiziertes lokales Quellbackup vor WP7: `.release-staging/before-lifestream-20261113T114933Z`, Quelle `de8a29d`, SHA-256 `B1EEBDB6E65E8941DD3D8732EF111AF6124796F76C2CF06B4B16DC52FAA23A82`. WP6-Glamourer-Schreiben ist nach begrenztem API-1.8-/Quellabgleich blockiert: `ApplyDesign(Once | Equipment, key: 0)` kann über verknüpfte AssociatedMods Penumbra ändern; ActorIndex-/Identitäts-/Kopienscope ist ebenfalls ungeklärt. Kein WP6-Produktcode, keine Dummyoberfläche oder native Abnahme. Belegte Quellkette und Grenzen: [Integrationsplan, WP6](docs/integrationen-plan.md#wp6--eigener-glamourer-equipment-look).
 
@@ -18,8 +37,6 @@ Technische Grenze: exakt geladene Lifestream-Version 2.6.0.13/API 15 über insta
 | ZIP SHA-256 | `C1A6C311FC79E35BF4397B87E134286CB826AEAE7B22FAAD2D338E94A31B55ED` |
 | JSON SHA-256 | `B72FE581D5F4FF19606922C6392F97A92BD1F43A46619BC65F500EDBD32EF4AD` |
 | LastUpdate | `1794587256` |
-
-**Aktueller Arbeitsfokus WP3:** Der kompakte UX-Abschluss ist am 2026-11-13 in Umsetzung (`integration_ux_impl`), noch ohne Funktions-/Prüf-/Releaseabschluss. Umfang ausschließlich `MainWindow.cs`, `Localization/UiText.cs` und `HelpContent.cs`: vier kurze, zunächst geschlossene Integrationsteile; Status und Freigabe bleiben außen sichtbar, Details gezielt öffnen. Keine Daten-/Sessionänderung. Verifiziertes Quellbackup: `.release-staging/before-integration-ux-20261113T163049Z`, Quelle `5c01d54`, SHA-256 `C3FC93FB27B5C3145EFED97E52FF77E7BB89C87395935A4F2E50E6D487D738D6`.
 
 ## Vorheriger Stand: WP5 Moodles als 0.2.0.7 veröffentlicht
 
@@ -40,7 +57,7 @@ Lokaler WP5-Nachweis laut abgeschlossener Teamprüfung: voller Release-Solutionb
 | JSON SHA-256 | `ED2E67B29314896F55509FCA77A4AAFBD2864E623234CE3083C95D6F74D3E123` |
 | LastUpdate | `1794570287` |
 
-Verifiziertes Quellbackup vor WP5: `.release-staging/before-moodles-20261113T112856Z`, Quelle `7666329`, SHA-256 `32CABC658791D3436FC4F8546EB88AD44D8052CEB81786BF8ACFD7072F3A2006`. WP3-Ausbau und WP6–8 bleiben separate Pakete. Bedienung: [Handbuch, Abschnitt 22](docs/benutzerhandbuch.md#22-moodles-lokal-auswählen-wp5).
+Verifiziertes Quellbackup vor WP5: `.release-staging/before-moodles-20261113T112856Z`, Quelle `7666329`, SHA-256 `32CABC658791D3436FC4F8546EB88AD44D8052CEB81786BF8ACFD7072F3A2006`. Historisch folgten WP3/WP6–8 als separate Pakete; aktueller Stand oben. Bedienung: [Handbuch, Abschnitt 22](docs/benutzerhandbuch.md#22-moodles-lokal-auswählen-wp5).
 
 ## Vorheriger Stand: WP4 als 0.2.0.6 veröffentlicht
 
