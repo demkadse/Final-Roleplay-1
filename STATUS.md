@@ -2,7 +2,26 @@
 
 Stand: 2026-11-13
 
-## Aktueller Checkpoint: WP5 Moodles als 0.2.0.7 veröffentlicht
+## Aktueller Checkpoint: WP7 als 0.2.0.8 veröffentlicht
+
+**WP7 Lifestream ist am 2026-11-13 im Produktcode implementiert; Tests bestanden, unabhängig ohne kritische/wichtige Restbefunde reviewfreigegeben; als 0.2.0.8 veröffentlicht, Quelle `5c01d545de0330ac6231175c617f8801453def33`.** Lokal 182/182 gezielte und 1201/1201 vollständige Funktionstests (28 Sekunden, keine Fehler/Skips), Testbuild ohne Warnungen/Fehler, voller API-15-Release-Solutionbuild 0 Warnungen/Fehler (1,25 Sekunden), Paket33/33. Release 0.2.0.8 ist öffentlich bestätigt. Native QA offen, Lifestream wurde durch den Agenten weder installiert noch aktiviert. Verifiziertes lokales Quellbackup vor WP7: `.release-staging/before-lifestream-20261113T114933Z`, Quelle `de8a29d`, SHA-256 `B1EEBDB6E65E8941DD3D8732EF111AF6124796F76C2CF06B4B16DC52FAA23A82`. WP6-Glamourer-Schreiben ist nach begrenztem API-1.8-/Quellabgleich blockiert: `ApplyDesign(Once | Equipment, key: 0)` kann über verknüpfte AssociatedMods Penumbra ändern; ActorIndex-/Identitäts-/Kopienscope ist ebenfalls ungeklärt. Kein WP6-Produktcode, keine Dummyoberfläche oder native Abnahme. Belegte Quellkette und Grenzen: [Integrationsplan, WP6](docs/integrationen-plan.md#wp6--eigener-glamourer-equipment-look).
+
+WP7-Bedienung: **Einstellungen → Integrationen → Lifestream – lokales Housingziel**, standardmäßig aus. Genau ein lokales Ziel: öffentliche Welt, eines von fünf Wohngebieten, Bezirk 1–30, Haus 1–60 oder Apartment 1–90 (FRP1-Produktgrenze), bei Apartments optional Unterbezirk. **Ziel speichern** startet keine Reise; **Besuchen** übergibt den gespeicherten unveränderten Zielstand bewusst an Lifestream. Welt-/Datenzentrumwechsel, Teleport, Bewegung und Apartmentzutritt sind möglich. Die UI bestätigt ausschließlich die Auftragsübergabe, keine Ankunft, Erreichbarkeit oder Eigentümerschaft. Kein Ticket, Erfolgsnachweis oder FRP1-Abbruch; Ausschalten stoppt bereits übergebene Reisen nicht. Lifestream für deren weitere Bedienung verwenden.
+
+Technische Grenze: exakt geladene Lifestream-Version 2.6.0.13/API 15 über installierte Pluginmetadaten, kein Versionshandshake. Nur `Lifestream.IsBusy` und die Action `Lifestream.GoToHousingAddress`; kein QuickTravel-Check, ein ausgeschaltetes QuickTravel blockiert diesen Weg nicht. Übergabe als typisiertes 10-Felder-Tuple mit leeren Namens-/Aliasstrings und deaktiviertem Alias. Ziel nur lokal in `integrations.json`, Schema 1/8 KiB, keine Profil-/Wirefelder oder FRP1-Server. Öffentliche Welt mit gültiger World-/DataCenter-ID vor Dispatch frisch gegen World-Sheet prüfen. Pending-Aufträge bei Dirty/Busy sowie Actor-, Welt-, Szenen-, Einstellungs-, Policy- oder Providerwechsel verwerfen. 500 ms Aktionsabstand, Hintergrundprüfung höchstens 1 Hz; ausdrückliche Übergabe prüft frisch. [WP7-Details und Quellen](docs/integrationen-plan.md#wp7--lifestream-housingbesuch), [Handbuch, Abschnitt 23](docs/benutzerhandbuch.md#23-lifestream-housingziel-bewusst-besuchen-wp7).
+
+[Hosted-Lauf 43462921783](https://github.com/demkadse/Final-Roleplay-1/actions/runs/43462921783) besteht Build/Publish mit **0 Warnungen/Fehlern**, **1201/1201 Funktionstests** (36 Sekunden), **33/33 Paketprüfungen** und **105/105 CI-Prüfungen** (Policy33, Publication24, SDK44, Quellpfade4). [Release v0.2.0.8](https://github.com/demkadse/Final-Roleplay-1/releases/tag/v0.2.0.8) und kanonischer Raw-Index öffentlich; Index anonym HTTP 200 mit Version 0.2.0.8, ZIP und `SHA256SUMS` anonym geladen, Hashvergleich und vollständige Paketvalidierung bestanden. Botcommit `5cc6ab3` ändert nur `repo.json`; per Fast-forward abgeglichen.
+
+| Datei / Feld | Nachweis für 0.2.0.8 |
+|---|---|
+| ZIP-Größe | 1.137.918 Bytes |
+| ZIP SHA-256 | `C1A6C311FC79E35BF4397B87E134286CB826AEAE7B22FAAD2D338E94A31B55ED` |
+| JSON SHA-256 | `B72FE581D5F4FF19606922C6392F97A92BD1F43A46619BC65F500EDBD32EF4AD` |
+| LastUpdate | `1794587256` |
+
+**Aktueller Arbeitsfokus WP3:** Der kompakte UX-Abschluss ist am 2026-11-13 in Umsetzung (`integration_ux_impl`), noch ohne Funktions-/Prüf-/Releaseabschluss. Umfang ausschließlich `MainWindow.cs`, `Localization/UiText.cs` und `HelpContent.cs`: vier kurze, zunächst geschlossene Integrationsteile; Status und Freigabe bleiben außen sichtbar, Details gezielt öffnen. Keine Daten-/Sessionänderung. Verifiziertes Quellbackup: `.release-staging/before-integration-ux-20261113T163049Z`, Quelle `5c01d54`, SHA-256 `C3FC93FB27B5C3145EFED97E52FF77E7BB89C87395935A4F2E50E6D487D738D6`.
+
+## Vorheriger Stand: WP5 Moodles als 0.2.0.7 veröffentlicht
 
 **Quellstand `1d5f7749cabfad47ad4636398ef524a71605d331`, veröffentlicht am 2026-11-13:** Moodles ist unter **Einstellungen → Integrationen** standardmäßig ausgeschaltet. Der Adapter liest ausschließlich eigene aktive Zustände (API 4, Quellformat 2). Höchstens fünf lokale Bindungen halten Status-ID, Inhalts-Hash und ein ausdrücklich bestätigtes General-/Mature-Rating. Titel, Text und Icon sind an den Hash gebunden; geänderte Inhalte gelten wieder als ungeprüft. Ungeprüfte und Mature-Vorschauen erfordern aktuelle Adult-Auswahl samt Mature-Opt-in; ein passendes geprüftes General-Rating erlaubt die Vorschau nach erfolgter Alterswahl. Bewertung selbst verlangt Adult samt Mature-Opt-in. Kein automatisches General-Rating.
 
@@ -22,8 +41,6 @@ Lokaler WP5-Nachweis laut abgeschlossener Teamprüfung: voller Release-Solutionb
 | LastUpdate | `1794570287` |
 
 Verifiziertes Quellbackup vor WP5: `.release-staging/before-moodles-20261113T112856Z`, Quelle `7666329`, SHA-256 `32CABC658791D3436FC4F8546EB88AD44D8052CEB81786BF8ACFD7072F3A2006`. WP3-Ausbau und WP6–8 bleiben separate Pakete. Bedienung: [Handbuch, Abschnitt 22](docs/benutzerhandbuch.md#22-moodles-lokal-auswählen-wp5).
-
-**WP7 Lifestream ist am 2026-11-13 nach dem begrenzten Adress-/Abbruchabgleich in Umsetzung (`lifestream_impl`); noch kein abgeschlossener Funktions-/Prüf-/Releaseumfang.** Verifiziertes lokales Quellbackup vor WP7: `.release-staging/before-lifestream-20261113T114933Z`, Quelle `de8a29d`, SHA-256 `B1EEBDB6E65E8941DD3D8732EF111AF6124796F76C2CF06B4B16DC52FAA23A82`. WP6-Glamourer-Schreiben ist nach begrenztem API-1.8-/Quellabgleich blockiert: `ApplyDesign(Once | Equipment, key: 0)` kann über verknüpfte AssociatedMods Penumbra ändern; ActorIndex-/Identitäts-/Kopienscope ist ebenfalls ungeklärt. Kein WP6-Produktcode, keine Dummyoberfläche oder native Abnahme. Belegte Quellkette und Grenzen: [Integrationsplan, WP6](docs/integrationen-plan.md#wp6--eigener-glamourer-equipment-look).
 
 ## Vorheriger Stand: WP4 als 0.2.0.6 veröffentlicht
 

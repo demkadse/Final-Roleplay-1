@@ -1,8 +1,8 @@
 # FRP1 – Benutzerhandbuch
 
-Stand: 2026-11-13 · veröffentlichter früher öffentlicher Teststand 0.2.0.7 (Prerelease).
+Stand: 2026-11-13 · veröffentlichter früher öffentlicher Teststand 0.2.0.8 (Prerelease).
 
-**Veröffentlicht:** Repository, MIT-Lizenz, Installerindex und Releasepaket 0.2.0.7 sind öffentlich und ohne Anmeldung erreichbar. Der erfolgreiche GitHub-Lauf besteht Build ohne Warnungen/Fehler, 1019/1019 Funktionstests (32 Sekunden), 33/33 Paketprüfungen und 105/105 CI-Prüfungen; anonyme JSON-/ZIP-/Hashprüfung und vollständige erneute Paketvalidierung sind erfolgreich. Eine native IPC-/Spiel-/LAN-/Internetabnahme steht noch aus.
+**Veröffentlicht:** Repository, MIT-Lizenz, Installerindex und Releasepaket 0.2.0.8 sind öffentlich und ohne Anmeldung erreichbar. Der erfolgreiche GitHub-Lauf besteht Build ohne Warnungen/Fehler, 1201/1201 Funktionstests (36 Sekunden), 33/33 Paketprüfungen und 105/105 CI-Prüfungen; anonyme JSON-/ZIP-/Hashprüfung und vollständige erneute Paketvalidierung sind erfolgreich. Eine native IPC-/Spiel-/LAN-/Internetabnahme steht noch aus.
 
 **Aktuelle Bedienung:** [Abschnitt 19](#19-kompakte-bedienung-seit-0204) beschreibt die seit 0.2.0.4 geltende Oberfläche: drei Hauptwege und Profilbereiche, eigene Lesekarte, einzeilige zielunabhängige eigene Leiste und drei primäre Themes. [Abschnitt 20](#20-honorific-titel-lokal-übernehmen-seit-0205) ergänzt die optionale Honorific-Titelübernahme seit 0.2.0.5, [Abschnitt 21](#21-lokale-frp1-schnittstelle-seit-0206) die lokale FRP1-Schnittstelle seit 0.2.0.6. Kapitel 1–18 halten ältere Bedienung und die Entwicklungshistorie fest. Daten und Freigaben bleiben erhalten.
 
@@ -275,7 +275,7 @@ Technische Details: [Architektur](architecture.md), [Machbarkeit](feasibility.md
 
 ## 17. Historische Bedienung von 0.1.1.1 bis 0.1.1.3
 
-Dieser Abschnitt hält die historische Bedienung von 0.1.1.1 bis 0.1.1.3 fest. Für das aktuelle 0.2.0.7 gelten die Anleitungen in Abschnitt 19–22; fünf Profilbereiche, zielabhängige eigene Leiste und Hilfebadges sind dort abgelöst. Die Installeradresse bleibt gleich.
+Dieser Abschnitt hält die historische Bedienung von 0.1.1.1 bis 0.1.1.3 fest. Für das aktuelle 0.2.0.8 gelten die Anleitungen in Abschnitt 19–23; fünf Profilbereiche, zielabhängige eigene Leiste und Hilfebadges sind dort abgelöst. Die Installeradresse bleibt gleich.
 
 ### Profil bearbeiten und lesen
 
@@ -330,7 +330,7 @@ Nach einem solchen Botcommit muss der Maintainer seinen lokalen Branch vor dem n
 
 ## 19. Kompakte Bedienung seit 0.2.0.4
 
-Dieser Abschnitt beschreibt die seit 0.2.0.4 geltende Oberfläche; das aktuelle Release ist 0.2.0.7. Aktualisiere über die bestehende JSON-Adresse im Dalamud-Installer und lade das Plugin bei Bedarf neu. Konfigurationslöschung oder Datenmigration sind nicht erforderlich. Die frühere Vorgabe für fünf Bereiche und eine zielabhängige eigene Leiste wurde ausdrücklich aufgehoben.
+Dieser Abschnitt beschreibt die seit 0.2.0.4 geltende Oberfläche; das aktuelle Release ist 0.2.0.8. Aktualisiere über die bestehende JSON-Adresse im Dalamud-Installer und lade das Plugin bei Bedarf neu. Konfigurationslöschung oder Datenmigration sind nicht erforderlich. Die frühere Vorgabe für fünf Bereiche und eine zielabhängige eigene Leiste wurde ausdrücklich aufgehoben.
 
 ### Drei Wege und eine lesbare eigene Karte
 
@@ -396,3 +396,16 @@ Stand **2026-11-13**, im Quellstand `1d5f774` umgesetzt, automatisiert geprüft 
 Die Prüfung gilt nur für den unveränderten Inhalt. Ändern sich Titel, Text oder Icon in Moodles, gilt der Eintrag wieder als ungeprüft und benötigt eine erneute Bestätigung; es gibt keine automatische Aktualisierung des bereits übernommenen Glance. Auswahl und Bewertung bleiben lokal. **Auswahl entfernen** löst die lokale Bindung, die ausgeschaltete Integration beendet ihre Lese-/Übernahmefunktion. FRP1 setzt, entfernt oder verändert keine Moodles-Zustände und liest keine fremden Statuslisten.
 
 Bei Charakter-, Profil-, Quellen- oder Freigabewechsel verwirft FRP1 veraltete Vorschauen und ausstehende Aktionen. Hintergrundaktualisierungen erfolgen höchstens einmal pro Sekunde; Bewertung und Import prüfen die Quelle zusätzlich frisch und teilen einen Mindestabstand von 500 ms. Bei einer Sperre kurz warten, aktuellen Zustand prüfen und die gewünschte Aktion bewusst erneut auslösen.
+
+## 23. Lifestream-Housingziel bewusst besuchen (WP7)
+
+Stand **2026-11-13**, als [Release v0.2.0.8](https://github.com/demkadse/Final-Roleplay-1/releases/tag/v0.2.0.8) veröffentlicht, Quelle `5c01d54`. Automatisierte Prüfung und unabhängiges Review ohne kritische/wichtige Restbefunde erfolgreich; [Hosted-Lauf 43462921783](https://github.com/demkadse/Final-Roleplay-1/actions/runs/43462921783) sowie anonyme Index-/ZIP-/Hash-/Paketprüfung bestanden. Über die bestehende JSON-Adresse aktualisieren und bei Bedarf neu laden. Daten und Freigaben bleiben erhalten; Lifestream wird nicht automatisch aktiviert. 182/182 gezielte und 1201/1201 vollständige Funktionstests bestanden, Build ohne Warnungen/Fehler, Paket33; Reviewfreigabe erteilt; native Spiel-/UI-/Reiseabnahme offen. Lifestream wurde durch den Agenten weder installiert noch aktiviert.
+
+1. Öffne **Einstellungen → Integrationen → Lifestream – lokales Housingziel**. Die Funktion ist standardmäßig aus. Unterstützt wird exakt eine geladene Lifestream-Installation **2.6.0.13 mit API 15**; fehlende oder andere Versionen sperren die Übergabe.
+2. Lies den Reisehinweis und aktiviere **Housingbesuch bewusst freigeben**. **Besuchen** kann deinen eigenen aktuellen Spielcharakter bewegen, teleportieren, die Welt beziehungsweise das Datenzentrum wechseln und ein Apartment betreten.
+3. Wähle eine öffentliche **Zielwelt**, dann **Kelchkuppe**, **Lavendelbeete**, **Dorf des Nebels**, **Empyreum** oder **Shirogane** und einen **Bezirk von 1 bis 30**. Für ein Haus gilt **1 bis 60**. Aktiviere für ein Apartment **Apartment statt Haus**, wähle **1 bis 90** und bei Bedarf **Apartment im Unterbezirk**. Die Apartmentgrenze 90 ist eine FRP1-Produktgrenze.
+4. Wähle **Ziel speichern**. FRP1 hält genau ein Ziel ausschließlich lokal; Speichern startet keine Reise und ergänzt kein öffentliches Profil. Änderungen an der Auswahl müssen erneut gespeichert werden.
+5. Warte auf **bereit zur Auftragsübergabe**, schließe offene Entwurfsänderungen ab und warte laufende Vorgänge ab. Die aktuelle Alterswahl und ein verfügbarer eigener Charakter sind erforderlich. Wähle dann ausdrücklich **Besuchen**. Ein ausgeschaltetes Lifestream-QuickTravel blockiert diesen Übergabeweg nicht.
+6. **Auftrag vorgemerkt** bedeutet, dass FRP1 vor der Übergabe erneut prüft. **Auftrag übergeben. Keine Ankunftsbestätigung.** bestätigt ausschließlich die Übergabe an Lifestream. Erreichbarkeit, Ankunft und erfolgreicher Zutritt werden nicht bestätigt.
+
+Bei Charakter-, Welt-, Szenen-, Ziel-/Einstellungs-, Freigabe- oder Providerwechsel sowie offenen Änderungen/laufenden Vorgängen verwirft FRP1 ausstehende Aufträge. Hintergrundprüfungen erfolgen höchstens einmal pro Sekunde, Besuchsaktionen mit mindestens 500 ms Abstand. Ein bereits an Lifestream übergebener Auftrag wird dadurch nicht zurückgenommen: **Ausschalten in FRP1 stoppt eine gestartete Reise nicht.** FRP1 hat keinen Abbruchknopf, keinen Reiseticket-/Erfolgsnachweis und beansprucht keine Kontrolle über die gestartete Reise. Bediene laufende Reisen in Lifestream selbst.
