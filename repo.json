@@ -3,7 +3,7 @@
     "Author": "FRP1 Contributors",
     "Name": "Final Roleplay 1",
     "InternalName": "FRP1.Plugin",
-    "AssemblyVersion": "0.2.0.7",
+    "AssemblyVersion": "0.2.0.8",
     "Description": "Früher öffentlicher Teststand für lokale Rollenspielprofile und freiwilligen verschlüsselten Direktaustausch zwischen Clients. Keine Registrierung, Profilserver oder Telemetrie. Spiel- und netzübergreifende Abnahme stehen aus; NAT und Firewalls können Direktverbindungen verhindern.",
     "ApplicableVersion": "any",
     "Tags": [
@@ -19,12 +19,12 @@
     "Punchline": "Früher öffentlicher Teststand: RP-Profile direkt zwischen Clients.",
     "AcceptsFeedback": true,
     "RepoUrl": "https://github.com/demkadse/Final-Roleplay-1",
-    "DownloadLinkInstall": "https://github.com/demkadse/Final-Roleplay-1/releases/download/v0.2.0.7/FRP1-0.2.0.7.zip",
-    "DownloadLinkUpdate": "https://github.com/demkadse/Final-Roleplay-1/releases/download/v0.2.0.7/FRP1-0.2.0.7.zip",
-    "DownloadLinkTesting": "https://github.com/demkadse/Final-Roleplay-1/releases/download/v0.2.0.7/FRP1-0.2.0.7.zip",
+    "DownloadLinkInstall": "https://github.com/demkadse/Final-Roleplay-1/releases/download/v0.2.0.8/FRP1-0.2.0.8.zip",
+    "DownloadLinkUpdate": "https://github.com/demkadse/Final-Roleplay-1/releases/download/v0.2.0.8/FRP1-0.2.0.8.zip",
+    "DownloadLinkTesting": "https://github.com/demkadse/Final-Roleplay-1/releases/download/v0.2.0.8/FRP1-0.2.0.8.zip",
     "IsHide": false,
     "IsTestingExclusive": false,
     "TestingAssemblyVersion": null,
-    "LastUpdate": 1794570287
+    "LastUpdate": 1794587256
   }
 ]
