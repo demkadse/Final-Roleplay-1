@@ -423,50 +423,56 @@ internal sealed class MainWindow : Window, IDisposable
     {
         ImGui.TextUnformatted(T("Integration.Title"));
         if (Integrations is not { } session) { Wrapped(T("Integration.Error")); return; }
-        var enabled = session.Settings.HonorificEnabled;
-        ImGui.BeginDisabled(!session.SettingsLoaded);
-        if (ImGui.Checkbox(T("Integration.EnableHonorific"), ref enabled)) session.SetHonorificEnabled(enabled);
-        ImGui.EndDisabled();
-        Wrapped(T("Integration." + session.Status));
-        Wrapped(T("Integration.Explanation"));
         if (session.LoadFailed || session.SaveFailed) Wrapped(T("Integration.SettingsError"));
-        ImGui.BeginDisabled(!session.SettingsLoaded || !enabled);
-        if (ImGui.Button(T("Integration.Refresh"))) session.RequestRead();
-        ImGui.EndDisabled();
-        if (!string.IsNullOrEmpty(session.Title))
-        {
-            ImGui.Separator();
-            Wrapped(T("Integration.Preview"));
-            Wrapped(session.Title);
-        }
-        var draft = enabled && session.SettingsLoaded ? CaptureIntegrationDraft() : null;
-        Wrapped(T("Integration.SelectedProfile") + (draft is null ? T("Common.Unavailable") : original.DisplayName));
-        ImGui.BeginDisabled(draft is null || dirty || Busy || session.Status != IntegrationStatus.Ready ||
-            string.IsNullOrWhiteSpace(session.Title) || session.HasPendingImport);
-        if (ImGui.Button(T("Integration.Import"))) session.RequestImport();
-        ImGui.EndDisabled();
-        if (dirty) Wrapped(T("Integration.Dirty"));
-        else if (Busy) Wrapped(T("Integration.EditorBusy"));
-        if (session.LastAction is IntegrationActionResult.Stale or IntegrationActionResult.Blocked or IntegrationActionResult.RateLimited)
-            Wrapped(T("Integration.Rejected"));
+        DrawHonorificSettings(session);
         DrawMoodlesSettings(session);
         DrawLifestreamSettings(session);
         DrawIpcSettings(session);
     }
 
+    private void DrawHonorificSettings(IntegrationSession session)
+    {
+        var expanded = Help.Section(T("Integration.Honorific"), HelpTopicId.HonorificIntegration);
+        Wrapped(T("Integration." + session.Status));
+        Wrapped(T("Integration.Permission") + T(session.Settings.HonorificEnabled ? "Integration.On" : "Integration.Off"));
+        if (!expanded) return;
+        var enabled = session.Settings.HonorificEnabled;
+        ImGui.BeginDisabled(!session.SettingsLoaded);
+        if (ImGui.Checkbox(T("Integration.EnableHonorific"), ref enabled)) session.SetHonorificEnabled(enabled);
+        Help.AfterItem(HelpTopicId.HonorificIntegration);
+        ImGui.EndDisabled();
+        if (!string.IsNullOrEmpty(session.Title))
+        {
+            Wrapped(T("Integration.Preview"));
+            Wrapped(session.Title);
+        }
+        var draft = enabled && session.SettingsLoaded ? CaptureIntegrationDraft() : null;
+        Wrapped(T("Integration.SelectedProfile") + (draft is null ? T("Common.Unavailable") : original.DisplayName));
+        Wrapped(T("Integration.ImportHint"));
+        ImGui.BeginDisabled(draft is null || dirty || Busy || session.Status != IntegrationStatus.Ready ||
+            string.IsNullOrWhiteSpace(session.Title) || session.HasPendingImport);
+        if (ImGui.Button(T("Integration.Import"))) session.RequestImport();
+        Help.AfterItem(HelpTopicId.HonorificIntegration);
+        ImGui.EndDisabled();
+        ContinueActionRow(T("Integration.Refresh"));
+        ImGui.BeginDisabled(!session.SettingsLoaded || !enabled);
+        if (ImGui.SmallButton(T("Integration.Refresh"))) session.RequestRead();
+        Help.AfterItem(HelpTopicId.HonorificIntegration);
+        ImGui.EndDisabled();
+        if (dirty) Wrapped(T("Integration.Dirty"));
+        else if (Busy) Wrapped(T("Integration.EditorBusy"));
+        if (session.LastAction is IntegrationActionResult.Stale or IntegrationActionResult.Blocked or IntegrationActionResult.RateLimited)
+            Wrapped(T("Integration.Rejected"));
+    }
+
     private void DrawLifestreamSettings(IntegrationSession integrations)
     {
         ImGui.Separator();
-        ImGui.TextUnformatted(T("Lifestream.Title"));
-        if (Lifestream is not { } session) return;
+        var expanded = Help.Section(T("Lifestream.Section"), HelpTopicId.LifestreamIntegration);
+        if (Lifestream is not { } session) { Wrapped(T("Lifestream.Missing")); return; }
         var enabled = integrations.Settings.LifestreamEnabled;
-        ImGui.BeginDisabled(!integrations.SettingsLoaded);
-        if (ImGui.Checkbox(T("Lifestream.Enable"), ref enabled))
-            integrations.SetLifestreamOptions(integrations.LifestreamOptions with { Enabled = enabled });
-        ImGui.EndDisabled();
         Wrapped(T("Lifestream." + session.Status));
-        Wrapped(T("Lifestream.Explanation"));
-        if (!enabled || !integrations.SettingsLoaded) return;
+        Wrapped(T("Integration.Permission") + T(enabled ? "Integration.On" : "Integration.Off"));
         var saved = integrations.Settings.LifestreamAddress;
         if (!housingInitialized || saved != housingSaved)
         {
@@ -474,86 +480,124 @@ internal sealed class MainWindow : Window, IDisposable
             housingDraft = saved ?? new(0, HousingDistrict.Mist, 1, HousingPropertyType.House);
             session.AddressSelectionChanged();
         }
-        var changed = false;
+        if (!expanded) return;
+        ImGui.BeginDisabled(!integrations.SettingsLoaded);
+        if (ImGui.Checkbox(T("Lifestream.Enable"), ref enabled))
+            integrations.SetLifestreamOptions(integrations.LifestreamOptions with { Enabled = enabled });
+        Help.AfterItem(HelpTopicId.LifestreamIntegration);
+        ImGui.EndDisabled();
         var worlds = HousingWorldProvider();
-        var worldName = worlds.FirstOrDefault(world => world.WorldId == housingDraft.WorldId)?.Name ?? T("Lifestream.ChooseWorld");
-        ImGui.SetNextItemWidth(220);
-        if (ImGui.BeginCombo(T("Lifestream.World"), worldName))
+        Wrapped(T("Lifestream.SavedDestination"));
+        if (saved is null) Wrapped(T("Lifestream.NoDestination"));
+        else
         {
-            foreach (var world in worlds)
-                if (ImGui.Selectable(world.Name, world.WorldId == housingDraft.WorldId))
-                { housingDraft = housingDraft with { WorldId = world.WorldId }; changed = true; }
-            ImGui.EndCombo();
+            var savedWorld = worlds.FirstOrDefault(world => world.WorldId == saved.WorldId)?.Name ?? T("Lifestream.UnknownWorld");
+            Wrapped(savedWorld + " · " + T("Lifestream.District." + saved.District));
+            Wrapped(UiText.Format("Lifestream.AddressSummary", LanguageProvider(), saved.Ward,
+                T(saved.PropertyType == HousingPropertyType.Apartment ? "Lifestream.ApartmentLabel" : "Lifestream.HouseLabel"),
+                saved.PropertyType == HousingPropertyType.Apartment ? saved.Apartment : saved.Plot));
+            if (saved.PropertyType == HousingPropertyType.Apartment && saved.ApartmentSubdivision)
+                Wrapped(T("Lifestream.Subdivision"));
         }
-        ImGui.SetNextItemWidth(220);
-        if (ImGui.BeginCombo(T("Lifestream.District"), T("Lifestream.District." + housingDraft.District)))
-        {
-            foreach (var district in Enum.GetValues<HousingDistrict>())
-                if (ImGui.Selectable(T("Lifestream.District." + district), housingDraft.District == district))
-                { housingDraft = housingDraft with { District = district }; changed = true; }
-            ImGui.EndCombo();
-        }
-        var ward = housingDraft.Ward;
-        ImGui.SetNextItemWidth(130);
-        if (ImGui.InputInt(T("Lifestream.Ward"), ref ward))
-        { housingDraft = housingDraft with { Ward = ward }; changed = true; }
-        var apartment = housingDraft.PropertyType == HousingPropertyType.Apartment;
-        if (ImGui.Checkbox(T("Lifestream.Apartment"), ref apartment))
-        {
-            housingDraft = LifestreamRules.Canonicalize(housingDraft with
-            { PropertyType = apartment ? HousingPropertyType.Apartment : HousingPropertyType.House });
-            changed = true;
-        }
-        var number = apartment ? housingDraft.Apartment : housingDraft.Plot;
-        ImGui.SetNextItemWidth(130);
-        if (ImGui.InputInt(T(apartment ? "Lifestream.ApartmentNumber" : "Lifestream.Plot"), ref number))
-        {
-            housingDraft = apartment ? housingDraft with { Apartment = number } : housingDraft with { Plot = number };
-            changed = true;
-        }
-        if (apartment)
-        {
-            var subdivision = housingDraft.ApartmentSubdivision;
-            if (ImGui.Checkbox(T("Lifestream.Subdivision"), ref subdivision))
-            { housingDraft = housingDraft with { ApartmentSubdivision = subdivision }; changed = true; }
-        }
-        if (changed) session.AddressSelectionChanged();
-        var valid = LifestreamRules.IsValidAddress(housingDraft) && LifestreamRules.WorldExists(housingDraft, worlds);
-        if (!valid) Wrapped(T("Lifestream.InvalidAddress"));
-        ImGui.BeginDisabled(!valid);
-        if (ImGui.Button(T("Lifestream.Save"))) session.SaveAddress(housingDraft);
-        ImGui.EndDisabled();
-        ImGui.SameLine();
-        ImGui.BeginDisabled(!valid || housingDraft != integrations.Settings.LifestreamAddress || dirty || Busy ||
-            session.Status != IntegrationStatus.Ready || session.HasPendingVisit);
-        if (ImGui.Button(T("Lifestream.Visit"))) session.RequestVisit();
-        ImGui.EndDisabled();
-        if (housingDraft != integrations.Settings.LifestreamAddress) Wrapped(T("Lifestream.Unsaved"));
         if (session.LastAction == LifestreamActionResult.HandedOff) Wrapped(T("Lifestream.HandedOff"));
         else if (session.LastAction == LifestreamActionResult.Queued) Wrapped(T("Lifestream.Queued"));
         else if (session.LastAction != LifestreamActionResult.None) Wrapped(T("Lifestream.Rejected"));
+        if (!enabled || !integrations.SettingsLoaded) return;
+        if (ImGui.CollapsingHeader(T("Lifestream.EditDestination") + "###HousingEditor"))
+        {
+            var changed = false;
+            var worldName = worlds.FirstOrDefault(world => world.WorldId == housingDraft.WorldId)?.Name ?? T("Lifestream.ChooseWorld");
+            Wrapped(T("Lifestream.World"));
+            ImGui.SetNextItemWidth(-1);
+            if (ImGui.BeginCombo("##HousingWorld", worldName))
+            {
+                foreach (var world in worlds)
+                    if (ImGui.Selectable(world.Name, world.WorldId == housingDraft.WorldId))
+                    { housingDraft = housingDraft with { WorldId = world.WorldId }; changed = true; }
+                ImGui.EndCombo();
+            }
+            Wrapped(T("Lifestream.District"));
+            ImGui.SetNextItemWidth(-1);
+            if (ImGui.BeginCombo("##HousingDistrict", T("Lifestream.District." + housingDraft.District)))
+            {
+                foreach (var district in Enum.GetValues<HousingDistrict>())
+                    if (ImGui.Selectable(T("Lifestream.District." + district), housingDraft.District == district))
+                    { housingDraft = housingDraft with { District = district }; changed = true; }
+                ImGui.EndCombo();
+            }
+            var ward = housingDraft.Ward;
+            Wrapped(T("Lifestream.Ward"));
+            ImGui.SetNextItemWidth(-1);
+            if (ImGui.InputInt("##HousingWard", ref ward))
+            { housingDraft = housingDraft with { Ward = ward }; changed = true; }
+            var apartment = housingDraft.PropertyType == HousingPropertyType.Apartment;
+            if (ImGui.Checkbox(T("Lifestream.Apartment"), ref apartment))
+            {
+                housingDraft = LifestreamRules.Canonicalize(housingDraft with
+                { PropertyType = apartment ? HousingPropertyType.Apartment : HousingPropertyType.House });
+                changed = true;
+            }
+            var number = apartment ? housingDraft.Apartment : housingDraft.Plot;
+            Wrapped(T(apartment ? "Lifestream.ApartmentNumber" : "Lifestream.Plot"));
+            ImGui.SetNextItemWidth(-1);
+            if (ImGui.InputInt("##HousingNumber", ref number))
+            {
+                housingDraft = apartment ? housingDraft with { Apartment = number } : housingDraft with { Plot = number };
+                changed = true;
+            }
+            if (apartment)
+            {
+                var subdivision = housingDraft.ApartmentSubdivision;
+                if (ImGui.Checkbox(T("Lifestream.Subdivision"), ref subdivision))
+                { housingDraft = housingDraft with { ApartmentSubdivision = subdivision }; changed = true; }
+            }
+            if (changed) session.AddressSelectionChanged();
+            var valid = LifestreamRules.IsValidAddress(housingDraft) && LifestreamRules.WorldExists(housingDraft, worlds);
+            if (!valid) Wrapped(T("Lifestream.InvalidAddress"));
+            ImGui.BeginDisabled(!valid);
+            if (ImGui.Button(T("Lifestream.Save")) && session.SaveAddress(housingDraft))
+            {
+                housingSaved = integrations.Settings.LifestreamAddress;
+                housingDraft = housingSaved ?? housingDraft;
+            }
+            Help.AfterItem(HelpTopicId.LifestreamIntegration);
+            ImGui.EndDisabled();
+        }
+        var validDestination = LifestreamRules.IsValidAddress(housingDraft) && LifestreamRules.WorldExists(housingDraft, worlds);
+        Wrapped(T("Lifestream.Explanation"));
+        ImGui.BeginDisabled(!validDestination || housingDraft != integrations.Settings.LifestreamAddress || dirty || Busy ||
+            session.Status != IntegrationStatus.Ready || session.HasPendingVisit);
+        if (ImGui.Button(T("Lifestream.Visit"))) session.RequestVisit();
+        Help.AfterItem(HelpTopicId.LifestreamIntegration);
+        ImGui.EndDisabled();
+        if (housingDraft != integrations.Settings.LifestreamAddress) Wrapped(T("Lifestream.Unsaved"));
     }
 
     private void DrawMoodlesSettings(IntegrationSession integrations)
     {
         ImGui.Separator();
-        ImGui.TextUnformatted(T("Moodles.Title"));
-        if (Moodles is not { } session) return;
+        var expanded = Help.Section(T("Moodles.Section"), HelpTopicId.MoodlesIntegration);
+        if (Moodles is not { } session) { Wrapped(T("Moodles.Missing")); return; }
         var enabled = integrations.Settings.MoodlesEnabled;
+        Wrapped(T("Moodles." + session.Status));
+        Wrapped(T("Integration.Permission") + T(enabled ? "Integration.On" : "Integration.Off") + " · " +
+            UiText.Format("Moodles.SelectionCount", LanguageProvider(), integrations.Settings.MoodlesBindings.Count));
+        if (!expanded) return;
         ImGui.BeginDisabled(!integrations.SettingsLoaded);
         if (ImGui.Checkbox(T("Moodles.Enable"), ref enabled))
             integrations.SetMoodlesOptions(integrations.MoodlesOptions with { Enabled = enabled });
+        Help.AfterItem(HelpTopicId.MoodlesIntegration);
         ImGui.EndDisabled();
-        Wrapped(T("Moodles." + session.Status));
-        Wrapped(T("Moodles.Explanation"));
         if (!enabled) return;
-        if (ImGui.Button(T("Moodles.Refresh"))) session.RequestRead();
         var visible = session.VisibleStatuses;
         var bindings = integrations.Settings.MoodlesBindings;
-        ImGui.SameLine();
         ImGui.BeginDisabled(bindings.Count >= MoodlesRules.MaximumBindings);
         if (ImGui.Button(T("Moodles.Add") + $" ({bindings.Count}/5)")) ImGui.OpenPopup("##MoodlesAdd");
+        Help.AfterItem(HelpTopicId.MoodlesIntegration);
         ImGui.EndDisabled();
+        ContinueActionRow(T("Moodles.Refresh"));
+        if (ImGui.SmallButton(T("Moodles.Refresh"))) session.RequestRead();
+        Help.AfterItem(HelpTopicId.MoodlesIntegration);
         if (ImGui.BeginPopup("##MoodlesAdd"))
         {
             if (visible.Count == 0) Wrapped(T("Moodles.Hidden"));
@@ -575,19 +619,24 @@ internal sealed class MainWindow : Window, IDisposable
             else
             {
                 DrawLocalIcon(source.IconId, new Vector2(28));
-                ImGui.SameLine(); Wrapped(source.Label);
-                Wrapped(source.Description);
+                ContinueActionRow(source.Label); Wrapped(source.Label);
                 var rating = MoodlesRules.ReviewedRating(source, integrations.MoodlesOptions);
                 Wrapped(T(rating == ContentRating.General ? "Moodles.General" : rating == ContentRating.Mature18 ? "Moodles.Mature" : "Moodles.Unknown"));
-                ImGui.BeginDisabled(!MoodlesRules.AdultOptIn(store.Policy.Snapshot) || session.HasPendingImport);
-                if (ImGui.Button(T("Moodles.ReviewGeneral"))) session.RequestRating(source.StatusId, ContentRating.General);
-                ImGui.SameLine();
-                if (ImGui.Button(T("Moodles.ReviewMature"))) session.RequestRating(source.StatusId, ContentRating.Mature18);
-                ImGui.EndDisabled();
+                if (ImGui.CollapsingHeader(T("Moodles.Review") + "###MoodleReview"))
+                {
+                    Wrapped(source.Description);
+                    ImGui.BeginDisabled(!MoodlesRules.AdultOptIn(store.Policy.Snapshot) || session.HasPendingImport);
+                    if (ImGui.Button(T("Moodles.ReviewGeneral"))) session.RequestRating(source.StatusId, ContentRating.General);
+                    ContinueActionRow(T("Moodles.ReviewMature"));
+                    if (ImGui.Button(T("Moodles.ReviewMature"))) session.RequestRating(source.StatusId, ContentRating.Mature18);
+                    ImGui.EndDisabled();
+                }
                 ImGui.BeginDisabled(draft is null || dirty || Busy || session.HasPendingImport || details.Glances.Count >= 5 ||
                     !MoodlesRules.CanCopy(source, rating, contentRating, store.Policy.Snapshot));
                 if (ImGui.Button(T("Moodles.Import"))) session.RequestImport(source.StatusId);
+                Help.AfterItem(HelpTopicId.MoodlesIntegration);
                 ImGui.EndDisabled();
+                Wrapped(T("Moodles.ImportHint"));
                 if (source.Label.Length > 80 || source.Description.Length > 1024 || source.IconId > 1_000_000)
                     Wrapped(T("Moodles.TooLarge"));
             }
@@ -604,26 +653,37 @@ internal sealed class MainWindow : Window, IDisposable
     private void DrawIpcSettings(IntegrationSession session)
     {
         ImGui.Separator();
-        ImGui.TextUnformatted(T("Ipc.Title"));
-        Wrapped(T("Ipc.Explanation"));
+        var expanded = Help.Section(T("Ipc.Section"), HelpTopicId.LocalIpc);
         if (!IpcAvailable) Wrapped(T("Ipc.Unavailable"));
         var options = session.IpcOptions;
+        if (IpcAvailable && IpcSession is { } ipc) Wrapped(T("Ipc.Readiness." + ipc.GetReadiness()));
+        Wrapped(T("Ipc.ReadSummary") + T(options.ReadEnabled ? "Integration.On" : "Integration.Off") + " · " +
+            T("Ipc.ControlSummary") + T(options.ControlEnabled ? "Integration.On" : "Integration.Off"));
+        Wrapped(T("Ipc.StatusSummary") + T(options.SetStatusEnabled ? "Integration.On" : "Integration.Off") + " · " +
+            T("Ipc.AvailabilitySummary") + T(options.SetAvailabilityEnabled ? "Integration.On" : "Integration.Off") + " · " +
+            T("Ipc.OpenSummary") + T(options.OpenOwnProfileEnabled ? "Integration.On" : "Integration.Off"));
+        if (!expanded) return;
+        Wrapped(T("Ipc.AllPlugins"));
+        Wrapped(T("Ipc.ActionHint"));
         ImGui.BeginDisabled(!session.SettingsLoaded || !IpcAvailable);
         var read = options.ReadEnabled;
         if (ImGui.Checkbox(T("Ipc.Read"), ref read)) session.SetIpcOptions(options = options with { ReadEnabled = read });
+        Help.AfterItem(HelpTopicId.LocalIpc);
         var control = options.ControlEnabled;
         if (ImGui.Checkbox(T("Ipc.Control"), ref control)) session.SetIpcOptions(options = options with { ControlEnabled = control });
-        if (control)
-        {
-            var status = options.SetStatusEnabled;
-            if (ImGui.Checkbox(T("Ipc.Status"), ref status)) session.SetIpcOptions(options = options with { SetStatusEnabled = status });
-            var availability = options.SetAvailabilityEnabled;
-            if (ImGui.Checkbox(T("Ipc.Availability"), ref availability)) session.SetIpcOptions(options = options with { SetAvailabilityEnabled = availability });
-            var open = options.OpenOwnProfileEnabled;
-            if (ImGui.Checkbox(T("Ipc.Open"), ref open)) session.SetIpcOptions(options with { OpenOwnProfileEnabled = open });
-        }
+        Help.AfterItem(HelpTopicId.LocalIpc);
+        ImGui.BeginDisabled(!control);
+        var status = options.SetStatusEnabled;
+        if (ImGui.Checkbox(T("Ipc.Status"), ref status)) session.SetIpcOptions(options = options with { SetStatusEnabled = status });
+        Help.AfterItem(HelpTopicId.LocalIpc);
+        var availability = options.SetAvailabilityEnabled;
+        if (ImGui.Checkbox(T("Ipc.Availability"), ref availability)) session.SetIpcOptions(options = options with { SetAvailabilityEnabled = availability });
+        Help.AfterItem(HelpTopicId.LocalIpc);
+        var open = options.OpenOwnProfileEnabled;
+        if (ImGui.Checkbox(T("Ipc.Open"), ref open)) session.SetIpcOptions(options with { OpenOwnProfileEnabled = open });
+        Help.AfterItem(HelpTopicId.LocalIpc);
         ImGui.EndDisabled();
-        if (IpcAvailable && IpcSession is { } ipc) Wrapped(T("Ipc.Readiness." + ipc.GetReadiness()));
+        ImGui.EndDisabled();
     }
 
     private void DrawSettings()
