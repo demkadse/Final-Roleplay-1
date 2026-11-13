@@ -1,8 +1,8 @@
 # Plan für lokale Pluginintegrationen und FRP1-IPC
 
-Stand: 2026-11-12 · **Planung abgeschlossen; keine Integration implementiert.** Planinhalt vollständig, alle vier Reviewanforderungen eingearbeitet; abschließender Reviewer-Abgleich der zuletzt ergänzten Queue-Klarstellung noch offen. Kontrollierter Checkpoint am 2026-11-12; am 2026-11-13 zuerst diesen einen Abgleich abschließen, danach WP1/Honorific lesen beginnen.
+Stand: 2026-11-13 · **WP1/WP2 als 0.2.0.5 veröffentlicht; WP4 in Umsetzung.** Abschließender Planreview ohne Restbefunde und MVP-Code-Review ohne wichtige Restbefunde abgeschlossen. Lokales MVP: 152 neue Headless-Tests plus 510 bisherige Tests, insgesamt 662/662 bestanden (27 Sekunden, keine Fehler/Skips); voller Release-Solutionbuild gegen API 15/.NET-SDK 10 mit 0 Warnungen/Fehlern (1,03 Sekunden), 33/33 Paketprüfungen. [Hosted-Lauf 43354035033](https://github.com/demkadse/Final-Roleplay-1/actions/runs/43354035033) zu `bae4ef86c6e812c45536f73db7ea356fc5ce1e31` bestätigt Build/Publish erfolgreich, 662/662 Funktionstests (33 Sekunden), Paket33 und CI105. [Release v0.2.0.5](https://github.com/demkadse/Final-Roleplay-1/releases/tag/v0.2.0.5) und anonyme JSON-/ZIP-/Hash-/Paketprüfung sind belegt; Details in [STATUS](../STATUS.md). Native IPC-/Spielabnahme offen, keine automatische Aktivierung. WP4 hat noch keinen abgeschlossenen Funktions-/Testnachweis; WP3-Ausbau und WP5–8 bleiben geplant, weitere Adapter nicht begonnen.
 
-Die Planungsrunde am **2026-11-12** beschränkt sich auf Planung und Dokumentation. Umsetzung frühestens am **2026-11-13**. Ausgangsstand `89b5e42`, öffentliches FRP1 0.2.0.4; Produktcode, Runtime und Veröffentlichung bleiben in der Planungsrunde unverändert. Die Architektur ist entschieden. Offene API-/Runtimefragen sind begrenzte Prüfaufträge vor dem jeweiligen Adapter, keine noch ausstehende Produktentscheidung.
+Die Planungsrunde am **2026-11-12** beschränkte sich auf Planung und Dokumentation zu `89b5e42`, ohne damalige Produktcode-/Runtime-/Releaseänderung oder Builds/Tests. Die Umsetzung am **2026-11-13** begann auf Quellbasis `e63b238` bei öffentlichem Stand 0.2.0.4; inzwischen ist das Honorific-MVP als 0.2.0.5 veröffentlicht. Verifiziertes Quellbackup: `.release-staging/integrations-backup-20261113T022114Z/source-before-integrations.zip`, Quelle `e63b2387f266be6b4f411e8eb49b7fe1b3925348`, SHA-256 `C34A4EE5D471D763B6F8E9808839A64E4B619F31AA1FE27DE4ABDA7CBD049A7C`. Die Architektur ist entschieden. Offene API-/Runtimefragen sind begrenzte Prüfaufträge vor dem jeweiligen Adapter, keine noch ausstehende Produktentscheidung.
 
 ## Umfang und Reihenfolge
 
@@ -71,9 +71,9 @@ Unter Einstellungen/Erweitert je Plugin Status, lokale Freigabe und verfügbare 
 
 ### WP4 – Eigene FRP1-IPC
 
-**Eigentum:** `Ipc/FrpIpcContracts.cs`, `FrpIpcRules.cs`, `FrpIpcProvider.cs`; Lebenszyklusverdrahtung in `Plugin.cs`. Abhängigkeit: WP1, vorhandene eigene Profilzustände; nach WP3 integrieren.
+**Eigentum:** `Ipc/FrpIpcContracts.cs`, `FrpIpcRules.cs`, `FrpIpcProvider.cs`; Lebenszyklusverdrahtung in `Plugin.cs`. Abhängigkeit: WP1, vorhandene eigene Profilzustände und der bereits im MVP verfügbare minimale Integrations-UI-Weg; der breitere WP3-Ausbau ist keine Voraussetzung.
 
-Versionierter kleiner Vertrag für Version/Readiness und begrenzte eigene Status-/Verfügbarkeitsaktionen. Globale sowie funktionsbezogene Freigaben, standardmäßig aus. Keine Vollprofil-/Register-/Peer-/Schlüsselexporte. Genaue Channelnamen, DTOs und Fehlercodes vor Registrierung festschreiben; Ergebnisse unterscheiden deaktiviert, inkompatibel, busy, veraltet und abgelehnt. Dieselben Policy-/CAS-/Queuegrenzen wie die UI.
+Versionierter kleiner Vertrag für Version/Readiness und begrenzte eigene Status-/Verfügbarkeitsaktionen. Globale sowie funktionsbezogene Freigaben, standardmäßig aus. Keine Vollprofil-/Register-/Peer-/Schlüsselexporte. Der [geplante FRP1-IPC-v1-Vertrag](frp1-ipc-v1.md) hält Channels, Rückgaben, Tickets und Fehlercodes vor Registrierung fest; noch nicht implementiert. Dieselben Policy-/CAS-/Queuegrenzen wie die UI. WP4 folgt als nächstes Paket nach dem abschließenden MVP-Review; der minimale Integrations-UI-Weg ist bereits im MVP vorhanden, der breitere WP3-Ausbau bleibt separat.
 
 **Tests/DoD:** `FrpIpcRulesTests` und Provider-Lebenszyklusfälle: Standard aus, ungültige Eingaben, Dirty/Busy/CAS, Rategrenze, Policywechsel und Unload. Keine Caller-Authentisierung behaupten; keine verborgenen Schreibwege.
 
@@ -111,7 +111,7 @@ Zunächst Readiness, lesbare eigene Auswahl und Wirkungsbereich prüfen. Schreib
 
 ## Quellen und begrenzte Spikes
 
-Die Quellen belegen vorhandene APIs, **nicht** bereits geprüfte installierte Versionen oder API-15-Runtimekompatibilität:
+Die Quellen belegen vorhandene APIs, **keine** native IPC-/Spielabnahme oder API-15-Runtimekompatibilität. Für Honorific wurde am 2026-11-13 zusätzlich das lokale Manifest schreibfrei abgeglichen:
 
 - [Honorific: IpcProvider](https://github.com/Caraxi/Honorific/blob/master/IpcProvider.cs)
 - [Glamourer: IGlamourerApiDesigns](https://github.com/Ottermandias/Glamourer.Api/blob/main/Api/IGlamourerApiDesigns.cs)
@@ -119,12 +119,14 @@ Die Quellen belegen vorhandene APIs, **nicht** bereits geprüfte installierte Ve
 - [Customize+: Profile-IPC](https://github.com/Aether-Tools/CustomizePlus/blob/main/CustomizePlus/Api/CustomizePlusIpc.Profile.cs)
 - [Lifestream: IPCProvider](https://github.com/NightmareXIV/Lifestream/blob/main/Lifestream/IPC/IPCProvider.cs)
 
+Honorific-Abgleich am **2026-11-13**: `Caraxi/Honorific`-`IpcProvider` mit `ApiVersion` 3.2, `GetLocalCharacterTitle`, `LocalCharacterTitleChanged`, `Ready` und `Disposing`; Quellprojektversion 1.7.5.1, SDK 15, `net10.0-windows`; lokales Honorific-Manifest 1.7.5.1/API 15. Native IPC-Probe bleibt offen. Das erste MVP bleibt standardmäßig aus und liest ausschließlich; sämtliche Honorific-Set-/Clear-/SetIdentity-Aufrufe bleiben verboten. Titelübernahme erfolgt bewusst über Draft-CAS und Kontextgeneration in den eigenen Entwurf, gespeichert wird regulär. Begrenztes JSON, Frame-Queue, ausschließlich eigener nativer Titelslot und kein automatischer Export privater/Mature-Inhalte sind MVP-Grenzen.
+
 Vor jedem Adapter einmal Zielversion, exakte Channels/Signaturen/DTOs, Threadanforderung und wirksamen Scope abgleichen. Eine kleine native Probe gesondert vom Quell-/Buildnachweis protokollieren. Bei fehlendem Nachweis Adapter deaktiviert belassen und den konkreten offenen Punkt dokumentieren, statt unbegrenzt zu recherchieren oder Plugins automatisch zu installieren. Honorific-Ownership, Glamourer-Equipmentwirkung, Lifestream-Adress-/Abbruchsemantik und Customize+-Eigentümerwirkung bleiben explizite Spikefragen.
 
 ## Prüfung und Einstieg am 2026-11-13
 
-**Bei sauberem Budgetstopp nächster Schritt:** Diese Datei sowie die obersten Abschnitte in STATUS/HANDOFF lesen. Planinhalt und dokumentierte Reviewnacharbeit sind vollständig; der letzte Reviewer-Abgleich zur Queue-Klarstellung ist noch offen. Am **2026-11-13** zuerst ausschließlich diesen Abgleich abschließen, danach Gitstatus/HEAD prüfen und mit WP1 sowie dem Honorific-Read-API-Spike beginnen. Bewusste Entwurfsübernahme und minimaler Opt-in-/Import-UI-Weg gehören zum ersten MVP. Das Verbot von Implementierung, Builds/Testläufen und Releases gilt für die Planungsrunde am **2026-11-12**; es verbietet nicht die ausdrücklich für 2026-11-13 geplanten Implementierungsprüfungen.
+**Bei Unterbrechung nächster Schritt:** Diese Datei sowie die obersten Abschnitte in STATUS/HANDOFF und den tatsächlichen Git-/Teststand abgleichen. WP1/WP2 sind am **2026-11-13** umgesetzt, getestet, reviewfreigegeben und als 0.2.0.5 veröffentlicht; Quell-/Manifestabgleich für Honorific erfolgt. Die laufende WP4-Umsetzung nach dem geplanten Vertrag fertigstellen und prüfen. Paketweise belastbare Checkpoints hinterlassen; native Abnahme bleibt gesondert offen.
 
-Nach diesem Reviewer-Abgleich am 2026-11-13 Gitstatus, HEAD und fremde Änderungen sichern/prüfen; dokumentierte API-Spikes gezielt beginnen. Das erste MVP beschränkt sich auf die kleine notwendige Grundlage und Honorific-Read mit bewusster sicherer Entwurfsübernahme sowie eigener Titelkollisionsregel. WP3–8 bleiben getrennte spätere Arbeitspakete; keine zusätzlichen Integrationen oder vorsorgliche Frameworkausweitung in dieses MVP ziehen. Keine festen zukünftigen Testzahlen versprechen.
+Das erste MVP beschränkt sich auf die kleine notwendige Grundlage und Honorific-Read mit bewusster sicherer Entwurfsübernahme sowie eigener Titelkollisionsregel. WP4 ist das laufende nächste Paket; WP3-Ausbau und WP5–8 bleiben getrennte spätere Arbeitspakete. Keine zusätzlichen Integrationen oder vorsorgliche Frameworkausweitung in dieses MVP ziehen. Keine festen zukünftigen Testzahlen versprechen.
 
-Pro Implementierung gezielte Tests, Build und unabhängiges Review. Vollständigen Solutionbuild und Funktionstests nach tatsächlichen Änderungen durchführen, nicht für diesen Plan wiederholen. Reale Plugin-/Spielabnahme, Unload und Skalierung bleiben eigene Schritte. Dokumentationsabschluss oder Planreview bedeuten weder bereits implementierte Integrationen noch eine neue Pluginveröffentlichung.
+Pro Implementierung gezielte Tests, Build und unabhängiges Review. Vollständigen Solutionbuild und Funktionstests nach tatsächlichen Änderungen durchführen, nicht für diesen Plan wiederholen. Reale Plugin-/Spielabnahme, Unload und Skalierung bleiben eigene Schritte. Dokumentationsabschluss oder Planreview allein belegen keine Implementierung oder Veröffentlichung; für das Honorific-MVP liegen die gesonderten Nachweise oben vor.

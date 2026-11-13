@@ -1,10 +1,25 @@
 # Status
 
-Stand: 2026-11-12
+Stand: 2026-11-13
 
-**Planungsrunde am 2026-11-12 abgeschlossen:** [Integrationsplan](docs/integrationen-plan.md) für Honorific, Moodles, Glamourer, Customize+, Lifestream und eigene FRP1-IPC fertig. Planinhalt vollständig, alle vier Reviewanforderungen eingearbeitet; abschließender Reviewer-Abgleich der zuletzt ergänzten Queue-Klarstellung noch offen. Kontrollierter Checkpoint am 2026-11-12; am 2026-11-13 zuerst diesen einen Abgleich abschließen, danach WP1/Honorific lesen beginnen. Keine Integration implementiert, keine Builds/Tests/Runtimeänderungen. Produktstand `89b5e42` / öffentlich 0.2.0.4 unverändert. Nächster Schritt am 2026-11-13: zuerst den offenen Reviewer-Abgleich zur Queue-Klarstellung abschließen; anschließend Gitstatus/HEAD prüfen, WP1 und Honorific-Read-API-Spike; erstes MVP einschließlich bewusstem Entwurfsimport und minimalem Opt-in-/Importknopf. Bei Budgetstopp mit diesem Wiedereinstieg fortsetzen.
+**Integrationen, MVP als 0.2.0.5 veröffentlicht am 2026-11-13:** WP1/WP2 des [freigegebenen Integrationsplans](docs/integrationen-plan.md) sind umgesetzt und unabhängig ohne wichtige Restbefunde reviewfreigegeben. [Release v0.2.0.5](https://github.com/demkadse/Final-Roleplay-1/releases/tag/v0.2.0.5) ist öffentlich, als Prerelease markiert und kein Entwurf; Quelle `bae4ef86c6e812c45536f73db7ea356fc5ce1e31`. Die standardmäßig ausgeschaltete Honorific-Integration liest ausschließlich den eigenen Titel, zeigt Status/Vorschau und übernimmt ihn nur bewusst in einen unveränderten gespeicherten eigenen Entwurf. Erst normales Speichern persistiert den Profilinhalt. Aktuelle Actor-/Policy-/Kontextgeneration, Busy/Draft-CAS und Frame-Queue sichern die Übernahme; bei bestätigtem Kontext überlässt FRP1 ausschließlich den eigenen nativen Titelslot Honorific. Keine Honorific-Set-/Clear-/SetIdentity-Aufrufe oder automatischen Privat-/Mature-Exporte. Native IPC-/Spielabnahme bleibt offen; keine Aktivierung durch den Agenten.
 
-## Aktuell: kompakter UI-Neubau als 0.2.0.4 veröffentlicht
+Lokaler Nachweis: 152 neue Headless-Tests einschließlich elf Unicodefällen plus 510 bisherige Tests, insgesamt **662/662 bestanden** in 27 Sekunden, ohne Fehler/Skips. Voller Release-Solutionbuild gegen API 15/.NET-SDK 10: **0 Warnungen/Fehler** (1,03 Sekunden); **33/33 Paketprüfungen** bestanden. Der Titelparser verwirft doppelte JSON-Schlüssel auch in ignorierten Feldern sowie ungültiges UTF-16 ohne Ersatzzeichen; elf Unicodefälle decken die Korrektur der zunächst acht fehlgeschlagenen Exceptionfälle ab. Bei ausgeschalteter Integration wird kein Entwurf erfasst; regulärer Draft-Cache und frische CAS-Prüfung bei Import erhalten die Gültigkeit. `LocalJsonFile` serialisiert Laden/Speichern über das bestehende Instanzgate gegen das beobachtete Windows-Rename-/Leserennen; keine Garantie über mehrere Instanzen und keine Retries. Diese Prüfungen belegen keine native IPC-/Spielausführung.
+
+Der erfolgreiche [Hosted-Lauf 43354035033](https://github.com/demkadse/Final-Roleplay-1/actions/runs/43354035033) bestätigt Build/Publish erfolgreich, Build mit 0 Warnungen/Fehlern, 662/662 Funktionstests (33 Sekunden), 33/33 Paketprüfungen und 105/105 CI-Prüfungen (33 Policy, 24 Publishabläufe, 44 SDK, vier Quellpfadfälle). Botcommit `a655c30` ändert ausschließlich `repo.json`; der lokale Branch ist per Fast-forward abgeglichen. Die kanonische Raw-JSON-Adresse liefert anonym HTTP 200 und 0.2.0.5. ZIP und `SHA256SUMS` sind ebenfalls anonym geladen, Hashes passend und vollständige erneute Paketvalidierung bestanden.
+
+| Datei / Feld | Nachweis für 0.2.0.5 |
+|---|---|
+| ZIP-Größe | 1.094.651 Bytes |
+| ZIP SHA-256 | `432AA0E6177B8753462397AF392F987086E008D4D2D42C7EAD340E0C7CD3659D` |
+| JSON SHA-256 | `F3BA5D2E5495DF8B2EAB2F55DF9267FE1790771D5A36CF482FB6F6041ABF49BE` |
+| LastUpdate | `1794537751` |
+
+Nächster Schritt: laufende WP4-Umsetzung nach dem [geplanten FRP1-IPC-v1-Vertrag](docs/frp1-ipc-v1.md) fertigstellen und prüfen. Für WP4 noch kein abgeschlossener Funktions-/Testnachweis oder Release; die Datei beschreibt den Vertrag. WP3-Ausbau und WP5–8 bleiben geplant, weitere Adapter wurden nicht begonnen. Die Arbeit geht paketweise mit belastbaren Checkpoints weiter; dieser MVP-Stand beendet den Gesamtauftrag nicht.
+
+Verifiziertes Quellbackup vor Integrationen: `.release-staging/integrations-backup-20261113T022114Z/source-before-integrations.zip`, Quelle `e63b2387f266be6b4f411e8eb49b7fe1b3925348`, SHA-256 `C34A4EE5D471D763B6F8E9808839A64E4B619F31AA1FE27DE4ABDA7CBD049A7C`. Historischer Planungsstand vom 2026-11-12: `89b5e42`, ohne damalige Code-/Runtime-/Releaseänderungen oder Builds/Tests.
+
+## Vorheriger Stand: kompakter UI-Neubau als 0.2.0.4 veröffentlicht
 
 Die neue Oberfläche ist als 0.2.0.4 öffentlich veröffentlicht und über dieselbe Installeradresse verfügbar. Quellcommit ist `6c2e49115d764ae391922d5c5b3bc4f8fc70413e`; die Pluginversionsbasis bleibt 0.2.0.0, FRP1.Core bleibt 1.0.0.0. Bestehende Installationen über Dalamud aktualisieren und bei Bedarf neu laden. Keine Installation durch den Agenten durchgeführt.
 
