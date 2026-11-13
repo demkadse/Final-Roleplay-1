@@ -7,7 +7,15 @@ public sealed record IntegrationSettings
 {
     [JsonRequired] public int SchemaVersion { get; init; } = 1;
     [JsonRequired] public bool HonorificEnabled { get; init; }
+    public bool IpcReadEnabled { get; init; }
+    public bool IpcControlEnabled { get; init; }
+    public bool IpcSetStatusEnabled { get; init; }
+    public bool IpcSetAvailabilityEnabled { get; init; }
+    public bool IpcOpenOwnProfileEnabled { get; init; }
 }
+
+public sealed record IntegrationIpcOptions(bool ReadEnabled = false, bool ControlEnabled = false,
+    bool SetStatusEnabled = false, bool SetAvailabilityEnabled = false, bool OpenOwnProfileEnabled = false);
 
 public enum IntegrationStatus { Disabled, Missing, Incompatible, Ready, Busy, Error, Blocked }
 public enum IntegrationActionResult { None, Queued, Applied, Disabled, NotReady, Blocked, Stale, RateLimited, AlreadyPending }

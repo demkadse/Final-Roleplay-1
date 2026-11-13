@@ -21,6 +21,7 @@ using Dalamud.Game.ClientState.Conditions;
 using FRP1.Plugin.GameIntegration;
 using FRP1.Plugin.Localization;
 using FRP1.Plugin.Integrations;
+using FRP1.Plugin.Ipc;
 
 namespace FRP1.Plugin;
 
@@ -54,11 +55,17 @@ public sealed class Plugin : IDalamudPlugin
     private readonly LocalToolsModule localTools;
     private readonly GamePresentationModule gamePresentation;
     private readonly IntegrationSession integrations;
+    private readonly AudiencePolicy policy;
+    private readonly FrpIpcSession ipcSession;
+    private readonly FrpIpcProvider? ipcProvider;
+    private long ipcCatalogVersion = -1;
+    private FrpIpcProfile? ipcActiveProfile;
+    private IntegrationActor ipcSceneActor;
 
     public Plugin()
     {
         var directory = PluginInterface.GetPluginConfigDirectory();
-        var policy = new AudiencePolicy();
+        policy = new AudiencePolicy();
         var profileStore = new ProfileStore(directory, policy);
         ownProfiles = new OwnProfileSession(profileStore, new RpBarSettingsStore(directory));
         network = new NetworkSession(profileStore, new PeerIdentityStore(directory), new PeerTrustStore(directory));
@@ -83,6 +90,13 @@ public sealed class Plugin : IDalamudPlugin
         integrations = new IntegrationSession(new IntegrationSettingsStore(directory), HonorificAdapter.Create(PluginInterface),
             () => mainWindow.CaptureIntegrationContext(CaptureIntegrationActor()), mainWindow.TryApplyHonorificTitle);
         mainWindow.Integrations = integrations;
+        ipcSession = new FrpIpcSession(CaptureIpcContext, WriteIpcActionAsync, mainWindow.TryOpenIpcOwnProfile);
+        integrations.IpcOptionsChanged += ipcSession.SetOptions;
+        ipcProvider = FrpIpcProvider.Create(PluginInterface, ipcSession);
+        mainWindow.IpcSession = ipcSession;
+        mainWindow.IpcAvailable = ipcProvider is not null;
+        policy.Changed += OnIpcPolicyChanged;
+        Framework.Update += ObserveIpcScene;
         gamePresentation.PreserveOwnTitle = (objectId, address) => integrations.HasConfirmedReadiness && integrations.CanYieldOwnTitle(CaptureIntegrationActor(),
             policy.Snapshot, mainWindow.IntegrationPolicyGeneration, mainWindow.ProfileAccessReady, objectId, address);
         mainWindow.LanguageProvider = () => localTools.Language;
@@ -149,6 +163,43 @@ public sealed class Plugin : IDalamudPlugin
         catch (Exception) { return default; }
     }
 
+    private FrpIpcContext CaptureIpcContext()
+    {
+        if (ipcCatalogVersion != ownProfiles.Version)
+        {
+            ipcCatalogVersion = ownProfiles.Version;
+            var active = ownProfiles.ActiveProfile;
+            ipcActiveProfile = active is null ? null : FrpIpcProfile.From(active);
+        }
+        return new(CaptureIntegrationActor(), mainWindow.ProfileAccessReady, policy.Snapshot,
+            mainWindow.IntegrationPolicyGeneration, ipcCatalogVersion, mainWindow.IntegrationEditorGeneration,
+            mainWindow.IntegrationDraftDirty, mainWindow.IntegrationBusy, ipcActiveProfile);
+    }
+
+    private async Task<FrpIpcProfile> WriteIpcActionAsync(FrpIpcAction action, FrpIpcProfile expected, CancellationToken cancellationToken)
+    {
+        var active = ownProfiles.ActiveProfile;
+        if (active is null || FrpIpcProfile.From(active) != expected) throw new InvalidOperationException("The active profile changed.");
+        var operation = action.Kind switch
+        {
+            FrpIpcActionKind.SetStatus => ownProfiles.UpdateStatusAsync((Core.Profiles.RpStatus)action.Value, cancellationToken),
+            FrpIpcActionKind.SetAvailability => ownProfiles.UpdateAvailabilityAsync((Core.Profiles.RpAvailability)action.Value, cancellationToken),
+            _ => throw new ArgumentException("Unsupported local action."),
+        };
+        return FrpIpcProfile.From(await operation.ConfigureAwait(false));
+    }
+
+    private void OnIpcPolicyChanged(object? sender, EventArgs args) => ipcSession.InvalidatePolicy();
+
+    private void ObserveIpcScene(IFramework _)
+    {
+        if (!ipcSession.HasCapabilities) { ipcSceneActor = default; return; }
+        var current = CaptureIntegrationActor();
+        if (current == ipcSceneActor) return;
+        ipcSceneActor = current;
+        ipcSession.InvalidatePolicy();
+    }
+
     private void Draw()
     {
         var contentId = PlayerState.IsLoaded ? PlayerState.ContentId : 0;
@@ -165,6 +216,7 @@ public sealed class Plugin : IDalamudPlugin
         integrations.Tick();
         if (integrations.Generation != integrationGeneration || integrations.Status != integrationStatus) gamePresentation.Invalidate();
         ownProfiles.SetEditorBlocked(mainWindow.EditorBlocked);
+        ipcSession.Tick();
         localTools.SetContext(new AutomationContext(contentId, mainWindow.ProfileAccessReady, contentId != 0,
             Condition[ConditionFlag.InCombat], Condition[ConditionFlag.BoundByDuty] || Condition[ConditionFlag.BoundByDuty56] ||
             Condition[ConditionFlag.BoundByDuty95], ClientState.TerritoryType));
@@ -182,6 +234,7 @@ public sealed class Plugin : IDalamudPlugin
         var drawnPresentationVersion = resolver.Version;
         var drawnAccess = mainWindow.ProfileAccessReady;
         windows.Draw();
+        ipcSession.Refresh();
         if (integrations.Generation != integrationGeneration) gamePresentation.Invalidate();
         // Local block/binding or audience changes made by the panels invalidate
         // native display snapshots immediately, before drawing further overlays.
@@ -201,6 +254,11 @@ public sealed class Plugin : IDalamudPlugin
         PluginInterface.UiBuilder.OpenMainUi -= Open;
         PluginInterface.UiBuilder.OpenConfigUi -= Open;
         windows.RemoveAllWindows();
+        policy.Changed -= OnIpcPolicyChanged;
+        Framework.Update -= ObserveIpcScene;
+        integrations.IpcOptionsChanged -= ipcSession.SetOptions;
+        ipcProvider?.Dispose();
+        ipcSession.Dispose();
         integrations.Dispose();
         gamePresentation.Dispose();
         socialUi.Dispose();
@@ -215,7 +273,7 @@ public sealed class Plugin : IDalamudPlugin
         var networkDisposal = Task.Run(async () => await network.DisposeAsync().ConfigureAwait(false));
         _ = Task.WhenAll(networkDisposal, socialUi.DisposalCompletion, ownProfiles.DisposalCompletion,
             register.DisposalCompletion, themeSession.DisposalCompletion, localTools.DisposalCompletion,
-            gamePresentation.DisposalCompletion, integrations.DisposalCompletion).ContinueWith(task => { _ = task.Exception; },
+            gamePresentation.DisposalCompletion, integrations.DisposalCompletion, ipcSession.DisposalCompletion).ContinueWith(task => { _ = task.Exception; },
                 CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
     }
 }

@@ -46,7 +46,15 @@ internal sealed class LocalJsonFile<T>(string directory, string name, int maximu
             Directory.CreateDirectory(Path.GetDirectoryName(path)!);
             await File.WriteAllBytesAsync(temporary, bytes, cancellationToken).ConfigureAwait(false);
             cancellationToken.ThrowIfCancellationRequested();
-            File.Move(temporary, path, overwrite: true);
+            if (File.Exists(path))
+            {
+                // Rename the previous file aside before deleting it: Windows readers may still hold its handle.
+                var previous = temporary + ".previous";
+                File.Replace(temporary, path, previous);
+                // Keep the previous file recoverable if replacement itself fails partway through.
+                File.Delete(previous);
+            }
+            else File.Move(temporary, path);
         }
         finally { try { File.Delete(temporary); } finally { gate.Release(); } }
     }

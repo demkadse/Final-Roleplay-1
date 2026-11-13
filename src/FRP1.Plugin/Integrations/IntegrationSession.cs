@@ -48,6 +48,22 @@ public sealed class IntegrationSession : IDisposable
     public bool HasPendingImport => pendingImport is not null;
     public bool HasConfirmedReadiness => Volatile.Read(ref titleConfirmation) is { } snapshot && snapshot.ReaderVersion == reader.Version;
     public Task DisposalCompletion { get; private set; } = Task.CompletedTask;
+    public IntegrationIpcOptions IpcOptions => new(Settings.IpcReadEnabled, Settings.IpcControlEnabled,
+        Settings.IpcSetStatusEnabled, Settings.IpcSetAvailabilityEnabled, Settings.IpcOpenOwnProfileEnabled);
+    public event Action<IntegrationIpcOptions>? IpcOptionsChanged;
+
+    public void SetIpcOptions(IntegrationIpcOptions options)
+    {
+        if (disposed || !SettingsLoaded || IpcOptions == options) return;
+        Settings = Settings with
+        {
+            IpcReadEnabled = options.ReadEnabled, IpcControlEnabled = options.ControlEnabled,
+            IpcSetStatusEnabled = options.SetStatusEnabled, IpcSetAvailabilityEnabled = options.SetAvailabilityEnabled,
+            IpcOpenOwnProfileEnabled = options.OpenOwnProfileEnabled,
+        };
+        savePending = true;
+        IpcOptionsChanged?.Invoke(options);
+    }
 
     public void SetHonorificEnabled(bool enabled)
     {
@@ -171,6 +187,7 @@ public sealed class IntegrationSession : IDisposable
             catch (Exception) { LoadFailed = true; Settings = new(); }
             SettingsLoaded = true;
             readPending = Settings.HonorificEnabled;
+            IpcOptionsChanged?.Invoke(IpcOptions);
         }
         if (save is { IsCompleted: true } written)
         {

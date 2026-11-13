@@ -16,6 +16,7 @@ using Dalamud.Plugin.Services;
 using FRP1.Plugin.UiTools;
 using FRP1.Plugin.GameIntegration;
 using FRP1.Plugin.Integrations;
+using FRP1.Plugin.Ipc;
 
 namespace FRP1.Plugin;
 
@@ -51,6 +52,8 @@ internal sealed class MainWindow : Window, IDisposable
     public LocalToolsModule? LocalTools { get; set; }
     public GamePresentationModule? GamePresentation { get; set; }
     public IntegrationSession? Integrations { get; set; }
+    public FrpIpcSession? IpcSession { get; set; }
+    public bool IpcAvailable { get; set; }
     public Func<Guid, string?>? OwnProfileReferenceProvider { get; set; }
     private HelpTopicId? helpTopic;
     private enum MainArea { Character, Contacts, Settings }
@@ -129,6 +132,19 @@ internal sealed class MainWindow : Window, IDisposable
         store.Policy.Snapshot.Selection != AudienceSelection.Unspecified;
     public bool EditorBlocked => dirty || Busy;
     public long IntegrationPolicyGeneration => Volatile.Read(ref policyGeneration);
+    public long IntegrationEditorGeneration => editorGeneration;
+    public bool IntegrationDraftDirty => dirty;
+    public bool IntegrationBusy => Busy;
+
+    public bool TryOpenIpcOwnProfile(FrpIpcProfile expected)
+    {
+        if (disposed || !ProfileAccessReady || dirty || Busy) return false;
+        var active = ownProfiles.ActiveProfile;
+        if (active is null || FrpIpcProfile.From(active) != expected || !CanDisplay(active)) return false;
+        SetDraft(active);
+        IsOpen = true; mainArea = MainArea.Character; editing = preview = false;
+        return true;
+    }
 
     public IntegrationContext CaptureIntegrationContext(IntegrationActor actor)
     {
@@ -405,6 +421,32 @@ internal sealed class MainWindow : Window, IDisposable
         else if (Busy) Wrapped(T("Integration.EditorBusy"));
         if (session.LastAction is IntegrationActionResult.Stale or IntegrationActionResult.Blocked or IntegrationActionResult.RateLimited)
             Wrapped(T("Integration.Rejected"));
+        DrawIpcSettings(session);
+    }
+
+    private void DrawIpcSettings(IntegrationSession session)
+    {
+        ImGui.Separator();
+        ImGui.TextUnformatted(T("Ipc.Title"));
+        Wrapped(T("Ipc.Explanation"));
+        if (!IpcAvailable) Wrapped(T("Ipc.Unavailable"));
+        var options = session.IpcOptions;
+        ImGui.BeginDisabled(!session.SettingsLoaded || !IpcAvailable);
+        var read = options.ReadEnabled;
+        if (ImGui.Checkbox(T("Ipc.Read"), ref read)) session.SetIpcOptions(options = options with { ReadEnabled = read });
+        var control = options.ControlEnabled;
+        if (ImGui.Checkbox(T("Ipc.Control"), ref control)) session.SetIpcOptions(options = options with { ControlEnabled = control });
+        if (control)
+        {
+            var status = options.SetStatusEnabled;
+            if (ImGui.Checkbox(T("Ipc.Status"), ref status)) session.SetIpcOptions(options = options with { SetStatusEnabled = status });
+            var availability = options.SetAvailabilityEnabled;
+            if (ImGui.Checkbox(T("Ipc.Availability"), ref availability)) session.SetIpcOptions(options = options with { SetAvailabilityEnabled = availability });
+            var open = options.OpenOwnProfileEnabled;
+            if (ImGui.Checkbox(T("Ipc.Open"), ref open)) session.SetIpcOptions(options with { OpenOwnProfileEnabled = open });
+        }
+        ImGui.EndDisabled();
+        if (IpcAvailable && IpcSession is { } ipc) Wrapped(T("Ipc.Readiness." + ipc.GetReadiness()));
     }
 
     private void DrawSettings()
