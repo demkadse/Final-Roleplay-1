@@ -1,10 +1,10 @@
 # FRP1 – Benutzerhandbuch
 
-Stand: 2026-11-13 · veröffentlichter früher öffentlicher Teststand 0.2.0.5 (Prerelease).
+Stand: 2026-11-13 · veröffentlichter früher öffentlicher Teststand 0.2.0.6 (Prerelease).
 
-**Veröffentlicht:** Repository, MIT-Lizenz, Installerindex und Releasepaket 0.2.0.5 sind öffentlich und ohne Anmeldung erreichbar. Der erfolgreiche GitHub-Lauf besteht Build ohne Warnungen/Fehler, 662/662 Funktionstests, 33/33 Paketprüfungen und 105/105 CI-Prüfungen. Eine native IPC-/Spiel-/LAN-/Internetabnahme steht noch aus.
+**Veröffentlicht:** Repository, MIT-Lizenz, Installerindex und Releasepaket 0.2.0.6 sind öffentlich und ohne Anmeldung erreichbar. Der erfolgreiche GitHub-Lauf besteht Build ohne Warnungen/Fehler, 812/812 Funktionstests, 33/33 Paketprüfungen und 105/105 CI-Prüfungen. Eine native IPC-/Spiel-/LAN-/Internetabnahme steht noch aus.
 
-**Aktuelle Bedienung:** [Abschnitt 19](#19-kompakte-bedienung-seit-0204) beschreibt die seit 0.2.0.4 geltende Oberfläche: drei Hauptwege und Profilbereiche, eigene Lesekarte, einzeilige zielunabhängige eigene Leiste und drei primäre Themes. [Abschnitt 20](#20-honorific-titel-lokal-übernehmen-seit-0205) ergänzt die optionale Honorific-Titelübernahme seit 0.2.0.5. Kapitel 1–18 halten ältere Bedienung und die Entwicklungshistorie fest. Daten und Freigaben bleiben erhalten.
+**Aktuelle Bedienung:** [Abschnitt 19](#19-kompakte-bedienung-seit-0204) beschreibt die seit 0.2.0.4 geltende Oberfläche: drei Hauptwege und Profilbereiche, eigene Lesekarte, einzeilige zielunabhängige eigene Leiste und drei primäre Themes. [Abschnitt 20](#20-honorific-titel-lokal-übernehmen-seit-0205) ergänzt die optionale Honorific-Titelübernahme seit 0.2.0.5, [Abschnitt 21](#21-lokale-frp1-schnittstelle-seit-0206) die lokale FRP1-Schnittstelle seit 0.2.0.6. Kapitel 1–18 halten ältere Bedienung und die Entwicklungshistorie fest. Daten und Freigaben bleiben erhalten.
 
 ## 1. Was FRP1 ist
 
@@ -273,7 +273,7 @@ Technische Details: [Architektur](architecture.md), [Machbarkeit](feasibility.md
 
 ## 17. Historische Bedienung von 0.1.1.1 bis 0.1.1.3
 
-Dieser Abschnitt hält die historische Bedienung von 0.1.1.1 bis 0.1.1.3 fest. Für das aktuelle 0.2.0.5 gelten die Anleitungen in Abschnitt 19–20; fünf Profilbereiche, zielabhängige eigene Leiste und Hilfebadges sind dort abgelöst. Die Installeradresse bleibt gleich.
+Dieser Abschnitt hält die historische Bedienung von 0.1.1.1 bis 0.1.1.3 fest. Für das aktuelle 0.2.0.6 gelten die Anleitungen in Abschnitt 19–21; fünf Profilbereiche, zielabhängige eigene Leiste und Hilfebadges sind dort abgelöst. Die Installeradresse bleibt gleich.
 
 ### Profil bearbeiten und lesen
 
@@ -328,7 +328,7 @@ Nach einem solchen Botcommit muss der Maintainer seinen lokalen Branch vor dem n
 
 ## 19. Kompakte Bedienung seit 0.2.0.4
 
-Dieser Abschnitt beschreibt die seit 0.2.0.4 geltende Oberfläche; das aktuelle Release ist 0.2.0.5. Aktualisiere über die bestehende JSON-Adresse im Dalamud-Installer und lade das Plugin bei Bedarf neu. Konfigurationslöschung oder Datenmigration sind nicht erforderlich. Die frühere Vorgabe für fünf Bereiche und eine zielabhängige eigene Leiste wurde ausdrücklich aufgehoben.
+Dieser Abschnitt beschreibt die seit 0.2.0.4 geltende Oberfläche; das aktuelle Release ist 0.2.0.6. Aktualisiere über die bestehende JSON-Adresse im Dalamud-Installer und lade das Plugin bei Bedarf neu. Konfigurationslöschung oder Datenmigration sind nicht erforderlich. Die frühere Vorgabe für fünf Bereiche und eine zielabhängige eigene Leiste wurde ausdrücklich aufgehoben.
 
 ### Drei Wege und eine lesbare eigene Karte
 
@@ -367,3 +367,15 @@ Die Honorific-Titelübernahme ist seit **2026-11-13** als Teil von [0.2.0.5](htt
 5. Prüfe den entstandenen Entwurf und speichere ihn über den normalen Profilablauf. Du kannst die Änderung stattdessen verwerfen. Übernahme und Speichern erteilen keine neue Kontakt- oder Netzwerkfreigabe.
 
 FRP1 liest ausschließlich den eigenen Titel aus Honorific. Es setzt oder löscht dort keinen Titel und ändert keine Identität. Ist Honorific im aktuellen Charakter-/Freigabekontext bestätigt, überlässt FRP1 den eigenen nativen Titelslot Honorific; fremde FRP1-Titel bleiben davon unberührt. Bei Profil-, Charakter- oder Freigabewechsel werden veraltete Ergebnisse verworfen. Private oder erwachsene Inhalte werden nicht automatisch übernommen oder exportiert. Über **Honorific-Titel lokal lesen** kannst du die Integration wieder ausschalten.
+
+## 21. Lokale FRP1-Schnittstelle seit 0.2.0.6
+
+Die Schnittstelle ist seit **2026-11-13** als Teil von [0.2.0.6](https://github.com/demkadse/Final-Roleplay-1/releases/tag/v0.2.0.6) veröffentlicht. Automatisierte Tests, Build, Veröffentlichung und anonyme Download-/Hash-/Paketprüfung sind erfolgreich, unabhängiges Review ohne kritische/wichtige Restbefunde freigegeben. Eine native IPC-/Spielprobe steht aus. Technischer Vertrag: [FRP1-IPC v1](frp1-ipc-v1.md).
+
+Unter **Einstellungen → Integrationen → Lokale FRP1-Schnittstelle** kannst du getrennt **Lokalen Status lesen erlauben** und **Lokale Aktionen erlauben** aktivieren. Für Aktionen wählst du zusätzlich einzeln **RP-Status ändern erlauben**, **Verfügbarkeit ändern erlauben** oder **Eigenes aktives Profil öffnen erlauben**. Alle Freigaben sind standardmäßig aus und gelten für alle lokal geladenen Plugins. FRP1 prüft dabei keine Identität des aufrufenden Plugins.
+
+Lesen liefert ausschließlich RP-Status und Verfügbarkeit deines aktiven allgemein gekennzeichneten Profils. Namen, Profiltexte, IDs, Notizen, Kontakte und Peerangaben werden nicht ausgegeben. Auch mit Erwachsenenfreigabe bleiben Mature-Profile vom Lesen ausgeschlossen. Erlaubte Steueraktionen auf Mature-Profilen setzen dagegen deine aktuelle Auswahl „mindestens 18“ und zusätzliche Mature-Freigabe voraus; Fremdplugins können diese Freigaben nicht erteilen.
+
+Maßgeblich ist dein ausdrücklich aktives eigenes Profil, unabhängig davon, welchen Entwurf du gerade im Hauptfenster ausgewählt hast. Offene Entwurfsänderungen oder laufende Vorgänge können Aktionen sperren. Der angezeigte Zustand unterscheidet ausgeschaltet, Profil/Zugriff nicht bereit, offener Entwurf/Vorgang und bereit. Ein angenommener Auftrag bestätigt zunächst nur die Warteschlange; das aufrufende Plugin kann den tatsächlichen Abschluss abfragen.
+
+Status- und Verfügbarkeitsänderungen werden über den normalen eigenen Profilschreiber gespeichert. Bestehende Freigaben können diese gespeicherten Änderungen anschließend mit verbundenen Kontakten synchronisieren. Eine IPC-Freigabe erstellt keine zusätzliche Netzwerkfreigabe. Du kannst Lese-/Aktionsfreigaben jederzeit zurücknehmen; veraltete Aufträge und Ergebnisse werden dadurch ungültig. Bereits abgeschlossene Speicherungen werden dabei nicht rückgängig gemacht.

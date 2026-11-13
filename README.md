@@ -4,15 +4,17 @@
 
 FRP1 ist ein Dalamud-Plugin für Charakterbeschreibungen, erste Eindrücke, RP-Status und Kontakte. Es orientiert sich beim Bedienkonzept an Total RP 3 und übernimmt die lokal beziehungsweise direkt zwischen Clients umsetzbaren Funktionen von Glance in einer eigenen FFXIV-Oberfläche.
 
-**Stand: 2026-11-13 – veröffentlicht als früher öffentlicher Teststand 0.2.0.5 (Prerelease).** Repository, MIT-Lizenz, Installerindex und Releasepaket sind öffentlich verfügbar. Der erfolgreiche GitHub-Lauf besteht Build mit 0 Warnungen/Fehlern, 662/662 Funktionstests, 33/33 Paketprüfungen und 105/105 CI-Prüfungen. Native IPC-/Bedienungs-/Skalierungsabnahme und reale LAN-/Internet-/NAT-Abnahme stehen noch aus.
+**Stand: 2026-11-13 – veröffentlicht als früher öffentlicher Teststand 0.2.0.6 (Prerelease).** Repository, MIT-Lizenz, Installerindex und Releasepaket sind öffentlich verfügbar. Der erfolgreiche GitHub-Lauf besteht Build mit 0 Warnungen/Fehlern, 812/812 Funktionstests, 33/33 Paketprüfungen und 105/105 CI-Prüfungen. Native IPC-/Bedienungs-/Skalierungsabnahme und reale LAN-/Internet-/NAT-Abnahme stehen noch aus.
 
 **Im aktuellen Installerpaket:** Drei Hauptwege **Mein Charakter**, **Kontakte**, **Einstellungen**; eigene Lesekarte mit getrenntem Bearbeiten, drei Profilbereiche **Überblick**, **Charakter**, **OOC**, einzeilige zielunabhängige eigene RP-Leiste und drei primäre Themes. Fremde Angaben bleiben in kompakter Ziel-/Mouseoveranzeige; vollständige Glances sind per Hover/Fokus/Klickpin zugänglich.
 
-**Neu in 0.2.0.5:** Optionale Honorific-Titelübernahme unter **Einstellungen → Integrationen**, standardmäßig aus. Nach lokalem Opt-in zeigt FRP1 Status und Vorschau und übernimmt den eigenen Titel nur bewusst in einen unveränderten eigenen Entwurf; gespeichert wird anschließend regulär. Honorific wird dabei nicht verändert. Unabhängiges Code-Review ohne wichtige Restbefunde freigegeben; native IPC-/Spielabnahme steht aus. Bedienung: [Handbuch, Abschnitt 20](docs/benutzerhandbuch.md#20-honorific-titel-lokal-übernehmen-seit-0205). Die nächste Schnittstelle [FRP1-IPC v1](docs/frp1-ipc-v1.md) befindet sich in Umsetzung und gehört noch nicht zum veröffentlichten Umfang.
+**Neu in 0.2.0.5:** Optionale Honorific-Titelübernahme unter **Einstellungen → Integrationen**, standardmäßig aus. Nach lokalem Opt-in zeigt FRP1 Status und Vorschau und übernimmt den eigenen Titel nur bewusst in einen unveränderten eigenen Entwurf; gespeichert wird anschließend regulär. Honorific wird dabei nicht verändert. Unabhängiges Code-Review ohne wichtige Restbefunde freigegeben; native IPC-/Spielabnahme steht aus. Bedienung: [Handbuch, Abschnitt 20](docs/benutzerhandbuch.md#20-honorific-titel-lokal-übernehmen-seit-0205).
+
+**Neu in 0.2.0.6:** [FRP1-IPC v1](docs/frp1-ipc-v1.md) bietet begrenztes Lesen von General-Status/Verfügbarkeit sowie separat freizugebende eigene Aktionen. Die lokale Schnittstelle ist standardmäßig ausgeschaltet; Freigaben gelten für alle lokal geladenen Plugins. Quelle `6b97c1b` unabhängig reviewfreigegeben, [Releaseprüfung 43416697284](https://github.com/demkadse/Final-Roleplay-1/actions/runs/43416697284) und anonyme JSON-/ZIP-/Hash-/Paketprüfung erfolgreich. Bedienung: [Handbuch, Abschnitt 21](docs/benutzerhandbuch.md#21-lokale-frp1-schnittstelle-seit-0206). Native IPC-/Spielprobe bleibt offen.
 
 **RP-Leiste wieder einblenden:** 0.1.1.3 korrigiert ein sofortiges erneutes Ausschalten nach dem Aktivieren. Nach dem Update die Leistensichtbarkeit erneut aktivieren oder **Anzeigen und Position zurücksetzen** wählen; alternativ `/frpbar` beziehungsweise `/frp bar show` verwenden. Die gespeicherte ausgeschaltete Wahl wird durch das Update nicht automatisch verändert.
 
-**Auf 0.2.0.5 aktualisieren:** Verwende dieselbe untenstehende JSON-Adresse im Dalamud-Installer. Aktualisiere das Plugin und lade es bei Bedarf neu. Profildaten, alte Theme-IDs, private Registerdaten, Kopplungen und Freigaben bleiben erhalten; eine Konfigurationslöschung ist nicht erforderlich. Honorific wird durch das Update nicht automatisch aktiviert. Aktuelle Anleitung: [Handbuch, Abschnitte 19–20](docs/benutzerhandbuch.md#19-kompakte-bedienung-seit-0204), [UX](docs/ux-and-vanity.md). Eine Installation oder native Spielabnahme wurde durch uns nicht durchgeführt.
+**Auf 0.2.0.6 aktualisieren:** Verwende dieselbe untenstehende JSON-Adresse im Dalamud-Installer. Aktualisiere das Plugin und lade es bei Bedarf neu. Profildaten, alte Theme-IDs, private Registerdaten, Kopplungen und Freigaben bleiben erhalten; eine Konfigurationslöschung ist nicht erforderlich. Honorific und lokale IPC werden durch das Update nicht automatisch aktiviert. Aktuelle Anleitung: [Handbuch, Abschnitte 19–21](docs/benutzerhandbuch.md#19-kompakte-bedienung-seit-0204), [UX](docs/ux-and-vanity.md). Eine Installation oder native Spielabnahme wurde durch uns nicht durchgeführt.
 
 ## Kein zentraler Server für deine Profile
 
@@ -58,7 +60,7 @@ https://raw.githubusercontent.com/demkadse/Final-Roleplay-1/master/repo.json
 
 Die GitHub-Projektseite oder eine ZIP-Adresse gehört nicht in das Repositoryfeld. Der Index ist eine JSON-Liste, aus der Dalamud die eigentlichen Installations-/Updatepakete lädt. Grundlage ist das [offizielle Dalamud-Verfahren für eigene Repositories](https://dalamud.dev/plugin-publishing/custom-repositories/).
 
-Projekt: [demkadse/Final-Roleplay-1](https://github.com/demkadse/Final-Roleplay-1), Branch `master`. Das [Release v0.2.0.5](https://github.com/demkadse/Final-Roleplay-1/releases/tag/v0.2.0.5) enthält [FRP1-0.2.0.5.zip](https://github.com/demkadse/Final-Roleplay-1/releases/download/v0.2.0.5/FRP1-0.2.0.5.zip) und [SHA256-Prüfsummen](https://github.com/demkadse/Final-Roleplay-1/releases/download/v0.2.0.5/SHA256SUMS). Das Release ist ein öffentlicher früher Teststand/Prerelease und kein Entwurf.
+Projekt: [demkadse/Final-Roleplay-1](https://github.com/demkadse/Final-Roleplay-1), Branch `master`. Das [Release v0.2.0.6](https://github.com/demkadse/Final-Roleplay-1/releases/tag/v0.2.0.6) enthält [FRP1-0.2.0.6.zip](https://github.com/demkadse/Final-Roleplay-1/releases/download/v0.2.0.6/FRP1-0.2.0.6.zip) und [SHA256-Prüfsummen](https://github.com/demkadse/Final-Roleplay-1/releases/download/v0.2.0.6/SHA256SUMS). Das Release ist ein öffentlicher früher Teststand/Prerelease und kein Entwurf.
 
 ## Die ersten Minuten
 
@@ -146,13 +148,13 @@ Die GitHub-Actions-Einrichtung ist mit Nutzercommit `ffe036c` eingeführt. Relev
 
 Die CI-Version entsteht aus Basis `0.1.1` und Laufnummer minus eins als vierter Komponente: Lauf 1 verwendet `0.1.1.0`, Lauf 2 `0.1.1.1`. Erst nach erfolgreicher Veröffentlichung und anonymer Paket-/Hashprüfung schreibt ein Bot ausschließlich den erzeugten `repo.json`-Index zurück. Die Installeradresse bleibt unverändert. Es wird nur das integrierte `GITHUB_TOKEN` benötigt, kein zusätzliches PAT, Profilserver oder Nutzerkonto.
 
-Die Automatik veröffentlicht Quellcommit `bae4ef8` erfolgreich: [Lauf 43354035033](https://github.com/demkadse/Final-Roleplay-1/actions/runs/43354035033) besteht Build und Publish. Die Protokolle bestätigen ausdrücklich 662/662 Funktionstests (33 Sekunden), 33/33 Paketfälle, 33 Policyfälle, 24 Publishabläufe, 44 SDK-Fälle und vier Quellpfadfälle. Anonyme JSON-/ZIP-/Prüfsummendownloads und erneute vollständige Paketvalidierung sind erfolgreich. Details: [Status](STATUS.md), [Releaseautomatik](docs/auto-release.md).
+Die Automatik veröffentlicht Quellcommit `6b97c1b` erfolgreich: [Lauf 43416697284](https://github.com/demkadse/Final-Roleplay-1/actions/runs/43416697284) besteht Build und Publish. Die Protokolle bestätigen ausdrücklich 812/812 Funktionstests (32 Sekunden), 33/33 Paketfälle, 33 Policyfälle, 24 Publishabläufe, 44 SDK-Fälle und vier Quellpfadfälle. Anonyme JSON-/ZIP-/Prüfsummendownloads und erneute vollständige Paketvalidierung sind erfolgreich. Details: [Status](STATUS.md), [Releaseautomatik](docs/auto-release.md).
 
 Softwareupdates laufen über den normalen Dalamud-Installer und die Repositoryadresse; FRP1 betreibt keinen eigenen automatischen Updater und keinen Profilserver. Profiländerungen zwischen bereits verbundenen freigegebenen Peers sind davon unabhängig.
 
 Historischer Stand 0.1.0.0: 467/467 Funktionstests, Build mit 0 Warnungen/Fehlern, unabhängige Reviewfreigabe und acht Probegruppen mit zwei echten Loopback-TLS-Clients. Dieser Nachweis bleibt getrennt vom neuen 500er-Prüfstand.
 
-Die öffentliche JSON-Adresse liefert Version 0.2.0.5/API 15. JSON, ZIP und Prüfsummen wurden anonym geladen, gemeinsam per SHA-256 geprüft und erneut paketvalidiert. Das ist eine Distributionsprüfung, keine Spiel-/Netzabnahme.
+Die öffentliche JSON-Adresse liefert Version 0.2.0.6/API 15. JSON, ZIP und Prüfsummen wurden anonym geladen, gemeinsam per SHA-256 geprüft und erneut paketvalidiert. Das ist eine Distributionsprüfung, keine Spiel-/Netzabnahme.
 
 **Nicht tatsächlich abgenommen:** Bedienung/Renderdarstellung im laufenden Spiel, reales LAN/Internet, NAT/CGNAT und umfangreiche Belastung. Dies ist ein früher Teststand, keine Zusicherung reibungsloser Verbindung zwischen beliebigen zwei Spielern.
 
@@ -168,7 +170,7 @@ dotnet test FRP1.slnx -c Release --nologo -p:BuildInParallel=false
 dotnet run --project tools/FRP1.Probe -c Release -- --self-test
 ```
 
-Release-Ausgaben aus dem Entwicklungsbuild: `src/FRP1.Plugin/bin/Release/FRP1.Plugin.dll` und `src/FRP1.Plugin/bin/Release/FRP1.Plugin/latest.zip`. Das aktuelle veröffentlichte Installerpaket heißt `FRP1-0.2.0.5.zip`.
+Release-Ausgaben aus dem Entwicklungsbuild: `src/FRP1.Plugin/bin/Release/FRP1.Plugin.dll` und `src/FRP1.Plugin/bin/Release/FRP1.Plugin/latest.zip`. Das aktuelle veröffentlichte Installerpaket heißt `FRP1-0.2.0.6.zip`.
 
 Weitere Dokumentation: [Benutzerhandbuch](docs/benutzerhandbuch.md), [Release-Notes 0.1.0.0](docs/release-notes-v0.1.0.0.md), [Status](STATUS.md), [Übergabe](HANDOFF.md), [Architektur](docs/architecture.md), [Machbarkeit](docs/feasibility.md), [TRP3-Abgleich](docs/trp3-feature-map.md), [Glance-Abgleich](docs/glance-feature-map.md), [UX/Gestaltung](docs/ux-and-vanity.md).
 

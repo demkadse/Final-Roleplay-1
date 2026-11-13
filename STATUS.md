@@ -2,6 +2,25 @@
 
 Stand: 2026-11-13
 
+**WP4 als 0.2.0.6 veröffentlicht am 2026-11-13:** `6b97c1bd556f98d7d6295954d4a371e5e7c32f41` implementiert [FRP1-IPC v1](docs/frp1-ipc-v1.md) mit API 1.0, Capabilities/Readiness, General-only-Status/Verfügbarkeit und separat freizugebenden eigenen Aktionen samt Ticketabfrage. Alle fünf Freigaben standardmäßig aus. Aktives eigenes Profil unabhängig von der Editorauswahl; keine privaten Datenexporte. Mature-Steuerung nur mit aktueller Adult-Auswahl und zusätzlichem Mature-Opt-in, lesbarer Export bleibt General-only. Native-freie IPC-Callbacks, begrenzte Frame-Queue, synchroner Policy-Epochenwechsel und generationengebundene Ergebnisse sichern Kontext und Widerruf. `Persisted` erst nach erfolgreichem eigenen Schreibauftrag und Übernahme genau dieses gespeicherten Profilstands; das Poll-Zeitfenster bleibt `Running`, echte Konflikte werden `Stale`.
+
+Lokaler WP4-Nachweis: **812/812 Funktionstests** (27 Sekunden; 150 zusätzlich zum 662er-MVP), **287 gezielte Tests**, voller Release-Solutionbuild mit **0 Warnungen/Fehlern** (2,54 Sekunden) und **33/33 Paketprüfungen**. Unabhängiges abschließendes Review ohne kritische/wichtige Restbefunde freigegeben. Registrierung und Pluginverdrahtung sind statisch geprüft und kompiliert; native IPC-/Spielprobe steht aus.
+
+Der [Hosted-Lauf 43416697284](https://github.com/demkadse/Final-Roleplay-1/actions/runs/43416697284) besteht beide Jobs Build/Publish: 0 Warnungen/Fehler, **812/812 Funktionstests** (32 Sekunden), **33/33 Paketprüfungen** und **105/105 CI-Prüfungen** (Policy33, Publish24, SDK44, Quellpfade4), alle Ergebnisse ausdrücklich in den Logs bestätigt. [Release v0.2.0.6](https://github.com/demkadse/Final-Roleplay-1/releases/tag/v0.2.0.6) und kanonischer Raw-Index sind öffentlich; JSON anonym HTTP 200, ZIP und `SHA256SUMS` anonym geladen, Hashvergleich und erneute vollständige Paketvalidierung erfolgreich. Botcommit `7666329` ändert nur `repo.json`; lokaler Branch per Fast-forward abgeglichen.
+
+| Datei / Feld | Nachweis für 0.2.0.6 |
+|---|---|
+| ZIP-Größe | 1.110.041 Bytes |
+| ZIP SHA-256 | `E4DBF184BC5F09F6F54307CEE2227DC374DD206FDF7816C539AB00C2FD8C3450` |
+| JSON SHA-256 | `F045E351A03AE6F7A47C38E120343F0155A643F38D92A6BABD401F57BD90C57A` |
+| LastUpdate | `1794569012` |
+
+**Lokale I/O-Korrektur im selben Quellstand:** Das MVP-Instanzgate verhinderte den sporadischen Windows-Fehler bei `File.Move` mit Überschreiben nicht vollständig; die Ursache der zeitweise offenen Handles ist unbelegt. `LocalJsonFile` ersetzt bestehende Zieldateien jetzt mit `File.Replace` und eindeutig benannter `.previous`-Sicherung. Erst nach erfolgreichem Replace wird die Sicherung entfernt; nach einem teilweisen Replacefehler bleibt sie zur Wiederherstellung erhalten. Erstanlage verwendet `File.Move` ohne Überschreiben. Instanzgate erhalten, keine instanzübergreifende Garantie oder Retries. Synthetische Diagnose mit 23.000 Vorgängen und Sicherung erfolgreich; Regressionen mit offenem bzw. blockierendem Leser und fünf Own-Poll-/Refresh-/Scope-Fälle sind im Prüfstand enthalten. Keine belegte Aussage zu Virenscannerursachen.
+
+Nächster Schritt: WP5 wird nach dem begrenzten Moodles-Quell-/API-/Ratingabgleich umgesetzt; noch kein abgeschlossener Funktions-/Prüf-/Releaseumfang. Moodles-Manifest 1.1.3.5/API 15 schreibfrei erfasst, keine native Aktivierung oder IPC-Probe. Verifiziertes Quellbackup vor WP5: `.release-staging/before-moodles-20261113T112856Z`, Quelle `7666329`, SHA-256 `32CABC658791D3436FC4F8546EB88AD44D8052CEB81786BF8ACFD7072F3A2006`. WP3-Ausbau und WP5–8 bleiben getrennte Pakete; native Spiel-/Netzabnahme bleibt offen.
+
+## Vorheriger Stand: Honorific-MVP als 0.2.0.5 veröffentlicht
+
 **Integrationen, MVP als 0.2.0.5 veröffentlicht am 2026-11-13:** WP1/WP2 des [freigegebenen Integrationsplans](docs/integrationen-plan.md) sind umgesetzt und unabhängig ohne wichtige Restbefunde reviewfreigegeben. [Release v0.2.0.5](https://github.com/demkadse/Final-Roleplay-1/releases/tag/v0.2.0.5) ist öffentlich, als Prerelease markiert und kein Entwurf; Quelle `bae4ef86c6e812c45536f73db7ea356fc5ce1e31`. Die standardmäßig ausgeschaltete Honorific-Integration liest ausschließlich den eigenen Titel, zeigt Status/Vorschau und übernimmt ihn nur bewusst in einen unveränderten gespeicherten eigenen Entwurf. Erst normales Speichern persistiert den Profilinhalt. Aktuelle Actor-/Policy-/Kontextgeneration, Busy/Draft-CAS und Frame-Queue sichern die Übernahme; bei bestätigtem Kontext überlässt FRP1 ausschließlich den eigenen nativen Titelslot Honorific. Keine Honorific-Set-/Clear-/SetIdentity-Aufrufe oder automatischen Privat-/Mature-Exporte. Native IPC-/Spielabnahme bleibt offen; keine Aktivierung durch den Agenten.
 
 Lokaler Nachweis: 152 neue Headless-Tests einschließlich elf Unicodefällen plus 510 bisherige Tests, insgesamt **662/662 bestanden** in 27 Sekunden, ohne Fehler/Skips. Voller Release-Solutionbuild gegen API 15/.NET-SDK 10: **0 Warnungen/Fehler** (1,03 Sekunden); **33/33 Paketprüfungen** bestanden. Der Titelparser verwirft doppelte JSON-Schlüssel auch in ignorierten Feldern sowie ungültiges UTF-16 ohne Ersatzzeichen; elf Unicodefälle decken die Korrektur der zunächst acht fehlgeschlagenen Exceptionfälle ab. Bei ausgeschalteter Integration wird kein Entwurf erfasst; regulärer Draft-Cache und frische CAS-Prüfung bei Import erhalten die Gültigkeit. `LocalJsonFile` serialisiert Laden/Speichern über das bestehende Instanzgate gegen das beobachtete Windows-Rename-/Leserennen; keine Garantie über mehrere Instanzen und keine Retries. Diese Prüfungen belegen keine native IPC-/Spielausführung.
@@ -15,7 +34,7 @@ Der erfolgreiche [Hosted-Lauf 43354035033](https://github.com/demkadse/Final-Rol
 | JSON SHA-256 | `F3BA5D2E5495DF8B2EAB2F55DF9267FE1790771D5A36CF482FB6F6041ABF49BE` |
 | LastUpdate | `1794537751` |
 
-Nächster Schritt: laufende WP4-Umsetzung nach dem [geplanten FRP1-IPC-v1-Vertrag](docs/frp1-ipc-v1.md) fertigstellen und prüfen. Für WP4 noch kein abgeschlossener Funktions-/Testnachweis oder Release; die Datei beschreibt den Vertrag. WP3-Ausbau und WP5–8 bleiben geplant, weitere Adapter wurden nicht begonnen. Die Arbeit geht paketweise mit belastbaren Checkpoints weiter; dieser MVP-Stand beendet den Gesamtauftrag nicht.
+Historischer Folgeauftrag des MVP: WP4 umsetzen und prüfen. Der aktuelle abgeschlossene Quell-/Prüf-/Veröffentlichungsstand steht im obersten Checkpoint. Die Arbeit geht paketweise mit belastbaren Checkpoints weiter; das MVP beendet den Gesamtauftrag nicht.
 
 Verifiziertes Quellbackup vor Integrationen: `.release-staging/integrations-backup-20261113T022114Z/source-before-integrations.zip`, Quelle `e63b2387f266be6b4f411e8eb49b7fe1b3925348`, SHA-256 `C34A4EE5D471D763B6F8E9808839A64E4B619F31AA1FE27DE4ABDA7CBD049A7C`. Historischer Planungsstand vom 2026-11-12: `89b5e42`, ohne damalige Code-/Runtime-/Releaseänderungen oder Builds/Tests.
 
