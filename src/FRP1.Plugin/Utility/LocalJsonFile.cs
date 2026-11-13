@@ -18,7 +18,8 @@ internal sealed class LocalJsonFile<T>(string directory, string name, int maximu
 
     public async Task<T> LoadAsync(CancellationToken cancellationToken = default)
     {
-        cancellationToken.ThrowIfCancellationRequested();
+        // Coordinate readers with the atomic rename on Windows, using the same per-file instance gate.
+        await gate.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
             await using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete, 4096, FileOptions.Asynchronous);
@@ -30,6 +31,7 @@ internal sealed class LocalJsonFile<T>(string directory, string name, int maximu
         catch (FileNotFoundException) { return validate(missing()); }
         catch (DirectoryNotFoundException) { return validate(missing()); }
         catch (Exception ex) when (ex is JsonException or ArgumentException) { throw new InvalidDataException("Invalid local settings.", ex); }
+        finally { gate.Release(); }
     }
 
     public async Task SaveAsync(T value, CancellationToken cancellationToken = default)

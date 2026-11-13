@@ -20,6 +20,7 @@ using FRP1.Plugin.Automation;
 using Dalamud.Game.ClientState.Conditions;
 using FRP1.Plugin.GameIntegration;
 using FRP1.Plugin.Localization;
+using FRP1.Plugin.Integrations;
 
 namespace FRP1.Plugin;
 
@@ -52,6 +53,7 @@ public sealed class Plugin : IDalamudPlugin
     private readonly SocialUiModule socialUi;
     private readonly LocalToolsModule localTools;
     private readonly GamePresentationModule gamePresentation;
+    private readonly IntegrationSession integrations;
 
     public Plugin()
     {
@@ -78,6 +80,11 @@ public sealed class Plugin : IDalamudPlugin
         mainWindow.RpBarWindow = rpBarWindow;
         mainWindow.LocalTools = localTools;
         mainWindow.GamePresentation = gamePresentation;
+        integrations = new IntegrationSession(new IntegrationSettingsStore(directory), HonorificAdapter.Create(PluginInterface),
+            () => mainWindow.CaptureIntegrationContext(CaptureIntegrationActor()), mainWindow.TryApplyHonorificTitle);
+        mainWindow.Integrations = integrations;
+        gamePresentation.PreserveOwnTitle = (objectId, address) => integrations.HasConfirmedReadiness && integrations.CanYieldOwnTitle(CaptureIntegrationActor(),
+            policy.Snapshot, mainWindow.IntegrationPolicyGeneration, mainWindow.ProfileAccessReady, objectId, address);
         mainWindow.LanguageProvider = () => localTools.Language;
         mainWindow.OwnProfileReferenceProvider = CreateOwnReference;
         windows.AddWindow(mainWindow);
@@ -130,6 +137,18 @@ public sealed class Plugin : IDalamudPlugin
         catch (InvalidOperationException) { return null; }
     }
 
+    private static IntegrationActor CaptureIntegrationActor()
+    {
+        try
+        {
+            if (!PlayerState.IsLoaded || !ClientState.IsLoggedIn || Condition[ConditionFlag.BetweenAreas] ||
+                Condition[ConditionFlag.BetweenAreas51] || ObjectTable.LocalPlayer is not { } local || !local.IsValid()) return default;
+            return new(PlayerState.ContentId, local.GameObjectId, (long)local.Address, local.Name.TextValue,
+                local.HomeWorld.RowId, ClientState.TerritoryType, ClientState.MapId);
+        }
+        catch (Exception) { return default; }
+    }
+
     private void Draw()
     {
         var contentId = PlayerState.IsLoaded ? PlayerState.ContentId : 0;
@@ -141,6 +160,10 @@ public sealed class Plugin : IDalamudPlugin
         ownProfiles.SetEditorBlocked(mainWindow.EditorBlocked);
         ownProfiles.Poll();
         mainWindow.SynchronizeProfiles();
+        var integrationGeneration = integrations.Generation;
+        var integrationStatus = integrations.Status;
+        integrations.Tick();
+        if (integrations.Generation != integrationGeneration || integrations.Status != integrationStatus) gamePresentation.Invalidate();
         ownProfiles.SetEditorBlocked(mainWindow.EditorBlocked);
         localTools.SetContext(new AutomationContext(contentId, mainWindow.ProfileAccessReady, contentId != 0,
             Condition[ConditionFlag.InCombat], Condition[ConditionFlag.BoundByDuty] || Condition[ConditionFlag.BoundByDuty56] ||
@@ -159,6 +182,7 @@ public sealed class Plugin : IDalamudPlugin
         var drawnPresentationVersion = resolver.Version;
         var drawnAccess = mainWindow.ProfileAccessReady;
         windows.Draw();
+        if (integrations.Generation != integrationGeneration) gamePresentation.Invalidate();
         // Local block/binding or audience changes made by the panels invalidate
         // native display snapshots immediately, before drawing further overlays.
         var currentContentId = PlayerState.IsLoaded ? PlayerState.ContentId : 0;
@@ -177,6 +201,7 @@ public sealed class Plugin : IDalamudPlugin
         PluginInterface.UiBuilder.OpenMainUi -= Open;
         PluginInterface.UiBuilder.OpenConfigUi -= Open;
         windows.RemoveAllWindows();
+        integrations.Dispose();
         gamePresentation.Dispose();
         socialUi.Dispose();
         profileUi.Dispose();
@@ -190,7 +215,7 @@ public sealed class Plugin : IDalamudPlugin
         var networkDisposal = Task.Run(async () => await network.DisposeAsync().ConfigureAwait(false));
         _ = Task.WhenAll(networkDisposal, socialUi.DisposalCompletion, ownProfiles.DisposalCompletion,
             register.DisposalCompletion, themeSession.DisposalCompletion, localTools.DisposalCompletion,
-            gamePresentation.DisposalCompletion).ContinueWith(task => { _ = task.Exception; },
+            gamePresentation.DisposalCompletion, integrations.DisposalCompletion).ContinueWith(task => { _ = task.Exception; },
                 CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
     }
 }

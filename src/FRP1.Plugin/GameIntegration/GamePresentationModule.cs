@@ -63,6 +63,7 @@ public sealed partial class GamePresentationModule : IDisposable
     public GamePresentationOptions Options => options;
     public bool LoadFailed => loadFailed;
     public bool SaveFailed => saveFailed;
+    public Func<ulong, long, bool>? PreserveOwnTitle { get; set; }
     public Task DisposalCompletion { get; private set; } = Task.CompletedTask;
 
     // This adapter and Update are UI-thread-only. The resulting entries contain no live profile references.
@@ -163,7 +164,7 @@ public sealed partial class GamePresentationModule : IDisposable
                 if (player is null || !snapshot.Entries.TryGetValue(new GameActorKey(player.Name.TextValue, player.HomeWorld.RowId).Canonical(), out var entry) ||
                     !CanUse(snapshot)) continue;
                 handler.Name = new SeString(new TextPayload(entry.RpName));
-                if (snapshot.Options.Titles)
+                if (snapshot.Options.Titles && !(PreserveOwnTitle?.Invoke(player.GameObjectId, (long)player.Address) ?? false))
                 {
                     handler.Title = new SeString(new TextPayload(entry.Title));
                     handler.DisplayTitle = !string.IsNullOrWhiteSpace(entry.Title);

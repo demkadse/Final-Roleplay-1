@@ -15,6 +15,7 @@ using FRP1.Plugin.Localization;
 using Dalamud.Plugin.Services;
 using FRP1.Plugin.UiTools;
 using FRP1.Plugin.GameIntegration;
+using FRP1.Plugin.Integrations;
 
 namespace FRP1.Plugin;
 
@@ -49,10 +50,11 @@ internal sealed class MainWindow : Window, IDisposable
     public RpBarWindow? RpBarWindow { get; set; }
     public LocalToolsModule? LocalTools { get; set; }
     public GamePresentationModule? GamePresentation { get; set; }
+    public IntegrationSession? Integrations { get; set; }
     public Func<Guid, string?>? OwnProfileReferenceProvider { get; set; }
     private HelpTopicId? helpTopic;
     private enum MainArea { Character, Contacts, Settings }
-    private enum SettingsArea { Appearance, Bar, Game, Network, Language, Tools, Safety, Help }
+    private enum SettingsArea { Appearance, Bar, Game, Integrations, Network, Language, Tools, Safety, Help }
     private MainArea mainArea;
     private SettingsArea settingsArea;
     private ProfileArea selectedProfileArea = ProfileArea.Overview;
@@ -73,6 +75,10 @@ internal sealed class MainWindow : Window, IDisposable
     private ExtendedProfileDraft extended = ExtendedProfileDraft.From(new ProfileDocument());
     private GlanceTemplateSet? glanceTemplate;
     private long editorGeneration;
+    private IntegrationDraftToken? integrationDraft;
+    private long integrationEditorGeneration = -1;
+    private long integrationCatalogVersion = -1;
+    private long integrationPolicyGeneration = -1;
     private Task<ProfileDocument>? saving;
     private Task<AudiencePreferences>? preferencesOperation;
     private Task<bool>? noticesLoading;
@@ -122,6 +128,56 @@ internal sealed class MainWindow : Window, IDisposable
     public bool ProfileAccessReady => noticesLoaded && noticesAcknowledged && initialPreferencesLoaded &&
         store.Policy.Snapshot.Selection != AudienceSelection.Unspecified;
     public bool EditorBlocked => dirty || Busy;
+    public long IntegrationPolicyGeneration => Volatile.Read(ref policyGeneration);
+
+    public IntegrationContext CaptureIntegrationContext(IntegrationActor actor)
+    {
+        return new(actor, !disposed && ProfileAccessReady, store.Policy.Snapshot, IntegrationPolicyGeneration,
+            CaptureIntegrationDraft(), dirty, Busy);
+    }
+
+    private IntegrationDraftToken? CaptureIntegrationDraft(bool recheck = false)
+    {
+        if (disposed || !ProfileAccessReady || dirty || Busy || catalogVersion != ownProfiles.Version) return null;
+        if (!recheck && integrationEditorGeneration == editorGeneration && integrationCatalogVersion == catalogVersion &&
+            integrationPolicyGeneration == policyGeneration) return integrationDraft;
+        integrationDraft = null;
+        integrationEditorGeneration = editorGeneration;
+        integrationCatalogVersion = catalogVersion;
+        integrationPolicyGeneration = policyGeneration;
+        var current = profiles.FirstOrDefault(profile => profile.Id == original.Id);
+        if (current is not null && current.Revision == original.Revision && CanDisplay(current))
+        {
+            try
+            {
+                var snapshot = BuildDraft();
+                var hash = ProfileJson.Hash(snapshot);
+                if (ProfileJson.Hash(current) == hash)
+                    integrationDraft = new(original.Id, original.Revision, hash, editorGeneration);
+            }
+            catch (Exception ex) when (IsExpectedFailure(ex)) { }
+        }
+        return integrationDraft;
+    }
+
+    public bool TryApplyHonorificTitle(IntegrationDraftToken expected, string title)
+    {
+        // Recheck the actual editor and current catalog atomically on the Draw thread.
+        if (disposed || !ProfileAccessReady || dirty || Busy || CaptureIntegrationDraft(recheck: true) != expected ||
+            title.Length > HonorificRules.MaximumTitleLength || title.Any(char.IsControl)) return false;
+        var next = BuildDraft() with { Title = title };
+        store.Policy.EnsureAllowed(next);
+        ProfileJson.Validate(next);
+        fields["Title"] = title;
+        visibleFields.Add("Title");
+        profileUi.ResetEditorContext();
+        editorGeneration++;
+        dirty = true; editing = true; preview = false;
+        mainArea = MainArea.Character;
+        selectedProfileArea = ProfileArea.Overview;
+        message = T("Integration.Imported");
+        return true;
+    }
     public ProfileDocument? GetSavedOwnProfile(Guid id)
     {
         if (!ProfileAccessReady || !ownProfiles.AccessReady) return null;
@@ -319,6 +375,38 @@ internal sealed class MainWindow : Window, IDisposable
         if (Help.Section(L("Karte"), HelpTopicId.Map)) GamePresentation?.DrawMapPanel();
     }
 
+    private void DrawIntegrationSettings()
+    {
+        ImGui.TextUnformatted(T("Integration.Title"));
+        if (Integrations is not { } session) { Wrapped(T("Integration.Error")); return; }
+        var enabled = session.Settings.HonorificEnabled;
+        ImGui.BeginDisabled(!session.SettingsLoaded);
+        if (ImGui.Checkbox(T("Integration.EnableHonorific"), ref enabled)) session.SetHonorificEnabled(enabled);
+        ImGui.EndDisabled();
+        Wrapped(T("Integration." + session.Status));
+        Wrapped(T("Integration.Explanation"));
+        if (session.LoadFailed || session.SaveFailed) Wrapped(T("Integration.SettingsError"));
+        ImGui.BeginDisabled(!session.SettingsLoaded || !enabled);
+        if (ImGui.Button(T("Integration.Refresh"))) session.RequestRead();
+        ImGui.EndDisabled();
+        if (!string.IsNullOrEmpty(session.Title))
+        {
+            ImGui.Separator();
+            Wrapped(T("Integration.Preview"));
+            Wrapped(session.Title);
+        }
+        var draft = enabled && session.SettingsLoaded ? CaptureIntegrationDraft() : null;
+        Wrapped(T("Integration.SelectedProfile") + (draft is null ? T("Common.Unavailable") : original.DisplayName));
+        ImGui.BeginDisabled(draft is null || dirty || Busy || session.Status != IntegrationStatus.Ready ||
+            string.IsNullOrWhiteSpace(session.Title) || session.HasPendingImport);
+        if (ImGui.Button(T("Integration.Import"))) session.RequestImport();
+        ImGui.EndDisabled();
+        if (dirty) Wrapped(T("Integration.Dirty"));
+        else if (Busy) Wrapped(T("Integration.EditorBusy"));
+        if (session.LastAction is IntegrationActionResult.Stale or IntegrationActionResult.Blocked or IntegrationActionResult.RateLimited)
+            Wrapped(T("Integration.Rejected"));
+    }
+
     private void DrawSettings()
     {
         var width = MathF.Min(116 * ImGuiHelpers.GlobalScale, ImGui.GetContentRegionAvail().X * .31f);
@@ -330,6 +418,7 @@ internal sealed class MainWindow : Window, IDisposable
                 {
                     SettingsArea.Appearance => T("Theme.Title"), SettingsArea.Bar => L("RP-Leiste"),
                     SettingsArea.Game => L("Spielanzeige"), SettingsArea.Network => L("Verbindungen"),
+                    SettingsArea.Integrations => T("Integration.Title"),
                     SettingsArea.Language => L("Sprache"), SettingsArea.Tools => L("Werkzeuge"),
                     SettingsArea.Safety => L("Alter & Inhalte"), _ => L("Hilfe"),
                 };
@@ -345,6 +434,7 @@ internal sealed class MainWindow : Window, IDisposable
                 case SettingsArea.Appearance: DrawAppearanceSettings(); break;
                 case SettingsArea.Bar: RpBarWindow?.DrawSettings(); break;
                 case SettingsArea.Game: GamePresentation?.DrawSettings(); break;
+                case SettingsArea.Integrations: DrawIntegrationSettings(); break;
                 case SettingsArea.Network: socialUi.DrawNetworkSettings(); break;
                 case SettingsArea.Language: LocalTools?.DrawLanguageSettings(); break;
                 case SettingsArea.Tools: LocalTools?.DrawToolsPanel(); break;
